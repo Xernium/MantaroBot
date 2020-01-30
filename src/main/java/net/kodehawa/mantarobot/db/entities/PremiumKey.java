@@ -52,6 +52,8 @@ public class PremiumKey implements ManagedObject {
     public PremiumKey(@JsonProperty("id") String id, @JsonProperty("duration") long duration,
                       @JsonProperty("expiration") long expiration, @JsonProperty("type") Type type,
                       @JsonProperty("enabled") boolean enabled, @JsonProperty("owner") String owner, @JsonProperty("data") PremiumKeyData data) {
+
+        //id
         this.id = id;
         this.duration = duration;
         this.expiration = expiration;
