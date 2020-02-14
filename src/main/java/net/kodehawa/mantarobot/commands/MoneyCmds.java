@@ -138,7 +138,7 @@ public class MoneyCmds {
                 String playerId = player.getUserId();
 
                 if(playerId.equals(event.getAuthor().getId())) {
-                    if(System.currentTimeMillis() - playerData.getLastDailyAt() < TimeUnit.HOURS.toMillis(50)) {
+                    if(System.currentTimeMillis() - playerData.getLastDailyAt() < TimeUnit.HOURS.toMillis(65)) {
                         playerData.setDailyStreak(playerData.getDailyStreak() + 1);
                         streak = String.format(languageContext.withRoot("commands", "daily.streak.up"), playerData.getDailyStreak());
                     } else {
