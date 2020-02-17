@@ -145,7 +145,8 @@
       "fossil_success": "%1$sYou caught a fossil while trying to find a fish. This might be worth a fair bit or be used for casting, I believe.",
       "bait": "The fish ate your bait in the process!",
       "missing_equipped": "%1$sYou had an equipped %2$s rod, but you no longer have any of its kind on your inventory! Equipped rod has been reset.",
-      "broken_drop": "%1$sYour rod broke, but you can repair it. Got broken item: %2$s *%3$s*"
+      "broken_drop": "%1$sYour rod broke, but you can repair it. Got broken item: %2$s *%3$s*",
+      "no_rod_equipped": "%1$sYou have no rod equipped. To equip one you need to run `~>profile equip <rod name> to start your adventure!`"
     },
     "softban": {
       "no_permission": "%1$sCannot soft ban: You don't have the Ban Members permission.",
@@ -737,7 +738,8 @@
       "interactive_no_action": "%1$sThis item has been marked as interactive, but has no action set. This item might use its own command? For example, picks use `~>mine`.",
       "no_item": "%1$sYou don't have this item in your inventory.",
       "not_enough_items": "%1$sYou don't have enough of this item.",
-      "too_little": "%1$sYou can't use less than 1 item."
+      "too_little": "%1$sYou can't use less than 1 item.",
+      "invalid_amount": "%1$sThe amount needs to be a valid number between `1` and `9`!"
     },
     "opts": {
       "note": "%1$sHey, if you're lost or want help on using opts, check <https://github.com/Mantaro/MantaroBot/wiki/Configuration> for a guide on how to use opts.\nNote: Only administrators, people with Manage Server or people with the Bot Commander role can use this command!",
@@ -859,7 +861,8 @@
         "times": "time(s)",
         "days": "day(s)",
         "times_used": "Times Used",
-        "equipment": "Equipment"
+        "equipment": "Equipment",
+        "seasonal_equipment": "Season Equipment"
       },
       "hide_tag": {
         "success": "%1%sTag hidden status is now: `%2$s`"
@@ -870,6 +873,11 @@
         "not_owned": "%1$sYou don't own this item!",
         "success": "%1$sYou successfully equipped %2$s *%3$s*, which will be remembered next time you use the proper currency command.",
         "not_suitable": "%1$sYou can't equip this."
+      },
+      "unequip": {
+        "no_content": "%1$sYou need to specify a tool type to unequip, can be either `pick, rod`",
+        "invalid_type": "%1$sInvalid type. Valid types are `pick, rod`",
+        "success": "%1$sSuccessfully unequipped your %2$s slot."
       },
       "display": {
         "not_premium": "%1$sProfile widget personalization is only available to premium users.",
@@ -1515,6 +1523,7 @@
       "easter": "\nSeems like you've got so much dust here... You might want to clean this up before it gets too messy!"
     },
     "mine": {
+      "not_equipped": "%1$sYou don't have any equipped pick. Use `~>profile equip <pick name>` to equip a pick and start your adventure!",
       "no_pick": "%1$sYou don't have any pick to mine. If you want to use any other pick use `~>mine <pick name>`.",
       "not_suitable": "%1$sThis is not a pick you can use to mine!",
       "not_in_inventory": "%1$sYou don't have this pick on your inventory, switching to the default pick.",
