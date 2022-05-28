@@ -88,8 +88,7 @@ public class ImageboardUtils {
         }
 
         final var dbGuild = ctx.getDBGuild();
-        final var data = dbGuild.getData();
-        if ((finalRating == Rating.EXPLICIT || finalRating == Rating.QUESTIONABLE || nsfwOnly) && data.isDisableExplicit()) {
+        if ((finalRating == Rating.EXPLICIT || finalRating == Rating.QUESTIONABLE || nsfwOnly) && dbGuild.isDisableExplicit()) {
             ctx.sendLocalized("commands.imageboard.disabled_explicit", EmoteReference.ERROR);
             return;
         }
@@ -104,7 +103,7 @@ public class ImageboardUtils {
             return;
         }
 
-        final var blackListedImageTags = data.getBlackListedImageTags();
+        final var blackListedImageTags = dbGuild.getBlackListedImageTags();
         if (list.stream().anyMatch(blackListedImageTags::contains)) {
             ctx.sendLocalized("commands.imageboard.blacklisted_tag", EmoteReference.ERROR);
             return;
@@ -173,7 +172,7 @@ public class ImageboardUtils {
 
     private static void sendImage(Context ctx, String imageboard, BoardImage image, DBGuild dbGuild) {
         final var tags = image.getTags();
-        final var blackListedImageTags = dbGuild.getData().getBlackListedImageTags();
+        final var blackListedImageTags = dbGuild.getBlackListedImageTags();
 
         // This is the last line of defense. It should filter *all* minor tags from all sort of images on
         // the method that calls this.

@@ -19,6 +19,7 @@ package net.kodehawa.mantarobot.commands.utils.reminders;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.data.MantaroData;
+import net.kodehawa.mantarobot.db.entities.helpers.DummySnowflake;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class ReminderTask {
@@ -50,22 +52,22 @@ public class ReminderTask {
                     // If the time has passed...
                     if (System.currentTimeMillis() >= fireAt) {
                         log.debug("Reminder date has passed, remind accordingly.");
-                        var userId = data.getString("user");
-                        var fullId = data.getString("id") + ":" + userId;
-                        var guildId = data.getString("guild");
+                        var userId = new DummySnowflake(data.getLong("user"));
+                        var id = UUID.fromString(data.getString("id"));
+                        var guildId =  new DummySnowflake(data.getLong("guild"));
                         var scheduledAt = data.getLong("scheduledAt");
 
                         // 1 day passed already, assuming it's a stale reminder:
                         // Done because ReminderTask wasn't working.
                         if (System.currentTimeMillis() - fireAt > TimeUnit.DAYS.toMillis(1)) {
-                            Reminder.cancel(userId, fullId, Reminder.CancelReason.CANCEL);
+                            Reminder.cancel(userId, id, Reminder.CancelReason.CANCEL);
                             return;
                         }
 
                         var reminder = data.getString("reminder"); //The actual reminder data
-                        var guild = bot.getShardManager().getGuildById(guildId);
+                        var guild = bot.getShardManager().getGuildById(guildId.getIdLong());
                         var scheduledTime = OffsetDateTime.ofInstant(Instant.ofEpochMilli(scheduledAt), ZoneId.systemDefault());
-                        bot.getShardManager().retrieveUserById(userId)
+                        bot.getShardManager().retrieveUserById(userId.getIdLong())
                                 .flatMap(User::openPrivateChannel)
                                 .flatMap(privateChannel -> privateChannel
                                         .sendMessageFormat("""
@@ -78,9 +80,9 @@ public class ReminderTask {
                                                 (guild != null ? "\nAsked on: %s".formatted(guild.getName()) : "")
                                         )
                                 ).queue(success -> {
-                                    log.debug("Reminded {}. Removing from remind database", fullId);
-                                    Reminder.cancel(userId, fullId, Reminder.CancelReason.REMINDED);
-                                }, err -> Reminder.cancel(userId, fullId, Reminder.CancelReason.ERROR_DELIVERING)
+                                    log.debug("Reminded {}. Removing from remind database", Reminder.toIdentifier(userId, id));
+                                    Reminder.cancel(userId, id, Reminder.CancelReason.REMINDED);
+                                }, err -> Reminder.cancel(userId, id, Reminder.CancelReason.ERROR_DELIVERING)
                         );
                     }
                 } catch (Exception e) {

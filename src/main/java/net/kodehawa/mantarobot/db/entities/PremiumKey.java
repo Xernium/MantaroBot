@@ -16,96 +16,80 @@
 
 package net.kodehawa.mantarobot.db.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.db.ManagedObject;
-import net.kodehawa.mantarobot.db.entities.helpers.PremiumKeyData;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Pair;
 
 import javax.annotation.Nonnull;
-import java.beans.ConstructorProperties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.currentTimeMillis;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class PremiumKey implements ManagedObject {
-    public static final String DB_TABLE = "keys";
     private long duration;
     private boolean enabled;
     private long expiration;
-    private String id;
-    private String owner;
+    private UUID id;
+    private ISnowflake owner;
     private int type;
-    //Setting a default to avoid backwards compat issues.
-    private PremiumKeyData data = new PremiumKeyData();
 
-    @JsonCreator
-    @ConstructorProperties({"id", "duration", "expiration", "type", "enabled", "owner"})
-    public PremiumKey(@JsonProperty("id") String id, @JsonProperty("duration") long duration,
-                      @JsonProperty("expiration") long expiration, @JsonProperty("type") Type type,
-                      @JsonProperty("enabled") boolean enabled, @JsonProperty("owner") String owner, @JsonProperty("data") PremiumKeyData data) {
+    private ISnowflake linkedTo;
+
+    public PremiumKey(UUID id, long duration, long expiration, Type type, boolean enabled, ISnowflake owner, ISnowflake linkedTo) {
         this.id = id;
         this.duration = duration;
         this.expiration = expiration;
         this.type = type.ordinal();
         this.enabled = enabled;
         this.owner = owner;
-        if (data != null)
-            this.data = data;
+        this.linkedTo = linkedTo;
     }
 
-    @JsonIgnore
+    public ISnowflake getLinkedTo() {
+        return this.linkedTo;
+    }
+
+    public void setLinkedTo(ISnowflake linkedTo) {
+        this.linkedTo = linkedTo;
+    }
+
     public PremiumKey() {
     }
 
-    @JsonIgnore
-    public static PremiumKey generatePremiumKey(String owner, Type type, boolean linked) {
-        String premiumId = UUID.randomUUID().toString();
-        PremiumKey newKey = new PremiumKey(premiumId, -1, -1, type, false, owner, new PremiumKeyData());
-        if (linked)
-            newKey.data.setLinkedTo(owner); //used for patreon checks in newly-activated keys (if applicable)
+    public static PremiumKey generatePremiumKey(ISnowflake owner, Type type, boolean linked) {
+        UUID premiumId = UUID.randomUUID();
+        PremiumKey newKey = new PremiumKey(premiumId, -1, -1, type, false, owner, linked ? owner : null);
 
         newKey.save();
         return newKey;
     }
 
-    @JsonIgnore
-    public static PremiumKey generatePremiumKeyTimed(String owner, Type type, int days, boolean linked) {
-        String premiumId = UUID.randomUUID().toString();
-        PremiumKey newKey = new PremiumKey(premiumId, TimeUnit.DAYS.toMillis(days), currentTimeMillis() + TimeUnit.DAYS.toMillis(days), type, false, owner, new PremiumKeyData());
-        if (linked)
-            newKey.data.setLinkedTo(owner); //used for patreon checks in newly-activated keys (if applicable)
+    public static PremiumKey generatePremiumKeyTimed(ISnowflake owner, Type type, int days, boolean linked) {
+        UUID premiumId = UUID.randomUUID();
+        PremiumKey newKey = new PremiumKey(premiumId, TimeUnit.DAYS.toMillis(days), currentTimeMillis() + TimeUnit.DAYS.toMillis(days), type, false, owner, linked ? owner : null);
 
         newKey.save();
         return newKey;
     }
 
-    @JsonIgnore
     public Type getParsedType() {
         return Type.values()[type];
     }
 
-    @JsonIgnore
     public long getDurationDays() {
         return TimeUnit.MILLISECONDS.toDays(duration);
     }
 
-    @JsonIgnore
     public long validFor() {
         return TimeUnit.MILLISECONDS.toDays(getExpiration() - currentTimeMillis());
     }
 
-    @JsonIgnore
     public long validForMs() {
         return getExpiration() - currentTimeMillis();
     }
 
-    @JsonIgnore
     public void activate(int days) {
         this.enabled = true;
         this.duration = TimeUnit.DAYS.toMillis(days);
@@ -113,10 +97,9 @@ public class PremiumKey implements ManagedObject {
         save();
     }
 
-    @JsonIgnore
     public boolean renew() {
-        if (data.getLinkedTo() != null && !data.getLinkedTo().isEmpty()) {
-            Pair<Boolean, String> pledgeInfo = APIUtils.getPledgeInformation(data.getLinkedTo());
+        if (linkedTo != null) {
+            Pair<Boolean, String> pledgeInfo = APIUtils.getPledgeInformation(linkedTo);
             if (pledgeInfo != null && pledgeInfo.getLeft()) {
                 switch (type) {
                     //user
@@ -145,28 +128,23 @@ public class PremiumKey implements ManagedObject {
         return this.expiration;
     }
 
-    @Nonnull
-    public String getId() {
-        return this.id;
+    @Override
+    public long getIdLong() {
+        return id.getMostSignificantBits();
     }
 
-    @JsonIgnore
     @Override
     @Nonnull
     public String getTableName() {
-        return DB_TABLE;
+        return "PremiumKeys";
     }
 
-    public String getOwner() {
+    public ISnowflake getOwner() {
         return this.owner;
     }
 
     public int getType() {
         return this.type;
-    }
-
-    public PremiumKeyData getData() {
-        return this.data;
     }
 
     public enum Type {

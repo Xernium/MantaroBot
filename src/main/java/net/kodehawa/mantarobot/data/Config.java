@@ -43,7 +43,6 @@ public class Config {
     public int totalShards = 0;
     public String webhookUrl;
     public String spambotUrl;
-    public String weebapiKey;
     public String apiTwoUrl = "http://127.0.0.1:5874";
     public boolean needApi = true;
     public String prometheusHost = "127.0.0.1";
@@ -157,10 +156,6 @@ public class Config {
 
     public String getSpambotUrl() {
         return this.spambotUrl;
-    }
-
-    public String getWeebapiKey() {
-        return this.weebapiKey;
     }
 
     public String getApiTwoUrl() {

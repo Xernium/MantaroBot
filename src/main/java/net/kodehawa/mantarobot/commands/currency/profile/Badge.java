@@ -147,12 +147,12 @@ public enum Badge {
 
     DEPTHS_OF_HELL("Depths of Hell", "\uD83D\uDE08", "Have all 3 Hellfire tools equipped",
             91, 92, (player, stats, dbUser) -> {
-            var equipment = dbUser.getData().getEquippedItems().getEquipment();
-            if (equipment.containsKey(PlayerEquipment.EquipmentType.PICK) &&
-                    equipment.containsKey(PlayerEquipment.EquipmentType.ROD) && equipment.containsKey(PlayerEquipment.EquipmentType.AXE)) {
-                boolean hellfirePick = equipment.get(PlayerEquipment.EquipmentType.PICK) == ItemHelper.idOf(ItemReference.HELLFIRE_PICK);
-                boolean hellfireRod = equipment.get(PlayerEquipment.EquipmentType.ROD) == ItemHelper.idOf(ItemReference.HELLFIRE_ROD);
-                boolean hellfireAxe = equipment.get(PlayerEquipment.EquipmentType.AXE) == ItemHelper.idOf(ItemReference.HELLFIRE_AXE);
+            var equipment = dbUser.getEquippedItems();
+            if (equipment.containsItem(PlayerEquipment.EquipmentType.PICK) &&
+                    equipment.containsItem(PlayerEquipment.EquipmentType.ROD) && equipment.containsItem(PlayerEquipment.EquipmentType.AXE)) {
+                boolean hellfirePick = equipment.getItem(PlayerEquipment.EquipmentType.PICK) == ItemHelper.idOf(ItemReference.HELLFIRE_PICK);
+                boolean hellfireRod = equipment.getItem(PlayerEquipment.EquipmentType.ROD) == ItemHelper.idOf(ItemReference.HELLFIRE_ROD);
+                boolean hellfireAxe = equipment.getItem(PlayerEquipment.EquipmentType.AXE) == ItemHelper.idOf(ItemReference.HELLFIRE_AXE);
 
                 return hellfireAxe && hellfirePick && hellfireRod;
             }
@@ -185,7 +185,7 @@ public enum Badge {
     BEST_WAIFU("Best Waifu", "\uD83D\uDC9B",
             "Get waifu claimed 1,000 times (how?).",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getTimesClaimed() >= 1000, false
+            (player, stats, dbUser) -> dbUser.getTimesClaimed() >= 1000, false
     ),
 
     BI_YEARLY_CLAIMER("Bi-Yearly Claimer", "\uD83D\uDD65",
@@ -402,13 +402,13 @@ public enum Badge {
     KNOWN_WAIFU("Known Waifu", "\uD83D\uDC9A",
             "Get waifu claimed 100 times.",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getTimesClaimed() >= 100, false
+            (player, stats, dbUser) -> dbUser.getTimesClaimed() >= 100, false
     ),
 
     POPULAR_WAIFU("Popular Waifu", "\uD83D\uDC99",
             "Get waifu claimed 10 times.",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getTimesClaimed() >= 10, false
+            (player, stats, dbUser) -> dbUser.getTimesClaimed() >= 10, false
     ),
 
     MUTUAL("Mutual", "\uD83C\uDF8E",
@@ -420,13 +420,13 @@ public enum Badge {
     WAIFU("Waifu", "\uD83D\uDC96",
             "Get waifu claimed once.",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getTimesClaimed() >= 1, false
+            (player, stats, dbUser) -> dbUser.getTimesClaimed() >= 1, false
     ),
 
     GOLDFISH_BRAIN("Goldfish Brain", "\uD83D\uDDD3",
             "Get reminded way too many times.",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getRemindedTimes() > 100, false
+            (player, stats, dbUser) -> dbUser.getRemindedTimes() > 100, false
     ),
 
     GEM_FINDER("Gem Finder", "\uD83D\uDC8E",
@@ -530,7 +530,7 @@ public enum Badge {
 
     DUSTY("Dusty", "\uD83D\uDCA8", "Get to 100% dust level",
             91, 92,
-            (player, stats, dbUser) -> dbUser.getData().getDustLevel() == 100, false
+            (player, stats, dbUser) -> dbUser.getDustLevel() == 100, false
     ),
 
     FIRE("Fire", "\uD83D\uDD25",

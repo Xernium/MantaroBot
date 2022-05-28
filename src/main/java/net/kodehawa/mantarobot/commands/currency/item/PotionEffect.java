@@ -16,30 +16,26 @@
 
 package net.kodehawa.mantarobot.commands.currency.item;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.beans.ConstructorProperties;
 import java.util.UUID;
 
-public class PotionEffect {
-    private String uuid;
+public class PotionEffect implements PlayerEquipment.EquipmentTyped {
+    private UUID uuid;
     private int potion; //item id
     private long until;
     private ItemType.PotionType type;
     private long timesUsed;
     private long amountEquipped = 1;
 
-    @JsonCreator
-    @ConstructorProperties({"potionId", "until", "type"})
+    private final PlayerEquipment.EquipmentType equipmentType;
+
     public PotionEffect(int potionId, long until, ItemType.PotionType type) {
-        uuid = UUID.randomUUID().toString();
+        uuid = UUID.randomUUID();
         this.potion = potionId;
         this.until = until;
         this.type = type;
+        this.equipmentType = PlayerEquipment.getTypeFor(ItemHelper.fromId(potion));
     }
 
-    @JsonIgnore
     public boolean use() {
         long newAmount = amountEquipped - 1;
         if (newAmount < 1) {
@@ -51,7 +47,6 @@ public class PotionEffect {
         }
     }
 
-    @JsonIgnore
     public void equip(int amount) {
         long newAmount = amountEquipped + amount;
         if (newAmount > 15) {
@@ -61,16 +56,15 @@ public class PotionEffect {
         }
     }
 
-    @JsonIgnore
     public void equip() {
         equip(1);
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return this.uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
@@ -112,5 +106,19 @@ public class PotionEffect {
 
     public void setAmountEquipped(long amountEquipped) {
         this.amountEquipped = amountEquipped;
+    }
+
+    public PlayerEquipment.EquipmentType getEquipmentType() {
+        return equipmentType;
+    }
+
+    // Small hack for Set
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (o instanceof PotionEffect p) {
+            return p.equipmentType == this.equipmentType;
+        }
+        return false;
     }
 }

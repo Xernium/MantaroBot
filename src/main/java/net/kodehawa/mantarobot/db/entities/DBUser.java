@@ -16,62 +16,138 @@
 
 package net.kodehawa.mantarobot.db.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.MantaroBot;
+import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedObject;
-import net.kodehawa.mantarobot.db.entities.helpers.PremiumKeyData;
 import net.kodehawa.mantarobot.db.entities.helpers.UserData;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Pair;
 import net.kodehawa.mantarobot.utils.Utils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.beans.ConstructorProperties;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.currentTimeMillis;
 
 public class DBUser implements ManagedObject {
-    public static final String DB_TABLE = "users";
-    private final UserData data;
-    private final String id;
+    private final long id;
     private long premiumUntil;
 
-    @JsonIgnore
+    private String birthday;
+
+    private boolean receivedFirstKey;
+
+    private String premiumKey;
+
+
+    private int remindedTimes;
+
+    private String timezone;
+    private String lang;
+    private int dustLevel; //percentage
+    private int equippedPick; //item id, 0 = nothing (even tho in theory 0 its headphones...)
+    private int equippedRod; //item id, 0 = nothing
+
+    //TODO: no. fuck this.
+    private PlayerEquipment equippedItems = new PlayerEquipment(new HashMap<>(), new HashMap<>(), new HashMap<>()); //hashmap is type -> itemId
+
+    public static class UserEquipment {
+
+        private final long id;
+        private
+
+    }
+
+    private boolean receivedExpirationWarning = false; //premium key about to expire!
+
+    private Map<String, String> keysClaimed = new HashMap<>(); //Map of user -> key. Will be used to account for keys the user can create themselves.
+
+    //NEW MARRIAGE SYSTEM
+    //Five: Fuck this (especially)
+    private UUID marriageId;
+
+    // woo another inner class
+    public static class UserWaifu implements ManagedObject {
+
+        private final long id;
+        private ISnowflake ownerId;
+        private ISnowflake userId;
+        private long purchasePrice;
+
+        public UserWaifu(long id, ISnowflake ownerId, ISnowflake userId, long purchasePrice) {
+            this.id = id;
+            this.ownerId = ownerId;
+            this.userId = userId;
+            this.purchasePrice = purchasePrice;
+        }
+
+        public ISnowflake getUserId() {
+            return userId;
+        }
+
+        public ISnowflake getOwnerId() {
+            return ownerId;
+        }
+
+        public long getPurchasePrice() {
+            return purchasePrice;
+        }
+
+        @NotNull
+        @Override
+        public String getTableName() {
+            return "UserWaifu";
+        }
+
+        @Override
+        public long getIdLong() {
+            return id;
+        }
+    }
+
+    //waifus....
+    private List<UserWaifu> waifus = new ArrayList<UserWaifu>();
+    private int waifuSlots = 3;
+    private int timesClaimed;
+
+    //Persistent reminders. UUID is saved here. <- WHY IS THIS A STRING THEN??
+    private List<UUID> reminders = new ArrayList<>();
+
+    //Hide tag (and ID on waifu) on marriage/waifu list
+    private boolean privateTag = false; //just explicitly setting it to false to make sure people know it's the default.
+
+    private boolean autoEquip = false;
+
+    private boolean actionsDisabled = false;
+
+
     private final Config config = MantaroData.config().get();
 
-    @JsonCreator
-    @ConstructorProperties({"id", "premiumUntil", "data"})
-    public DBUser(@JsonProperty("id") String id, @JsonProperty("premiumUntil") long premiumUntil, @JsonProperty("data") UserData data) {
+    public DBUser(long id) {
         this.id = id;
-        this.premiumUntil = premiumUntil;
-        this.data = data;
     }
 
     public static DBUser of(String id) {
         return new DBUser(id, 0, new UserData());
     }
 
-    @JsonIgnore
     public User getUser(JDA jda) {
         return jda.retrieveUserById(getId()).complete();
     }
 
-    @JsonIgnore
     public User getUser() {
         return MantaroBot.getInstance().getShardManager().retrieveUserById(getId()).complete();
     }
 
-    @JsonIgnore
     public long getPremiumLeft() {
         return isPremium() ? this.premiumUntil - currentTimeMillis() : 0;
     }
@@ -177,28 +253,24 @@ public class DBUser implements ManagedObject {
         return newKey;
     }
 
-    @JsonIgnore
-    public void removePremiumKey(String originalKey) {
-        data.setPremiumKey(null);
+    public void removePremiumKey(UUID originalKey) {
+        premiumKey = null;
+
         data.getKeysClaimed().remove(Utils.getKeyByValue(data.getKeysClaimed(), originalKey));
         data.setHasReceivedFirstKey(false);
         save();
     }
 
-    public UserData getData() {
-        return this.data;
+
+    @Override
+    public long getIdLong() {
+        return id;
     }
 
-    @Nonnull
-    public String getId() {
-        return this.id;
-    }
-
-    @JsonIgnore
     @Override
     @Nonnull
     public String getTableName() {
-        return DB_TABLE;
+        return "Users";
     }
 
     public long getPremiumUntil() {
@@ -207,5 +279,186 @@ public class DBUser implements ManagedObject {
 
     public Config getConfig() {
         return this.config;
+    }
+
+    public Marriage getMarriage() {
+        // Kode please. -_-
+        return MantaroData.db().getMarriage(marriageId);
+    }
+
+    public int increaseDustLevel(int by) {
+        int increased = dustLevel + Math.min(1, by);
+        if (increased >= 100) {
+            this.setDustLevel(100);
+            return dustLevel; //same as before, cap at 100.
+        }
+
+        this.setDustLevel(increased);
+        return this.dustLevel;
+    }
+
+    public String getBirthday() {
+        return this.birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+
+    public boolean hasReceivedFirstKey() {
+        return this.receivedFirstKey;
+    }
+
+    public void setHasReceivedFirstKey(boolean hasReceivedFirstKey) {
+        this.receivedFirstKey = hasReceivedFirstKey;
+    }
+
+    public UUID getPremiumKey() {
+        return this.premiumKey;
+    }
+
+    public void setPremiumKey(String premiumKey) {
+        this.premiumKey = premiumKey;
+    }
+
+    public int getRemindedTimes() {
+        return this.remindedTimes;
+    }
+
+    public void incrementReminders() {
+        remindedTimes += 1;
+    }
+
+    public void setRemindedTimes(int remindedTimes) {
+        this.remindedTimes = remindedTimes;
+    }
+
+    public String getTimezone() {
+        return this.timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
+    public String getLang() {
+        return this.lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+
+    public int getDustLevel() {
+        return this.dustLevel;
+    }
+
+    public void setDustLevel(int dustLevel) {
+        this.dustLevel = dustLevel;
+    }
+
+    public int getEquippedPick() {
+        return this.equippedPick;
+    }
+
+    public void setEquippedPick(int equippedPick) {
+        this.equippedPick = equippedPick;
+    }
+
+    public int getEquippedRod() {
+        return this.equippedRod;
+    }
+
+    public void setEquippedRod(int equippedRod) {
+        this.equippedRod = equippedRod;
+    }
+
+    public PlayerEquipment getEquippedItems() {
+        return this.equippedItems;
+    }
+
+    public void setEquippedItems(PlayerEquipment equippedItems) {
+        this.equippedItems = equippedItems;
+    }
+
+    public boolean hasReceivedExpirationWarning() {
+        return this.receivedExpirationWarning;
+    }
+
+    public void setReceivedExpirationWarning(boolean receivedExpirationWarning) {
+        this.receivedExpirationWarning = receivedExpirationWarning;
+    }
+
+    public Map<String, String> getKeysClaimed() {
+        return this.keysClaimed;
+    }
+
+    public void setKeysClaimed(Map<String, String> keysClaimed) {
+        this.keysClaimed = keysClaimed;
+    }
+
+    public UUID getMarriageId() {
+        return this.marriageId;
+    }
+
+    public void setMarriageId(UUID marriageId) {
+        this.marriageId = marriageId;
+    }
+
+    public Map<String, Long> getWaifus() {
+        return this.waifus;
+    }
+
+    public void setWaifus(Map<String, Long> waifus) {
+        this.waifus = waifus;
+    }
+
+    public int getWaifuSlots() {
+        return this.waifuSlots;
+    }
+
+    public void setWaifuSlots(int waifuSlots) {
+        this.waifuSlots = waifuSlots;
+    }
+
+    public int getTimesClaimed() {
+        return this.timesClaimed;
+    }
+
+    public void setTimesClaimed(int timesClaimed) {
+        this.timesClaimed = timesClaimed;
+    }
+
+    public List<UUID> getReminders() {
+        return this.reminders;
+    }
+
+    public void setReminders(List<UUID> reminders) {
+        this.reminders = reminders;
+    }
+
+    public boolean isPrivateTag() {
+        return this.privateTag;
+    }
+
+    public void setPrivateTag(boolean privateTag) {
+        this.privateTag = privateTag;
+    }
+
+    public boolean isAutoEquip() {
+        return autoEquip;
+    }
+
+    public void setAutoEquip(boolean autoEquip) {
+        this.autoEquip = autoEquip;
+    }
+
+    public boolean isActionsDisabled() {
+        return actionsDisabled;
+    }
+
+    public void setActionsDisabled(boolean actionsDisabled) {
+        this.actionsDisabled = actionsDisabled;
     }
 }

@@ -25,7 +25,6 @@ import net.kodehawa.mantarobot.core.modules.commands.help.HelpContent;
 import net.kodehawa.mantarobot.utils.cache.URLCache;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
-import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -37,7 +36,7 @@ public class ImageCmd extends NoArgsCommand {
     private final String desc;
     private final String imageName;
     private final String toSend;
-    private final WeebAPIRequester weebapi = new WeebAPIRequester();
+    private final OpenRamAPIRequester weebapi = new OpenRamAPIRequester();
     private final Random rand = new Random();
     private List<String> images;
     private boolean noMentions = false;
@@ -76,7 +75,7 @@ public class ImageCmd extends NoArgsCommand {
         String random;
         try {
             if (type != null) {
-                var result = weebapi.getRandomImageByType(type, false, null);
+                var result = weebapi.getRandomImageByType(type, false);
                 images = Collections.singletonList(result.getKey());
                 random = images.get(0); //Guaranteed random selection :^).
             } else {

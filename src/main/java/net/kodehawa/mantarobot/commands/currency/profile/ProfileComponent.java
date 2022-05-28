@@ -70,7 +70,7 @@ public enum ProfileComponent {
         return String.format("%d (%s: %,d)", player.getLevel(), i18nContext.get("commands.profile.xp"), player.getData().getExperience());
     }),
     BIRTHDAY(EmoteReference.POPPER, i18nContext -> i18nContext.get("commands.profile.birthday"), (holder, i18nContext) -> {
-        var data = holder.getDbUser().getData();
+        var data = holder.getDbUser();
 
         try {
             if (data.getBirthday() == null)
@@ -88,7 +88,7 @@ public enum ProfileComponent {
         }
     }, true, false),
     MARRIAGE(EmoteReference.HEART, i18nContext -> i18nContext.get("commands.profile.married"), (holder, i18nContext) -> {
-        var userData = holder.getDbUser().getData();
+        var userData = holder.getDbUser();
         var currentMarriage = holder.getMarriage();
         User marriedTo = null;
 
@@ -183,7 +183,7 @@ public enum ProfileComponent {
         return builder.toString();
     }),
     FOOTER(null, null, (holder, i18nContext) -> {
-        var userData = holder.getDbUser().getData();
+        var userData = holder.getDbUser();
         String timezone;
 
         if (userData.getTimezone() == null) {

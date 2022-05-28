@@ -16,299 +16,133 @@
 
 package net.kodehawa.mantarobot.db;
 
-import com.rethinkdb.model.OptArgs;
-import com.rethinkdb.net.Connection;
-import com.rethinkdb.net.Result;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.kodehawa.mantarobot.ExtraRuntimeOptions;
 import net.kodehawa.mantarobot.commands.currency.seasons.Season;
 import net.kodehawa.mantarobot.commands.currency.seasons.SeasonPlayer;
 import net.kodehawa.mantarobot.db.entities.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
-import static com.rethinkdb.RethinkDB.r;
-
-public class ManagedDatabase {
-    private static final Logger log = LoggerFactory.getLogger(ManagedDatabase.class);
-    private final Connection conn;
-
-    public ManagedDatabase(@Nonnull Connection conn) {
-        this.conn = conn;
-    }
-
-    private static void log(String message, Object... fmtArgs) {
-        if (ExtraRuntimeOptions.LOG_DB_ACCESS) {
-            log.info(message, fmtArgs);
-        }
-    }
-
-    private static void log(String message) {
-        if (ExtraRuntimeOptions.LOG_DB_ACCESS) {
-            log.info(message);
-        }
-    }
+public abstract class ManagedDatabase {
 
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull String guildId, @Nonnull String name) {
-        log("Requesting custom command {}:{} from rethink", guildId, name);
-        return r.table(CustomCommand.DB_TABLE).get(guildId + ":" + name).runAtom(conn, CustomCommand.class);
-    }
+    public abstract CustomCommand getCustomCommand(@Nonnull ISnowflake guildId, @Nonnull String name);
+
 
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull Guild guild, @Nonnull String name) {
-        return getCustomCommand(guild.getId(), name);
-    }
-
-    @Nullable
-    @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull DBGuild guild, @Nonnull String name) {
-        return getCustomCommand(guild.getId(), name);
-    }
-
-    @Nullable
-    @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull GuildMessageReceivedEvent event, @Nonnull String cmd) {
+    public final CustomCommand getCustomCommand(@Nonnull GuildMessageReceivedEvent event, @Nonnull String cmd) {
         return getCustomCommand(event.getGuild(), cmd);
     }
 
     @Nonnull
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands() {
-        log("Requesting all custom commands from rethink");
-        Result<CustomCommand> c = r.table(CustomCommand.DB_TABLE).run(conn, CustomCommand.class);
-        return c.toList();
-    }
+    public abstract List<CustomCommand> getCustomCommands();
 
     @Nonnull
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull String guildId) {
-        log("Requesting all custom commands from guild {} from rethink", guildId);
-        Result<CustomCommand> c = r.table(CustomCommand.DB_TABLE)
-                .getAll(guildId)
-                .optArg("index", "guild")
-                .run(conn, CustomCommand.class);
-        return c.toList();
-    }
+    public abstract List<CustomCommand> getCustomCommands(@Nonnull ISnowflake guildId);
+
 
     @Nonnull
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull Guild guild) {
-        return getCustomCommands(guild.getId());
-    }
+    public abstract List<CustomCommand> getCustomCommandsByName(@Nonnull String name);
 
     @Nonnull
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull DBGuild guild) {
-        return getCustomCommands(guild.getId());
-    }
+    public abstract DBGuild getGuild(@Nonnull ISnowflake guildId);
+
 
     @Nonnull
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommandsByName(@Nonnull String name) {
-        log("Requesting all custom commands named {} from rethink", name);
-        String pattern = ':' + name + '$';
-        Result<CustomCommand> c = r.table(CustomCommand.DB_TABLE).filter(quote -> quote.g("id").match(pattern)).run(conn, CustomCommand.class);
-        return c.toList();
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public DBGuild getGuild(@Nonnull String guildId) {
-        log("Requesting guild {} from rethink", guildId);
-        DBGuild guild = r.table(DBGuild.DB_TABLE).get(guildId).runAtom(conn, DBGuild.class);
-        return guild == null ? DBGuild.of(guildId) : guild;
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public DBGuild getGuild(@Nonnull Guild guild) {
-        return getGuild(guild.getId());
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public DBGuild getGuild(@Nonnull Member member) {
+    public final DBGuild getGuild(@Nonnull Member member) {
         return getGuild(member.getGuild());
     }
 
     @Nonnull
     @CheckReturnValue
-    public DBGuild getGuild(@Nonnull GuildMessageReceivedEvent event) {
+    public final DBGuild getGuild(@Nonnull GuildMessageReceivedEvent event) {
         return getGuild(event.getGuild());
     }
 
     @Nonnull
     @CheckReturnValue
-    public MantaroObj getMantaroData() {
-        log("Requesting MantaroObj from rethink");
-        MantaroObj obj = r.table(MantaroObj.DB_TABLE).get("mantaro").runAtom(conn, MantaroObj.class);
-        return obj == null ? MantaroObj.create() : obj;
-    }
+    public abstract MantaroObj getMantaroData();
 
     @Nonnull
     @CheckReturnValue
-    public Player getPlayer(@Nonnull String userId) {
-        log("Requesting player {} from rethink", userId);
-        Player player = r.table(Player.DB_TABLE).get(userId + ":g").runAtom(conn, Player.class);
-        return player == null ? Player.of(userId) : player;
-    }
+    public abstract Player getPlayer(@Nonnull ISnowflake userId);
 
     @Nonnull
     @CheckReturnValue
-    public Player getPlayer(@Nonnull User user) {
-        return getPlayer(user.getId());
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public Player getPlayer(@Nonnull Member member) {
+    public final Player getPlayer(@Nonnull Member member) {
         return getPlayer(member.getUser());
     }
 
     @Nonnull
     @CheckReturnValue
-    public SeasonPlayer getPlayerForSeason(@Nonnull String userId, Season season) {
-        log("Requesting player {} (season {}) from rethink", userId, season);
-        SeasonPlayer player = r.table(SeasonPlayer.DB_TABLE).get(userId + ":" + season).runAtom(conn, SeasonPlayer.class);
-        return player == null ? SeasonPlayer.of(userId, season) : player;
-    }
+    public abstract SeasonPlayer getPlayerForSeason(@Nonnull ISnowflake userId, Season season);
+
 
     @Nonnull
     @CheckReturnValue
-    public SeasonPlayer getPlayerForSeason(@Nonnull User user, Season season) {
-        return getPlayerForSeason(user.getId(), season);
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public SeasonPlayer getPlayerForSeason(@Nonnull Member member, Season season) {
+    public final SeasonPlayer getPlayerForSeason(@Nonnull Member member, Season season) {
         return getPlayerForSeason(member.getUser(), season);
     }
 
     @CheckReturnValue
-    public long getAmountSeasonalPlayers() {
-        return r.table(SeasonPlayer.DB_TABLE).count().runAtom(conn, OptArgs.of("read_mode", "outdated"), Long.class);
-    }
+    public abstract long getAmountSeasonalPlayers();
 
     @Nonnull
     @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull String userId) {
-        log("Requesting player STATS {} from rethink", userId);
-        PlayerStats playerStats = r.table(PlayerStats.DB_TABLE).get(userId).runAtom(conn, PlayerStats.class);
-        return playerStats == null ? PlayerStats.of(userId) : playerStats;
-    }
+    public abstract PlayerStats getPlayerStats(@Nonnull ISnowflake userId);
 
     @Nonnull
     @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull User user) {
-        return getPlayerStats(user.getId());
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull Member member) {
+    public final PlayerStats getPlayerStats(@Nonnull Member member) {
         return getPlayerStats(member.getUser());
     }
 
     @Nonnull
     @CheckReturnValue
-    public List<Player> getPlayers() {
-        log("Requesting all players from rethink");
-        String pattern = ":g$";
-        Result<Player> c = r.table(Player.DB_TABLE).filter(quote -> quote.g("id").match(pattern)).run(conn, Player.class);
-        return c.toList();
-    }
+    public abstract List<Player> getPlayers();
 
     //Can be null and it's perfectly valid.
-    public Marriage getMarriage(String marriageId) {
-        if (marriageId == null) {
-            return null;
-        }
-
-        log("Requesting marriage {} from rethink", marriageId);
-        return r.table(Marriage.DB_TABLE).get(marriageId).runAtom(conn, Marriage.class);
-    }
+    public abstract Marriage getMarriage(UUID marriageId);
 
     @Nonnull
     @CheckReturnValue
-    public List<Marriage> getMarriages() {
-        log("Requesting all marriages from rethink");
-        Result<Marriage> c = r.table(Marriage.DB_TABLE).run(conn, Marriage.class);
-        return c.toList();
-    }
+    public abstract List<Marriage> getMarriages();
 
     @Nonnull
     @CheckReturnValue
-    public List<PremiumKey> getPremiumKeys() {
-        log("Requesting all premium keys from rethink");
-        Result<PremiumKey> c = r.table(PremiumKey.DB_TABLE).run(conn, PremiumKey.class);
-        return c.toList();
-    }
+    public abstract List<PremiumKey> getPremiumKeys();
 
     //Also tests if the key is valid or not!
     @Nullable
     @CheckReturnValue
-    public PremiumKey getPremiumKey(@Nullable String id) {
-        log("Requesting premium key {} from rethink", id);
-        if (id == null) return null;
-        return r.table(PremiumKey.DB_TABLE).get(id).runAtom(conn, PremiumKey.class);
-    }
+    public abstract PremiumKey getPremiumKey(@Nullable UUID id);
 
     @Nonnull
     @CheckReturnValue
-    public DBUser getUser(@Nonnull String userId) {
-        log("Requesting user {} from rethink", userId);
-        DBUser user = r.table(DBUser.DB_TABLE).get(userId).runAtom(conn, DBUser.class);
-        return user == null ? DBUser.of(userId) : user;
-    }
+    public abstract DBUser getUser(@Nonnull ISnowflake userId);
 
     @Nonnull
     @CheckReturnValue
-    public DBUser getUser(@Nonnull User user) {
-        return getUser(user.getId());
-    }
-
-    @Nonnull
-    @CheckReturnValue
-    public DBUser getUser(@Nonnull Member member) {
+    public final DBUser getUser(@Nonnull Member member) {
         return getUser(member.getUser());
     }
 
-    public void save(@Nonnull ManagedObject object) {
-        log("Saving {} {}:{} to rethink (replacing)", object.getClass().getSimpleName(), object.getTableName(), object.getDatabaseId());
+    public abstract void save(@Nonnull ManagedObject object);
 
-        r.table(object.getTableName())
-                .insert(object)
-                .optArg("conflict", "replace")
-                .runNoReply(conn);
-    }
+    public abstract void saveUpdating(@Nonnull ManagedObject object);
 
-    public void saveUpdating(@Nonnull ManagedObject object) {
-        log("Saving {} {}:{} to rethink (updating)", object.getClass().getSimpleName(), object.getTableName(), object.getDatabaseId());
-
-        r.table(object.getTableName())
-                .insert(object)
-                .optArg("conflict", "update")
-                .runNoReply(conn);
-    }
-
-    public void delete(@Nonnull ManagedObject object) {
-        log("Deleting {} {}:{} from rethink", object.getClass().getSimpleName(), object.getTableName(), object.getDatabaseId());
-
-        r.table(object.getTableName())
-                .get(object.getId())
-                .delete()
-                .runNoReply(conn);
-    }
+    public abstract void delete(@Nonnull ManagedObject object);
 }

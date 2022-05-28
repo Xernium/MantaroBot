@@ -82,7 +82,7 @@ public class CurrencyActionCmds {
                 final var seasonalPlayerData = seasonalPlayer.getData();
 
                 final var dbUser = ctx.getDBUser();
-                final var userData = dbUser.getData();
+                final var userData = dbUser;
                 final var marriage = ctx.getMarriage(userData);
 
                 final var inventory = isSeasonal ? seasonalPlayer.getInventory() : player.getInventory();
@@ -355,7 +355,7 @@ public class CurrencyActionCmds {
 
                 final var seasonPlayer = ctx.getSeasonPlayer();
                 final var dbUser = ctx.getDBUser();
-                final var userData = dbUser.getData();
+                final var userData = dbUser;
                 final var marriage = ctx.getMarriage(userData);
 
                 final var playerInventory = isSeasonal ? seasonPlayer.getInventory() : player.getInventory();
@@ -644,8 +644,7 @@ public class CurrencyActionCmds {
 
                 final var seasonPlayer = ctx.getSeasonPlayer();
                 final var dbUser = ctx.getDBUser();
-                final var userData = dbUser.getData();
-                final var marriage = ctx.getMarriage(userData);
+                final var marriage = ctx.getMarriage(dbUser);
                 final var playerInventory = isSeasonal ? seasonPlayer.getInventory() : player.getInventory();
 
                 var extraMessage = "\n";
@@ -653,7 +652,7 @@ public class CurrencyActionCmds {
                         //seasonal equipped
                         seasonPlayer.getData().getEquippedItems().of(PlayerEquipment.EquipmentType.AXE) :
                         //not seasonal
-                        userData.getEquippedItems().of(PlayerEquipment.EquipmentType.AXE);
+                        dbUser.getEquippedItems().of(PlayerEquipment.EquipmentType.AXE);
 
                 if (equipped == 0) {
                     ctx.sendLocalized("commands.chop.not_equipped", EmoteReference.ERROR);
@@ -668,7 +667,7 @@ public class CurrencyActionCmds {
 
                 var chance = random.nextInt(100);
                 var hasPotion = ItemHelper.handleEffect(
-                        PlayerEquipment.EquipmentType.POTION, userData.getEquippedItems(), ItemReference.POTION_HASTE, dbUser
+                        PlayerEquipment.EquipmentType.POTION, dbUser.getEquippedItems(), ItemReference.POTION_HASTE, dbUser
                 );
 
                 if (hasPotion) {
@@ -677,7 +676,7 @@ public class CurrencyActionCmds {
 
                 if (chance < 10) {
                     // Found nothing.
-                    int level = userData.increaseDustLevel(random.nextInt(5));
+                    int level = dbUser.increaseDustLevel(random.nextInt(5));
                     dbUser.save();
                     // Process axe durability.
                     ItemHelper.handleItemDurability(item, ctx, player, dbUser, seasonPlayer, "commands.chop.autoequip.success", isSeasonal);
@@ -800,7 +799,7 @@ public class CurrencyActionCmds {
                         ctx.sendFormatStripped(extraMessage + "\n\n" + languageContext.get("commands.chop.success_only_item"), item.getEmojiDisplay(), itemDisplay, item.getName());
                     } else if (!found && money == 0) {
                         // This doesn't actually increase the dust level, though.
-                        var level = userData.getDustLevel();
+                        var level = dbUser.getDustLevel();
                         ctx.sendStrippedLocalized("commands.chop.dust", EmoteReference.SAD, level);
                     } else {
                         ctx.sendFormatStripped(extraMessage + "\n\n" + languageContext.get("commands.chop.success"), item.getEmojiDisplay(), itemDisplay, money, item.getName());

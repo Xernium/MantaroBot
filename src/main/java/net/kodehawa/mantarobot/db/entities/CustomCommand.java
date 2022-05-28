@@ -16,78 +16,118 @@
 
 package net.kodehawa.mantarobot.db.entities;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.db.ManagedObject;
-import net.kodehawa.mantarobot.db.entities.helpers.CustomCommandData;
-import net.kodehawa.mantarobot.utils.URLEncoding;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import java.beans.ConstructorProperties;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomCommand implements ManagedObject {
-    public static final String DB_TABLE = "commands";
-    private final String id;
-    private final List<String> values;
-    //Setting a default to avoid backwards compat issues.
-    private CustomCommandData data = new CustomCommandData();
+    private final long id;
+    private ISnowflake guildId;
+    private String name;
 
-    @ConstructorProperties({"id", "values"})
-    @JsonCreator
-    public CustomCommand(@JsonProperty("id") String id, @JsonProperty("values") List<String> values, @JsonProperty("data") CustomCommandData data) {
+    private ISnowflake owner;
+    private boolean nsfw = false;
+    private boolean locked = false;
+
+    private final List<CustomGuildCommand> completions;
+
+    public CustomCommand(long id, ISnowflake guildId, String name, ISnowflake owner, boolean nsfw, boolean locked, List<CustomGuildCommand> completions) {
         this.id = id;
-        this.values = values.stream().map(URLEncoding::decode).collect(Collectors.toList());
-        if (data != null)
-            this.data = data;
+        this.guildId = guildId;
+        this.name = name;
+        this.owner = owner;
+        this.nsfw = nsfw;
+        this.locked = locked;
+        this.completions = completions;
     }
 
-    public static CustomCommand of(String guildId, String cmdName, List<String> responses) {
-        return new CustomCommand(guildId + ":" + cmdName, responses.stream().map(URLEncoding::encode).collect(Collectors.toList()), new CustomCommandData());
+    public static CustomCommand of(ISnowflake guildId, String cmdName, List<CustomGuildCommand> responses) {
+        return new CustomCommand(0, guildId, cmdName, null, false, false, new ArrayList<>());
     }
 
-    public static CustomCommand transfer(String guildId, CustomCommand command) {
-        return new CustomCommand(guildId + ":" + command.getName(), command.getValues(), command.getData());
+    public static CustomCommand transfer(ISnowflake guildId, CustomCommand command) {
+        command.guildId = guildId;
+        return command;
     }
 
-    @JsonProperty("values")
-    public List<String> encodedValues() {
-        return values.stream().map(URLEncoding::encode).collect(Collectors.toList());
+    public ISnowflake getGuildId() {
+        return guildId;
     }
 
-    @JsonIgnore
-    public String getGuildId() {
-        return getId().split(":", 2)[0];
-    }
-
-    @JsonIgnore
     public String getName() {
-        return getId().split(":", 2)[1];
+        return name;
     }
 
-    @JsonIgnore
-    public List<String> getValues() {
-        return values;
+    public List<CustomGuildCommand> getValues() {
+        return completions;
     }
 
-    @Nonnull
-    public String getId() {
-        return this.id;
+    @Override
+    public long getIdLong() {
+        return 0;
     }
 
-    @JsonIgnore
     @Override
     @Nonnull
     public String getTableName() {
-        return DB_TABLE;
+        return "Commands";
     }
 
-    @Nonnull
-    public CustomCommandData getData() {
-        return this.data;
+    public void setNsfw(boolean nsfw) {
+        this.nsfw = nsfw;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    public void setOwner(ISnowflake owner) {
+        this.owner = owner;
+    }
+
+    public static class CustomGuildCommand implements ManagedObject{
+
+        private final long id;
+        private String value;
+
+        public CustomGuildCommand(long id, String value) {
+            this.id = id;
+            this.value = value;
+        }
+
+        @Override
+        public long getIdLong() {
+            return 0;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @NotNull
+        @Override
+        public String getTableName() {
+            return "GuildCommands";
+        }
+    }
+
+    public boolean isNsfw() {
+        return nsfw;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public ISnowflake getOwner() {
+        return owner;
     }
 }

@@ -548,7 +548,6 @@ public class CurrencyCmds {
 
         if ((item.getItemType() == ItemType.POTION || item.getItemType() == ItemType.BUFF) && item instanceof Potion) {
             var dbUser = ctx.getDBUser();
-            var userData = dbUser.getData();
 
             // Yes, parser limitations. Natan change to your parser eta wen :^), really though, we could use some generics on here lol
             // NumberFormatException?
@@ -562,7 +561,7 @@ public class CurrencyCmds {
                 }
             }
 
-            final var equippedItems = userData.getEquippedItems();
+            final var equippedItems = dbUser.getEquippedItems();
 
             var type = equippedItems.getTypeFor(item);
 
@@ -670,8 +669,7 @@ public class CurrencyCmds {
                 }
 
                 var dbUser = ctx.getDBUser();
-                var data = dbUser.getData();
-                var equippedItems = data.getEquippedItems();
+                var equippedItems = dbUser.getEquippedItems();
                 // TODO: Make a common class for this instead of making static methods on unrelated classes, PLEASE
                 var equipment = ProfileCmd.parsePlayerEquipment(equippedItems, ctx.getLanguageContext());
 

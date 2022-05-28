@@ -42,7 +42,6 @@ import net.kodehawa.mantarobot.db.entities.DBUser;
 import net.kodehawa.mantarobot.db.entities.Marriage;
 import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.db.entities.helpers.Inventory;
-import net.kodehawa.mantarobot.db.entities.helpers.UserData;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
@@ -92,8 +91,8 @@ public class MarryCmd {
                         User proposedToUser = ctx.getMentionedUsers().get(0);
 
                         //This is just for checking purposes, so we don't need the DBUser itself.
-                        UserData proposingUserData = ctx.getDBUser(proposingUser).getData();
-                        UserData proposedToUserData = ctx.getDBUser(proposedToUser).getData();
+                        DBUser proposingDBUser = ctx.getDBUser(proposingUser);
+                        DBUser proposedToDBUser = ctx.getDBUser(proposedToUser);
 
                         //Again just for checking, and no need to change.
                         final Inventory proposingPlayerInventory = ctx.getPlayer(proposingUser).getInventory();
@@ -104,8 +103,8 @@ public class MarryCmd {
                             return;
                         }
 
-                        final Marriage proposingMarriage = proposingUserData.getMarriage();
-                        final Marriage proposedToMarriage = proposedToUserData.getMarriage();
+                        final Marriage proposingMarriage = proposingDBUser.getMarriage();
+                        final Marriage proposedToMarriage = proposedToDBUser.getMarriage();
 
                         // We need to conduct a bunch of checks here.
                         // You CANNOT marry bots, yourself, people already married, or engage on another marriage if you're married.
@@ -121,7 +120,7 @@ public class MarryCmd {
 
                         // Already married to the same person you're proposing to.
                         if ((proposingMarriage != null && proposedToMarriage != null) &&
-                                proposedToUserData.getMarriage().getId().equals(proposingMarriage.getId())) {
+                                proposedToDBUser.getMarriage().getId().equals(proposingMarriage.getId())) {
                             ctx.sendLocalized("commands.marry.already_married_receipt", EmoteReference.ERROR);
                             return;
                         }
@@ -166,7 +165,7 @@ public class MarryCmd {
                                 }
                             }
 
-                            String guildCustomPrefix = dbGuild.getData().getGuildCustomPrefix();
+                            String guildCustomPrefix = dbGuild.getGuildCustomPrefix();
                             if (guildCustomPrefix != null && !guildCustomPrefix.isEmpty() && message.toLowerCase().startsWith(guildCustomPrefix)) {
                                 message = message.substring(guildCustomPrefix.length());
                             }
@@ -184,8 +183,8 @@ public class MarryCmd {
                                 DBUser proposingUserDB = ctx.getDBUser(proposingUser);
                                 DBUser proposedToUserDB = ctx.getDBUser(proposedToUser);
 
-                                final Marriage proposingMarriageFinal = proposingUserDB.getData().getMarriage();
-                                final Marriage proposedToMarriageFinal = proposedToUserDB.getData().getMarriage();
+                                final Marriage proposingMarriageFinal = proposingUserDB.getMarriage();
+                                final Marriage proposedToMarriageFinal = proposedToUserDB.getMarriage();
 
                                 if (proposingMarriageFinal != null) {
                                     ctx.sendLocalized("commands.marry.already_married", EmoteReference.ERROR);
@@ -221,12 +220,12 @@ public class MarryCmd {
 
                                 // Make and save the new marriage object.
                                 Marriage actualMarriage = Marriage.of(marriageId, proposingUser, proposedToUser);
-                                actualMarriage.getData().setMarriageCreationMillis(marriageCreationMillis);
+                                actualMarriage.setMarriageCreationMillis(marriageCreationMillis);
                                 actualMarriage.save();
 
                                 // Assign the marriage ID to the respective users and save it.
-                                proposingUserDB.getData().setMarriageId(marriageId);
-                                proposedToUserDB.getData().setMarriageId(marriageId);
+                                proposingUserDB.setMarriageId(marriageId);
+                                proposedToUserDB.setMarriageId(marriageId);
                                 proposingUserDB.save();
                                 proposedToUserDB.save();
 
@@ -237,8 +236,8 @@ public class MarryCmd {
                                 );
 
                                 // Add the badge to the married couple.
-                                proposingPlayer.getData().addBadgeIfAbsent(Badge.MARRIED);
-                                proposedToPlayer.getData().addBadgeIfAbsent(Badge.MARRIED);
+                                proposingPlayer.addBadgeIfAbsent(Badge.MARRIED);
+                                proposedToPlayer.addBadgeIfAbsent(Badge.MARRIED);
 
                                 // Give a love letter both to the proposing player and the one who was proposed to.
                                 if (proposingPlayerFinalInventory.getAmount(ItemReference.LOVE_LETTER) < 5000) {
@@ -261,7 +260,7 @@ public class MarryCmd {
 
                                 // Well, we have a badge for this too. Consolation prize I guess.
                                 final Player proposingPlayer = ctx.getPlayer(proposingUser);
-                                if (proposingPlayer.getData().addBadgeIfAbsent(Badge.DENIED)) {
+                                if (proposingPlayer.addBadgeIfAbsent(Badge.DENIED)) {
                                     proposingPlayer.saveUpdating();
                                 }
                                 return Operation.COMPLETED;
@@ -302,7 +301,7 @@ public class MarryCmd {
 
                 //Without one love letter we cannot do much, ya know.
                 if (playerInventory.containsItem(ItemReference.LOVE_LETTER)) {
-                    final Marriage currentMarriage = dbUser.getData().getMarriage();
+                    final Marriage currentMarriage = dbUser.getMarriage();
 
                     // Check if the user is married,
                     // is the proposed player, there's no love letter and
@@ -312,7 +311,7 @@ public class MarryCmd {
                         return;
                     }
 
-                    if (currentMarriage.getData().getLoveLetter() != null) {
+                    if (currentMarriage.getLoveLetter() != null) {
                         ctx.sendLocalized("commands.marry.loveletter.already_done", EmoteReference.ERROR);
                         return;
                     }
@@ -357,7 +356,7 @@ public class MarryCmd {
                             }
                         }
 
-                        String guildCustomPrefix = ctx.getDBGuild().getData().getGuildCustomPrefix();
+                        String guildCustomPrefix = ctx.getDBGuild().getGuildCustomPrefix();
                         if (guildCustomPrefix != null && !guildCustomPrefix.isEmpty() && c.toLowerCase().startsWith(guildCustomPrefix)) {
                             c = c.substring(guildCustomPrefix.length());
                         }
@@ -367,7 +366,7 @@ public class MarryCmd {
                         if (c.equalsIgnoreCase("yes")) {
                             final Player playerFinal = ctx.getPlayer();
                             final Inventory inventoryFinal = playerFinal.getInventory();
-                            final Marriage currentMarriageFinal = dbUser.getData().getMarriage();
+                            final Marriage currentMarriageFinal = dbUser.getMarriage();
 
                             //We need to do most of the checks all over again just to make sure nothing important slipped through.
                             if (currentMarriageFinal == null) {
@@ -386,7 +385,7 @@ public class MarryCmd {
 
                             //Save the love letter. The content variable is the actual letter, while c is the content of the operation itself.
                             //Yes it's confusing.
-                            currentMarriageFinal.getData().setLoveLetter(content);
+                            currentMarriageFinal.setLoveLetter(content);
                             currentMarriageFinal.save();
 
                             ctx.sendLocalized("commands.marry.loveletter.confirmed", EmoteReference.CORRECT);
@@ -415,7 +414,7 @@ public class MarryCmd {
                 var player = ctx.getPlayer();
                 var playerInventory = player.getInventory();
                 var dbUser = ctx.getDBUser();
-                var marriage = dbUser.getData().getMarriage();
+                var marriage = dbUser.getMarriage();
 
                 if (marriage == null) {
                     ctx.sendLocalized("commands.marry.buyhouse.not_married", EmoteReference.ERROR);
@@ -453,7 +452,7 @@ public class MarryCmd {
                         var playerConfirmed = ctx.getPlayer();
                         var playerInventoryConfirmed = playerConfirmed.getInventory();
                         var dbUserConfirmed = ctx.getDBUser();
-                        var marriageConfirmed = dbUserConfirmed.getData().getMarriage();
+                        var marriageConfirmed = dbUserConfirmed.getMarriage();
 
                         // People like to mess around lol.
                         if (!playerInventoryConfirmed.containsItem(ItemReference.HOUSE)) {
@@ -471,8 +470,8 @@ public class MarryCmd {
 
                         playerConfirmed.save();
 
-                        marriageConfirmed.getData().setHasHouse(true);
-                        marriageConfirmed.getData().setHouseName(finalContent);
+                        marriageConfirmed.setHasHouse(true);
+                        marriageConfirmed.setHouseName(finalContent);
                         marriageConfirmed.save();
 
                         ctx.sendLocalized("commands.marry.buyhouse.success", EmoteReference.POPPER, housePrice, finalContent);
@@ -500,7 +499,7 @@ public class MarryCmd {
                 var player = ctx.getPlayer();
                 var playerInventory = player.getInventory();
                 var dbUser = ctx.getDBUser();
-                var marriage = dbUser.getData().getMarriage();
+                var marriage = dbUser.getMarriage();
 
                 if (marriage == null) {
                     ctx.sendLocalized("commands.marry.general.not_married", EmoteReference.ERROR);
@@ -538,7 +537,7 @@ public class MarryCmd {
                         var playerConfirmed = ctx.getPlayer();
                         var playerInventoryConfirmed = playerConfirmed.getInventory();
                         var dbUserConfirmed = ctx.getDBUser();
-                        var marriageConfirmed = dbUserConfirmed.getData().getMarriage();
+                        var marriageConfirmed = dbUserConfirmed.getMarriage();
 
                         // People like to mess around lol.
                         if (!playerInventoryConfirmed.containsItem(ItemReference.CAR)) {
@@ -555,8 +554,8 @@ public class MarryCmd {
                         playerConfirmed.removeMoney(carPrice);
                         playerConfirmed.save();
 
-                        marriageConfirmed.getData().setHasCar(true);
-                        marriageConfirmed.getData().setCarName(finalContent);
+                        marriageConfirmed.setHasCar(true);
+                        marriageConfirmed.setCarName(finalContent);
                         marriageConfirmed.save();
 
                         ctx.sendLocalized("commands.marry.buycar.success", EmoteReference.POPPER, carPrice, finalContent);
@@ -593,7 +592,7 @@ public class MarryCmd {
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
                 var dbUser = ctx.getDBUser();
-                var marriage = dbUser.getData().getMarriage();
+                var marriage = dbUser.getMarriage();
 
                 if (content.isEmpty()) {
                     ctx.sendLocalized("commands.marry.timezone.no_content", EmoteReference.ERROR);
@@ -618,7 +617,7 @@ public class MarryCmd {
                     return;
                 }
 
-                marriage.getData().setTimezone(timezone);
+                marriage.setTimezone(timezone);
                 marriage.save();
                 dbUser.save();
                 ctx.sendLocalized("commands.marry.timezone.success", EmoteReference.CORRECT, timezone);
@@ -640,15 +639,15 @@ public class MarryCmd {
 
                 final var author = ctx.getAuthor();
                 final var dbUser = ctx.getDBUser();
-                final var dbUserData = dbUser.getData();
-                final var currentMarriage = dbUserData.getMarriage();
+                final var dbDBUser = dbUser;
+                final var currentMarriage = dbDBUser.getMarriage();
                 //What status would we have without marriage? Well, we can be unmarried omegalul.
                 if (currentMarriage == null) {
                     ctx.sendLocalized("commands.marry.status.no_marriage", EmoteReference.SAD);
                     return;
                 }
 
-                final var data = currentMarriage.getData();
+                final var data = currentMarriage;
 
                 //Can we find the user this is married to?
                 final var marriedTo = ctx.retrieveUserById(currentMarriage.getOtherPlayer(author.getId()));
@@ -664,10 +663,10 @@ public class MarryCmd {
                 }
 
                 final var marriedDBUser = ctx.getDBUser(marriedTo);
-                final var dateFormat = Utils.formatDate(data.getMarriageCreationMillis(), dbUserData.getLang());
-                final var eitherHasWaifus = !(dbUserData.getWaifus().isEmpty() && marriedDBUser.getData().getWaifus().isEmpty());
-                final var marriedToName = dbUserData.isPrivateTag() ? marriedTo.getName() : marriedTo.getAsTag();
-                final var authorName = dbUserData.isPrivateTag() ? author.getName() : author.getAsTag();
+                final var dateFormat = Utils.formatDate(data.getMarriageCreationMillis(), dbDBUser.getLang());
+                final var eitherHasWaifus = !(dbDBUser.getWaifus().isEmpty() && marriedDBUser.getWaifus().isEmpty());
+                final var marriedToName = dbDBUser.isPrivateTag() ? marriedTo.getName() : marriedTo.getAsTag();
+                final var authorName = dbDBUser.isPrivateTag() ? author.getName() : author.getAsTag();
                 final var daysMarried = TimeUnit.of(ChronoUnit.MILLIS).toDays(System.currentTimeMillis() - data.getMarriageCreationMillis());
 
                 EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -726,7 +725,7 @@ public class MarryCmd {
             @Override
             protected void call(Context ctx, String cn, String[] args) {
                 //We, indeed, have no marriage here.
-                if (ctx.getDBUser().getData().getMarriage() == null) {
+                if (ctx.getDBUser().getMarriage() == null) {
                     ctx.sendLocalized("commands.divorce.not_married", EmoteReference.ERROR);
                     return;
                 }
@@ -741,12 +740,12 @@ public class MarryCmd {
 
                     if (content.equalsIgnoreCase("yes")) {
                         final var divorceeDBUser = ctx.getDBUser();
-                        final var marriage = divorceeDBUser.getData().getMarriage();
+                        final var marriage = divorceeDBUser.getMarriage();
                         if (marriage == null) {
                             ctx.sendLocalized("commands.divorce.not_married", EmoteReference.ERROR);
                             return Operation.COMPLETED;
                         }
-                        final var marriageData = marriage.getData();
+                        final var marriageData = marriage;
 
                         //We do have a marriage, get rid of it.
                         final var marriedWithDBUser = ctx.getDBUser(marriage.getOtherPlayer(ctx.getAuthor().getId()));
@@ -754,18 +753,18 @@ public class MarryCmd {
                         final var divorceePlayer = ctx.getPlayer();
 
                         //Save the user of the person they were married with.
-                        marriedWithDBUser.getData().setMarriageId(null);
+                        marriedWithDBUser.setMarriageId(null);
                         marriedWithDBUser.save();
 
                         //Save the user of themselves.
-                        divorceeDBUser.getData().setMarriageId(null);
+                        divorceeDBUser.setMarriageId(null);
                         divorceeDBUser.save();
 
                         //Add the heart broken badge to the user who divorced.
-                        divorceePlayer.getData().addBadgeIfAbsent(Badge.HEART_BROKEN);
+                        divorceePlayer.addBadgeIfAbsent(Badge.HEART_BROKEN);
 
                         //Add the heart broken badge to the user got dumped.
-                        marriedWithPlayer.getData().addBadgeIfAbsent(Badge.HEART_BROKEN);
+                        marriedWithPlayer.addBadgeIfAbsent(Badge.HEART_BROKEN);
 
                         var moneySplit = 0L;
 

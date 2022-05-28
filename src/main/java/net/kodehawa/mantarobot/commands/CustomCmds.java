@@ -38,8 +38,7 @@ import net.kodehawa.mantarobot.core.modules.commands.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
 import net.kodehawa.mantarobot.db.entities.CustomCommand;
-import net.kodehawa.mantarobot.db.entities.helpers.CustomCommandData;
-import net.kodehawa.mantarobot.db.entities.helpers.GuildData;
+import net.kodehawa.mantarobot.db.entities.DBGuild;
 import net.kodehawa.mantarobot.utils.StringUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
@@ -67,27 +66,28 @@ public class CustomCmds {
                                 INVALID_CHARACTERS_PATTERN = Pattern.compile("[^a-zA-Z0-9_]"),
                                 NAME_WILDCARD_PATTERN = Pattern.compile("[a-zA-Z0-9_*]+");
 
-    private static final Map<String, CustomCommand> customCommands = new ConcurrentHashMap<>();
+    // no.
+    //private static final Map<String, CustomCommand> customCommands = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(CustomCmds.class);
     private static final SecureRandom random = new SecureRandom();
 
-    public static void handle(String prefix, String cmdName, Context ctx, GuildData guildData, String args) {
-        CustomCommand customCommand = getCustomCommand(ctx.getGuild().getId(), cmdName);
+    public static void handle(String prefix, String cmdName, Context ctx, DBGuild guild, String args) {
+        CustomCommand customCommand = getCustomCommand(ctx.getGuild(), cmdName);
         if (customCommand == null) {
             return;
         }
 
         // !! CCS disable check start.
-        if (guildData.getDisabledCommands().contains(cmdName)) {
+        if (guild.getDisabledCommands().contains(cmdName)) {
             return;
         }
 
-        List<String> channelDisabledCommands = guildData.getChannelSpecificDisabledCommands().get(ctx.getChannel().getId());
+        List<String> channelDisabledCommands = guild.getChannelSpecificDisabledCommands().get(ctx.getChannel().getId());
         if (channelDisabledCommands != null && channelDisabledCommands.contains(cmdName)) {
             return;
         }
 
-        HashMap<String, List<String>> roleSpecificDisabledCommands = guildData.getRoleSpecificDisabledCommands();
+        HashMap<String, List<String>> roleSpecificDisabledCommands = guild.getRoleSpecificDisabledCommands();
         if (ctx.getMember().getRoles().stream().anyMatch(r -> roleSpecificDisabledCommands.computeIfAbsent(r.getId(), s -> new ArrayList<>()).contains(cmdName)) && !CommandPermission.ADMIN.test(ctx.getMember())) {
             return;
         }
@@ -95,22 +95,22 @@ public class CustomCmds {
 
         // Create a new language context only if the command goes through.
         // This avoids getting a user everytime a command is ran, even if the command is not valid.
-        ctx.setLanguageContext(new I18nContext(guildData, db().getUser(ctx.getAuthor()).getData()));
+        ctx.setLanguageContext(new I18nContext(guild, db().getUser(ctx.getAuthor())));
 
         // Run the actual custom command.
-        List<String> values = customCommand.getValues();
+        List<CustomCommand.CustomGuildCommand> values = customCommand.getValues();
 
         // what
         if (values.isEmpty()) {
             return;
         }
 
-        if (customCommand.getData().isNsfw() && !ctx.getChannel().isNSFW()) {
+        if (customCommand.isNsfw() && !ctx.getChannel().isNSFW()) {
             ctx.sendLocalized("commands.custom.nsfw_not_nsfw", EmoteReference.ERROR);
             return;
         }
 
-        String response = values.get(random.nextInt(values.size()));
+        String response = values.get(random.nextInt(values.size())).getValue();
         try {
             new CustomCommandHandler(prefix, ctx, response, args).handle();
         } catch (SyntaxException e) {
@@ -123,15 +123,15 @@ public class CustomCmds {
     }
 
     //Lazy-load custom commands into cache.
-    public static CustomCommand getCustomCommand(String id, String name) {
+    public static CustomCommand getCustomCommand(ISnowflake id, String name) {
         //lol
         if (CommandProcessor.REGISTRY.commands().containsKey(name)) {
             return null;
         }
 
-        if (customCommands.containsKey(id + ":" + name)) {
-            return customCommands.get(id + ":" + name);
-        }
+        //if (customCommands.containsKey(id.getIdLong() + ":" + name)) {
+        //    return customCommands.get(id.getIdLong() + ":" + name);
+        //}
 
         CustomCommand custom = db().getCustomCommand(id, name);
         if (custom == null)
@@ -153,7 +153,7 @@ public class CustomCmds {
         }
 
         //add to registry
-        customCommands.put(custom.getId(), custom);
+        //customCommands.put(custom.getId(), custom);
 
         return custom;
     }
@@ -198,7 +198,7 @@ public class CustomCmds {
         //Just so this is in english.
         I18nContext i18nTemp = new I18nContext();
         Predicate<GuildMessageReceivedEvent> adminPredicate = (event) -> {
-            if (db().getGuild(event.getGuild()).getData().isCustomAdminLockNew() && !CommandPermission.ADMIN.test(event.getMember())) {
+            if (db().getGuild(event.getGuild()).isCustomAdminLockNew() && !CommandPermission.ADMIN.test(event.getMember())) {
                 event.getChannel().sendMessage(i18nTemp.get("commands.custom.admin_only")).queue();
                 return false;
             }
@@ -307,10 +307,10 @@ public class CustomCmds {
 
                 List<MessageEmbed.Field> fields = new ArrayList<>();
                 AtomicInteger count = new AtomicInteger();
-                for (String value : custom.getValues()) {
-                    var val = value;
+                for (CustomCommand.CustomGuildCommand value : custom.getValues()) {
+                    var val = value.getValue();
                     var current = count.incrementAndGet();
-                    if (value.length() > 900) {
+                    if (value.getValue().length() > 900) {
                         val = languageContext.get("commands.custom.raw.too_large_view").formatted(custom.getName(), current);
                     }
 
@@ -348,8 +348,8 @@ public class CustomCmds {
                 }
 
                 int size = customCommands.size();
-                customCommands.stream().filter(cmd -> !cmd.getData().isLocked()).forEach(CustomCommand::deleteAsync);
-                customCommands.forEach(c -> CustomCmds.customCommands.remove(c.getId()));
+                customCommands.stream().filter(cmd -> !cmd.isLocked()).forEach(CustomCommand::deleteAsync);
+                //customCommands.forEach(c -> CustomCmds.customCommands.remove(c.getId()));
                 ctx.sendLocalized("commands.custom.clear.success", EmoteReference.PENCIL, size);
             }
         }).createSubCommandAlias("clear", "clr");
@@ -416,13 +416,13 @@ public class CustomCmds {
                     return;
                 }
 
-                CustomCommand custom = getCustomCommand(ctx.getGuild().getId(), content);
+                CustomCommand custom = getCustomCommand(ctx.getGuild(), content);
                 if (custom == null) {
                     ctx.sendLocalized("commands.custom.not_found", EmoteReference.ERROR2, content);
                     return;
                 }
 
-                if (custom.getData().isLocked()) {
+                if (custom.isLocked()) {
                     ctx.sendLocalized("commands.custom.locked_command", EmoteReference.ERROR2);
                     return;
                 }
@@ -431,12 +431,12 @@ public class CustomCmds {
                 custom.deleteAsync();
 
                 //reflect at local
-                customCommands.remove(custom.getId());
+                //customCommands.remove(custom.getId());
 
                 //clear commands if none
-                if (customCommands.keySet().stream().noneMatch(s -> s.endsWith(":" + content))) {
-                    customCommands.remove(content);
-                }
+                //if (customCommands.keySet().stream().noneMatch(s -> s.endsWith(":" + content))) {
+                //    customCommands.remove(content);
+                //}
 
                 ctx.sendLocalized("commands.custom.remove.success", EmoteReference.PENCIL, content);
             }
@@ -493,12 +493,12 @@ public class CustomCmds {
                                         null
                                 ).build(),
                         pair -> {
-                            CustomCommand custom = CustomCommand.transfer(ctx.getGuild().getId(), pair.getValue());
+                            CustomCommand custom = CustomCommand.transfer(ctx.getGuild(), pair.getValue());
                             //save at DB
                             custom.saveAsync();
 
                             //reflect at local
-                            customCommands.put(custom.getId(), custom);
+                            //customCommands.put(custom.getId(), custom);
 
                             ctx.sendLocalized("commands.custom.import.success", custom.getName(), pair.getKey().getName(), custom.getValues().size());
                             //easter egg :D
@@ -527,8 +527,8 @@ public class CustomCmds {
                     return;
                 }
 
-                String owner = command.getData().getOwner();
-                Member member = owner.isEmpty() ? null : ctx.retrieveMemberById(owner, false);
+                ISnowflake owner = command.getOwner();
+                Member member = owner == null ? null : ctx.retrieveMemberById(owner, false);
                 
                 ctx.send(new EmbedBuilder()
                         .setAuthor("Custom Command Information for " + content, null, ctx.getAuthor().getEffectiveAvatarUrl())
@@ -538,7 +538,7 @@ public class CustomCmds {
                                         EmoteReference.BLUE_SMALL_MARKER +
                                         "**Owner ID:** " + (member == null ? "None" : member.getId()) + "\n" +
                                         EmoteReference.BLUE_SMALL_MARKER +
-                                        "**NSFW:** " + command.getData().isNsfw() + "\n" +
+                                        "**NSFW:** " + command.isNsfw() + "\n" +
                                         EmoteReference.BLUE_SMALL_MARKER +
                                         "**Responses:** " + command.getValues().size() + "\n"
                         )
@@ -581,7 +581,7 @@ public class CustomCmds {
                     return;
                 }
 
-                if (custom.getData().isLocked()) {
+                if (custom.isLocked()) {
                     ctx.sendLocalized("commands.custom.locked_command", EmoteReference.ERROR2);
                     return;
                 }
@@ -597,7 +597,7 @@ public class CustomCmds {
                     return;
                 }
 
-                List<String> values = custom.getValues();
+                List<CustomCommand.CustomGuildCommand> values = custom.getValues();
                 if (where - 1 > values.size()) {
                     ctx.sendLocalized("commands.custom.edit.no_index", EmoteReference.ERROR);
                     return;
@@ -614,13 +614,13 @@ public class CustomCmds {
                 }
 
                 if (opts.containsKey("nsfw")) {
-                    custom.getData().setNsfw(true);
+                    custom.setNsfw(true);
                 }
 
-                custom.getValues().set(where - 1, commandContent);
+                custom.getValues().set(where - 1, new CustomCommand.CustomGuildCommand(-1, commandContent));
 
                 custom.saveAsync();
-                customCommands.put(custom.getId(), custom);
+                //customCommands.put(custom.getId(), custom);
 
                 ctx.sendLocalized("commands.custom.edit.success", EmoteReference.CORRECT, where, custom.getName());
             }
@@ -655,7 +655,7 @@ public class CustomCmds {
                     return;
                 }
 
-                if (custom.getData().isLocked()) {
+                if (custom.isLocked()) {
                     ctx.sendLocalized("commands.custom.locked_command", EmoteReference.ERROR2);
                     return;
                 }
@@ -669,7 +669,7 @@ public class CustomCmds {
                     return;
                 }
 
-                List<String> values = custom.getValues();
+                List<CustomCommand.CustomGuildCommand> values = custom.getValues();
                 if (where - 1 > values.size()) {
                     ctx.sendLocalized("commands.custom.deleteresponse.no_index", EmoteReference.ERROR);
                     return;
@@ -684,7 +684,7 @@ public class CustomCmds {
                 }
 
                 custom.saveAsync();
-                customCommands.put(custom.getId(), custom);
+                //customCommands.put(custom.getId(), custom);
 
                 ctx.sendLocalized("commands.custom.deleteresponse.success", EmoteReference.CORRECT, where, custom.getName());
             }
@@ -714,7 +714,7 @@ public class CustomCmds {
                     return;
                 }
 
-                cmd.getData().setLocked(true);
+                cmd.setLocked(true);
                 cmd.saveUpdating();
 
                 ctx.sendLocalized("commands.custom.lockcommand.success", EmoteReference.CORRECT, content);
@@ -746,7 +746,7 @@ public class CustomCmds {
                     return;
                 }
 
-                var data = cmd.getData();
+                var data = cmd;
                 if (!data.isLocked()) {
                     ctx.sendLocalized("commands.custom.unlockcommand.not_locked", EmoteReference.ERROR, content);
                     return;
@@ -802,23 +802,23 @@ public class CustomCmds {
                     return;
                 }
 
-                CustomCommand newCustom = CustomCommand.of(ctx.getGuild().getId(), value, oldCustom.getValues());
+                CustomCommand newCustom = CustomCommand.of(ctx.getGuild(), value, oldCustom.getValues());
 
-                final CustomCommandData oldCustomData = oldCustom.getData();
-                newCustom.getData().setNsfw(oldCustomData.isNsfw());
-                newCustom.getData().setOwner(oldCustomData.getOwner());
+                final CustomCommand oldCustomData = oldCustom;
+                newCustom.setNsfw(oldCustomData.isNsfw());
+                newCustom.setOwner(oldCustomData.getOwner());
 
                 //change at DB
                 oldCustom.deleteAsync();
                 newCustom.saveAsync();
 
                 //reflect at local
-                customCommands.remove(oldCustom.getId());
-                customCommands.put(newCustom.getId(), newCustom);
+                //customCommands.remove(oldCustom.getId());
+                //customCommands.put(newCustom.getId(), newCustom);
 
                 //clear commands if none
-                if (customCommands.keySet().stream().noneMatch(s -> s.endsWith(":" + cmd)))
-                    customCommands.remove(cmd);
+                //if (customCommands.keySet().stream().noneMatch(s -> s.endsWith(":" + cmd)))
+                //    customCommands.remove(cmd);
 
                 ctx.sendLocalized("commands.custom.rename.success", EmoteReference.CORRECT, cmd, value);
 
@@ -893,11 +893,11 @@ public class CustomCmds {
                     }
                 }
 
-                CustomCommand custom = CustomCommand.of(ctx.getGuild().getId(), cmd, Collections.singletonList(cmdSource));
+                CustomCommand custom = CustomCommand.of(ctx.getGuild(), cmd, Collections.singletonList(new CustomCommand.CustomGuildCommand(-1, cmdSource)));
                 CustomCommand c = ctx.db().getCustomCommand(ctx.getEvent(), cmd);
 
                 if (c != null) {
-                    if (custom.getData().isLocked()) {
+                    if (custom.isLocked()) {
                         ctx.sendLocalized("commands.custom.locked_command", EmoteReference.ERROR2);
                         return;
                     }
@@ -923,15 +923,15 @@ public class CustomCmds {
                 }
 
 
-                custom.getData().setOwner(ctx.getAuthor().getId());
+                custom.setOwner(ctx.getAuthor());
                 if (opts.containsKey("nsfw")) {
-                    custom.getData().setNsfw(true);
+                    custom.setNsfw(true);
                 }
 
                 //save at DB
                 custom.saveAsync();
                 //reflect at local
-                customCommands.put(custom.getId(), custom);
+                //customCommands.put(custom.getId(), custom);
 
                 ctx.sendLocalized("commands.custom.add.success", EmoteReference.CORRECT, cmd);
 

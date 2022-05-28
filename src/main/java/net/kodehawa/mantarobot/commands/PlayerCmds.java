@@ -25,7 +25,7 @@ import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
 import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
-import net.kodehawa.mantarobot.commands.currency.item.special.helpers.Breakable;
+import net.kodehawa.mantarobot.commands.currency.equipment.Damageable;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.currency.seasons.helpers.UnifiedPlayer;
 import net.kodehawa.mantarobot.core.CommandRegistry;
@@ -303,9 +303,9 @@ public class PlayerCmds {
 
                         var equippedItemFinal = ItemHelper.fromId(equippedFinal);
                         var part = ""; //Start as an empty string.
-                        if (equippedItemFinal instanceof Breakable) {
+                        if (equippedItemFinal instanceof Damageable) {
                             // Gotta check again, just in case...
-                            var item = (Breakable) equippedItemFinal;
+                            var item = (Damageable) equippedItemFinal;
 
                             var percentage = ((float) equipmentFinal.getDurability().get(type) / (float) item.getMaxDurability()) * 100.0f;
                             if (percentage == 100) { //Basically never used

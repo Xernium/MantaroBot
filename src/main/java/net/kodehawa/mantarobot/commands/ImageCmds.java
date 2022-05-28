@@ -18,13 +18,11 @@ package net.kodehawa.mantarobot.commands;
 
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.kodehawa.lib.imageboards.DefaultImageBoards;
 import net.kodehawa.lib.imageboards.ImageBoard;
 import net.kodehawa.lib.imageboards.entities.impl.*;
-import net.kodehawa.mantarobot.commands.action.WeebAPIRequester;
+import net.kodehawa.mantarobot.commands.action.OpenRamAPIRequester;
 import net.kodehawa.mantarobot.commands.image.ImageRequestType;
 import net.kodehawa.mantarobot.core.CommandRegistry;
 import net.kodehawa.mantarobot.core.modules.Module;
@@ -74,111 +72,8 @@ public class ImageCmds {
     private static final ImageBoard<SafebooruImage> safebooru = DefaultImageBoards.SAFEBOORU;
     private static final ImageBoard<YandereImage> yandere = DefaultImageBoards.YANDERE;
     private static final ImageBoard<GelbooruImage> gelbooru = DefaultImageBoards.GELBOORU;
-    private static final WeebAPIRequester weebAPIRequester = new WeebAPIRequester();
 
     private static final Random random = new Random();
-
-    @Subscribe
-    public void cat(CommandRegistry cr) {
-        cr.register("cat", new SimpleCommand(CommandCategory.IMAGE) {
-            @Override
-            protected void call(Context ctx, String content, String[] args) {
-                try {
-                    var result = weebAPIRequester.getRandomImageByType("animal_cat", false, null);
-                    var url = result.getKey();
-                    var embed = new EmbedBuilder()
-                            .setAuthor(catResponses[random.nextInt(catResponses.length)].replace("%mention%", ctx.getMember().getEffectiveName()),
-                                    null, ctx.getAuthor().getEffectiveAvatarUrl())
-                            .setColor(ctx.getMemberColor())
-                            .setImage(url)
-                            .build();
-
-                    ctx.send(embed);
-                } catch (Exception e) {
-                    ctx.sendLocalized("commands.imageboard.cat.error", EmoteReference.ERROR);
-                }
-            }
-
-            @Override
-            public HelpContent help() {
-                return new HelpContent.Builder()
-                        .setDescription("Sends a random dog image. Really cute stuff, you know?")
-                        .build();
-            }
-        });
-    }
-
-    @Subscribe
-    public void dog(CommandRegistry cr) {
-        cr.register("dog", new SimpleCommand(CommandCategory.IMAGE) {
-            @Override
-            protected void call(Context ctx, String content, String[] args) {
-                try {
-                    var result = weebAPIRequester.getRandomImageByType("animal_dog", false, null);
-                    var url = result.getKey();
-                    var embed = new EmbedBuilder()
-                            .setAuthor(dogResponses[random.nextInt(dogResponses.length)].replace("%mention%", ctx.getMember().getEffectiveName()),
-                                    null, ctx.getAuthor().getEffectiveAvatarUrl())
-                            .setColor(ctx.getMemberColor())
-                            .setImage(url)
-                            .build();
-
-                    ctx.send(embed);
-                } catch (Exception e) {
-                    ctx.sendLocalized("commands.imageboard.dog.error", EmoteReference.ERROR);
-                }
-            }
-
-            @Override
-            public HelpContent help() {
-                return new HelpContent.Builder()
-                        .setDescription("Sends a random dog image. Really cute stuff, you know?")
-                        .build();
-            }
-        });
-    }
-
-
-    @Subscribe
-    public void catgirls(CommandRegistry cr) {
-        cr.register("catgirl", new SimpleCommand(CommandCategory.IMAGE) {
-            @Override
-            protected void call(Context ctx, String content, String[] args) {
-                var nsfw = args.length > 0 && args[0].equalsIgnoreCase("nsfw");
-
-                if (nsfw && !nsfwCheck(ctx, true, true, null)) {
-                    return;
-                }
-
-                try {
-                    var result = weebAPIRequester.getRandomImageByType("neko", nsfw, null);
-                    var image = result.getKey();
-
-                    if (image == null) {
-                        ctx.sendLocalized("commands.imageboard.catgirl.error");
-                        return;
-                    }
-
-                    ctx.getChannel().sendFile(
-                            imageCache.getInput(image), "catgirl-" + result.getValue() + ".png"
-                    ).queue();
-                } catch (Exception e) {
-                    ctx.sendLocalized("commands.imageboard.catgirl.error");
-                }
-            }
-
-            @Override
-            public HelpContent help() {
-                return new HelpContent.Builder()
-                        .setDescription("Sends images of catgirl(s). Maybe.")
-                        .setUsage("""
-                                    `~>catgirl` - Sends images of normal catgirls.
-                                    `~>catgirl nsfw` - Sends images of lewd catgirls. (Only works on NSFW channels)
-                                    """
-                        ).build();
-            }
-        });
-    }
 
     @Subscribe
     public void e621(CommandRegistry cr) {

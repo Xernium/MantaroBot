@@ -16,18 +16,20 @@
 
 package net.kodehawa.mantarobot.core.modules.commands.i18n;
 
+import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.data.I18n;
-import net.kodehawa.mantarobot.db.entities.helpers.GuildData;
+import net.kodehawa.mantarobot.db.entities.DBGuild;
+import net.kodehawa.mantarobot.db.entities.DBUser;
 import net.kodehawa.mantarobot.db.entities.helpers.UserData;
 
 public class I18nContext {
-    private GuildData guildData;
-    private UserData userData;
+    private DBGuild guild;
+    private DBUser user;
     private I18n i18n = null;
 
-    public I18nContext(GuildData guildData, UserData userData) {
-        this.guildData = guildData;
-        this.userData = userData;
+    public I18nContext(DBGuild guildData, DBUser user) {
+        this.guild = guild;
+        this.user = user;
     }
 
     public I18nContext(I18n i18n) {
@@ -52,15 +54,15 @@ public class I18nContext {
             return i18n.getLanguage();
         }
 
-        if (guildData == null && userData == null) {
+        if (guild == null && user == null) {
             return "en_US";
         }
 
         String lang;
-        if (userData == null)
-            lang = guildData.getLang();
+        if (user == null)
+            lang = guild.getLang();
         else
-            lang = userData.getLang() == null || userData.getLang().isEmpty() ? guildData.getLang() : userData.getLang();
+            lang = user.getLang() == null || user.getLang().isEmpty() ? guild.getLang() : user.getLang();
 
         I18n context = I18n.getForLanguage(lang);
         return context == null ? "en_US" : lang;

@@ -39,7 +39,7 @@ public enum StatsComponent {
     }),
 
     POTION_ACTIVE(EmoteReference.BOOSTER, lang -> lang.get("commands.profile.stats.potion"), holder -> {
-        var equippedItems = holder.getUserData().getEquippedItems();
+        var equippedItems = holder.getDbUser().getEquippedItems();
         var potion = (Potion) equippedItems.getEffectItem(PlayerEquipment.EquipmentType.POTION);
         var potionEffect = equippedItems.getCurrentEffect(PlayerEquipment.EquipmentType.POTION);
         var isPotionActive = potion != null &&
@@ -63,7 +63,7 @@ public enum StatsComponent {
     }),
 
     BUFF_ACTIVE(EmoteReference.BOOSTER, lang -> lang.get("commands.profile.stats.buff"), holder -> {
-        var equippedItems = holder.getUserData().getEquippedItems();
+        var equippedItems = holder.getDbUser().getEquippedItems();
         var buff = (Potion) equippedItems.getEffectItem(PlayerEquipment.EquipmentType.BUFF);
         var buffEffect = equippedItems.getCurrentEffect(PlayerEquipment.EquipmentType.BUFF);
         var isBuffActive = buff != null &&
@@ -87,7 +87,7 @@ public enum StatsComponent {
     }),
 
     EQUIPMENT(EmoteReference.PICK, lang -> lang.get("commands.profile.stats.equipment"), holder -> {
-        var equippedItems = holder.getUserData().getEquippedItems();
+        var equippedItems = holder.getDbUser().getEquippedItems();
         return ProfileCmd.parsePlayerEquipment(equippedItems, holder.getI18nContext());
     }),
 
@@ -98,7 +98,7 @@ public enum StatsComponent {
         return "%,d/%,d XP".formatted(holder.getPlayerData().getExperience(), experienceNext);
     }),
 
-    AUTO_EQUIP(EmoteReference.SATELLITE, lang -> lang.get("commands.profile.stats.autoequip"), holder -> String.valueOf(holder.getUserData().isAutoEquip())),
+    AUTO_EQUIP(EmoteReference.SATELLITE, lang -> lang.get("commands.profile.stats.autoequip"), holder -> String.valueOf(holder.getDbUser().isAutoEquip())),
 
     ACTIVITY_EXPERIENCE(EmoteReference.ZAP, lang -> lang.get("commands.profile.stats.activity_xp"), holder -> {
         var data = holder.getPlayerData();
@@ -130,12 +130,12 @@ public enum StatsComponent {
         if (playerData.getLastDailyAt() == 0) {
             return holder.getI18nContext().get("commands.profile.stats.never");
         } else {
-            return Utils.formatDate(playerData.getLastDailyAt(), holder.getUserData().getLang());
+            return Utils.formatDate(playerData.getLastDailyAt(), holder.getDbUser().getLang());
         }
     }),
 
     WAIFU_CLAIMED(EmoteReference.ROSE, lang -> lang.get("commands.profile.stats.waifu_claimed"),
-            holder -> "%,d %s".formatted(holder.getUserData().getTimesClaimed(), holder.getI18nContext().get("commands.profile.stats.times"))
+            holder -> "%,d %s".formatted(holder.getDbUser().getTimesClaimed(), holder.getI18nContext().get("commands.profile.stats.times"))
     ),
 
     WAIFU_LOCKED(EmoteReference.LOCK, lang -> lang.get("commands.profile.stats.waifu_locked"),
@@ -143,15 +143,15 @@ public enum StatsComponent {
     ),
 
     DUST_LEVEL(EmoteReference.DUST, lang -> lang.get("commands.profile.stats.dust"),
-            holder -> "%d%%".formatted(holder.getUserData().getDustLevel())
+            holder -> "%d%%".formatted(holder.getDbUser().getDustLevel())
     ),
 
     REMINDER_COUNT(EmoteReference.CALENDAR2, lang -> lang.get("commands.profile.stats.reminders"),
-            holder -> "%,d %s".formatted(holder.getUserData().getRemindedTimes(), holder.getI18nContext().get("commands.profile.stats.times"))
+            holder -> "%,d %s".formatted(holder.getDbUser().getRemindedTimes(), holder.getI18nContext().get("commands.profile.stats.times"))
     ),
 
     LANGUAGE(EmoteReference.GLOBE, lang -> lang.get("commands.profile.stats.lang"),
-            holder -> (holder.getUserData().getLang() == null ? "en_US" : holder.getUserData().getLang())
+            holder -> (holder.getDbUser().getLang() == null ? "en_US" : holder.getDbUser().getLang())
     ),
 
     CASINO_WINS(EmoteReference.MONEY, lang -> lang.get("commands.profile.stats.wins"), holder -> {
@@ -214,10 +214,6 @@ public enum StatsComponent {
 
         public DBUser getDbUser() {
             return dbUser;
-        }
-
-        public UserData getUserData() {
-            return getDbUser().getData();
         }
 
         public I18nContext getI18nContext() {

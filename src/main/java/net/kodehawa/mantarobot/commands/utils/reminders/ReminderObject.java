@@ -16,17 +16,21 @@
 
 package net.kodehawa.mantarobot.commands.utils.reminders;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
+
+import java.util.UUID;
+
 //This just exists for the sake of serializing (!)
 public class ReminderObject {
-    public final String id;
+    public final UUID id;
     public final String reminder;
     public final long time;
     private final long scheduledAtMillis;
-    private final String userId;
-    private final String guildId;
+    private final ISnowflake userId;
+    private final ISnowflake guildId;
 
-    ReminderObject(String id, String reminder, long time,
-                   long scheduledAtMillis, String userId, String guildId) {
+    ReminderObject(UUID id, String reminder, long time,
+                   long scheduledAtMillis, ISnowflake userId, ISnowflake guildId) {
         this.id = id;
         this.reminder = reminder;
         this.time = time;
@@ -39,7 +43,7 @@ public class ReminderObject {
         return new ReminderObjectBuilder();
     }
 
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
@@ -55,25 +59,25 @@ public class ReminderObject {
         return this.scheduledAtMillis;
     }
 
-    public String getUserId() {
+    public ISnowflake getUserId() {
         return this.userId;
     }
 
-    public String getGuildId() {
+    public ISnowflake getGuildId() {
         return this.guildId;
     }
 
     public static class ReminderObjectBuilder {
-        private String id;
+        private UUID id;
         private String reminder;
         private long time;
         private long scheduledAtMillis;
-        private String userId;
-        private String guildId;
+        private ISnowflake userId;
+        private ISnowflake guildId;
 
         ReminderObjectBuilder() { }
 
-        public ReminderObject.ReminderObjectBuilder id(String id) {
+        public ReminderObject.ReminderObjectBuilder id(UUID id) {
             this.id = id;
             return this;
         }
@@ -93,12 +97,12 @@ public class ReminderObject {
             return this;
         }
 
-        public ReminderObject.ReminderObjectBuilder userId(String userId) {
+        public ReminderObject.ReminderObjectBuilder userId(ISnowflake userId) {
             this.userId = userId;
             return this;
         }
 
-        public ReminderObject.ReminderObjectBuilder guildId(String guildId) {
+        public ReminderObject.ReminderObjectBuilder guildId(ISnowflake guildId) {
             this.guildId = guildId;
             return this;
         }

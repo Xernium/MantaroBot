@@ -17,13 +17,12 @@
 package net.kodehawa.mantarobot.db;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.data.MantaroData;
 
 import javax.annotation.Nonnull;
 
-public interface ManagedObject {
-    @Nonnull
-    String getId();
+public interface ManagedObject extends ISnowflake {
 
     @JsonIgnore
     @Nonnull
@@ -31,7 +30,7 @@ public interface ManagedObject {
 
     @JsonIgnore
     @Nonnull
-    default String getDatabaseId() {
+    default Object getDatabaseId() {
         return getId();
     }
 

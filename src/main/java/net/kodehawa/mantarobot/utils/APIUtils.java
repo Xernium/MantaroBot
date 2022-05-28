@@ -16,6 +16,7 @@
 
 package net.kodehawa.mantarobot.utils;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.MantaroInfo;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.data.Config;
@@ -87,7 +88,7 @@ public class APIUtils {
         }
     }
 
-    public static Pair<Boolean, String> getPledgeInformation(String user) {
+    public static Pair<Boolean, String> getPledgeInformation(ISnowflake user) {
         if (!config.needApi) {
             return null; //nothing to query on.
         }
@@ -100,7 +101,7 @@ public class APIUtils {
                     .post(RequestBody.create(
                             okhttp3.MediaType.parse("application/json"),
                             new JSONObject()
-                                    .put("id", user)
+                                    .put("id", user.getId())
                                     .put("context", config.isPremiumBot())
                                     .toString()
                     ))

@@ -27,7 +27,7 @@ import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
 import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
-import net.kodehawa.mantarobot.commands.currency.item.special.helpers.Breakable;
+import net.kodehawa.mantarobot.commands.currency.equipment.Damageable;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent;
 import net.kodehawa.mantarobot.commands.currency.profile.StatsComponent;
@@ -51,7 +51,6 @@ import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
-import java.awt.*;
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -752,7 +751,7 @@ public class ProfileCmd {
 
             return Utils.capitalize(entry.getKey().toString()) + ": " + SEPARATOR_ONE +
                     item.toDisplayString() + SEPARATOR_HALF + " [%,d / %,d]"
-                    .formatted(equipment.getDurability().get(entry.getKey()), ((Breakable) item).getMaxDurability());
+                    .formatted(equipment.getDurability().get(entry.getKey()), ((Damageable) item).getMaxDurability());
         }).collect(Collectors.joining("\n"));
     }
 

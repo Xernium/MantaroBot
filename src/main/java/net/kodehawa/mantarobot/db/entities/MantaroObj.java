@@ -19,6 +19,7 @@ package net.kodehawa.mantarobot.db.entities;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.db.ManagedObject;
 import net.kodehawa.mantarobot.utils.Pair;
 
@@ -95,7 +96,7 @@ public class MantaroObj implements ManagedObject {
         this.patreonUsers = patreonUsers;
     }
 
-    public Map<Long, Pair<String, Long>> getMutes() {
+    public Map<Long, Pair<ISnowflake, Long>> getMutes() {
         return this.mutes;
     }
 

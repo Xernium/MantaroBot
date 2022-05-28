@@ -16,8 +16,11 @@
 
 package net.kodehawa.mantarobot.commands.utils.reminders;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
+import net.kodehawa.mantarobot.db.entities.helpers.DummySnowflake;
+import net.kodehawa.mantarobot.utils.Pair;
 import org.json.JSONObject;
 import redis.clients.jedis.JedisPool;
 
@@ -29,17 +32,17 @@ public class Reminder {
     private static final JedisPool pool = MantaroData.getDefaultJedisPool();
     private static final ManagedDatabase db = MantaroData.db();
 
-    public final String id;
+    public final UUID id;
     public final String reminder;
 
     //When should we fire this.
     public final long time;
 
     private final long scheduledAtMillis;
-    private final String userId;
-    private final String guildId;
+    private final ISnowflake userId;
+    private final ISnowflake guildId;
 
-    private Reminder(String id, String userId, String guildId, String reminder, long scheduledAt, long time) {
+    private Reminder(UUID id, ISnowflake userId, ISnowflake guildId, String reminder, long scheduledAt, long time) {
         this.id = id;
         this.userId = userId;
         this.guildId = guildId;
@@ -48,9 +51,17 @@ public class Reminder {
         this.scheduledAtMillis = scheduledAt;
     }
 
-    //This is more useful now
-    //Id here contains the full id aka UUID:userId, unlike in the other methods
-    public static void cancel(String userId, String fullId, CancelReason reason) {
+    private static Pair<ISnowflake, UUID> fromIdentifier(String identifier) {
+        var sp = identifier.split(":");
+        return new Pair<>(new DummySnowflake(sp[0]), UUID.fromString(sp[1]));
+    }
+
+    public static String toIdentifier(ISnowflake userId, UUID reminderId) {
+        return userId.getIdLong() + ":" + reminderId.toString();
+    }
+
+    public static void cancel(ISnowflake userId, UUID reminderId, CancelReason reason) {
+        var fullId = toIdentifier(userId, reminderId);
         try (var redis = pool.getResource()) {
             var data = redis.hget(table, fullId);
 
@@ -59,11 +70,10 @@ public class Reminder {
         }
 
         var user = db.getUser(userId);
-        var data = user.getData();
-        data.getReminders().remove(fullId);
+        user.getReminders().remove(reminderId);
 
         if (reason == CancelReason.REMINDED) {
-            data.incrementReminders();
+            user.incrementReminders();
         }
 
         user.save();
@@ -71,9 +81,9 @@ public class Reminder {
 
     public void schedule() {
         var r = new JSONObject()
-                .put("id", id)
-                .put("user", userId)
-                .put("guild", guildId)
+                .put("id", id.toString())
+                .put("user", userId.getIdLong())
+                .put("guild", guildId.getIdLong())
                 .put("scheduledAt", scheduledAtMillis)
                 .put("reminder", reminder)
                 .put("at", time);
@@ -81,13 +91,13 @@ public class Reminder {
         try (var redis = pool.getResource()) {
             redis.zadd(ztable, time, r.toString());
             //Needed for removal.
-            redis.hset(table, id + ":" + userId, r.toString());
+            redis.hset(table, toIdentifier(userId, id), r.toString());
         }
 
         var user = db.getUser(userId);
-        var data = user.getData();
 
-        data.getReminders().add(id + ":" + userId);
+        var sp =
+        user.getReminders().add(id);
         user.save();
     }
 
@@ -95,10 +105,10 @@ public class Reminder {
         private long current;
         private String reminder;
         private long time;
-        private String userId;
-        private String guildId;
+        private ISnowflake userId;
+        private ISnowflake guildId;
 
-        public Builder id(String id) {
+        public Builder id(ISnowflake id) {
             userId = id;
             return this;
         }
@@ -118,7 +128,7 @@ public class Reminder {
             return this;
         }
 
-        public Builder guild(String id) {
+        public Builder guild(ISnowflake id) {
             guildId = id;
             return this;
         }
@@ -135,7 +145,7 @@ public class Reminder {
             if (current <= 0)
                 throw new IllegalArgumentException("Current time must be positive and >0");
 
-            return new Reminder(UUID.randomUUID().toString(), userId, guildId, reminder, current, time);
+            return new Reminder(UUID.randomUUID(), userId, guildId, reminder, current, time);
         }
     }
 

@@ -215,7 +215,7 @@ public class AudioCmdUtils {
 
             //Reset custom channel.
             var dbGuild = MantaroData.db().getGuild(event.getGuild());
-            dbGuild.getData().setMusicChannel(null);
+            dbGuild.setMusicChannel(null);
             dbGuild.saveAsync();
 
             CompletableFuture<Void> future = new CompletableFuture<>();
@@ -229,7 +229,7 @@ public class AudioCmdUtils {
         final var guild = event.getGuild();
         final var textChannel = event.getChannel();
         final var selfMember = guild.getSelfMember();
-        final var guildData = MantaroData.db().getGuild(guild).getData();
+        final var guildData = MantaroData.db().getGuild(guild);
 
         // I can't see you in any VC here?
         if (voiceChannel == null) {

@@ -156,7 +156,7 @@ public class GameCmds {
 
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
-                var guildData = ctx.getDBGuild().getData();
+                var guildData = ctx.getDBGuild();
                 if (guildData.isGameMultipleDisabled()) {
                     ctx.sendLocalized("commands.game.disabled_multiple", EmoteReference.ERROR);
                     return;
@@ -180,7 +180,7 @@ public class GameCmds {
                     return;
                 }
 
-                var userData = ctx.getDBUser().getData();
+                var userData = ctx.getDBUser();
                 var key = MantaroData.db().getPremiumKey(userData.getPremiumKey());
                 var premium = key != null && key.getDurationDays() > 1;
                 if (split.length > (premium ? MAX_GAME_AMOUNT_PREMIUM : MAX_GAME_AMOUNT)) {
@@ -226,7 +226,7 @@ public class GameCmds {
 
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
-                var guildData = ctx.getDBGuild().getData();
+                var guildData = ctx.getDBGuild();
                 if (guildData.isGameMultipleDisabled()) {
                     ctx.sendLocalized("commands.game.disabled_multiple", EmoteReference.ERROR);
                     return;
@@ -420,8 +420,8 @@ public class GameCmds {
         if (GameLobby.LOBBYS.containsKey(ctx.getChannel().getIdLong())) {
             var dbGuild = MantaroData.db().getGuild(ctx.getGuild());
 
-            if (dbGuild.getData().getGameTimeoutExpectedAt() != null &&
-                    (Long.parseLong(dbGuild.getData().getGameTimeoutExpectedAt()) < System.currentTimeMillis())) {
+            if (dbGuild.getGameTimeoutExpectedAt() != null &&
+                    (Long.parseLong(dbGuild.getGameTimeoutExpectedAt()) < System.currentTimeMillis())) {
                 GameLobby.LOBBYS.remove(ctx.getChannel().getIdLong()); // remove old lobby if dropped
                 ctx.sendLocalized("commands.game.game_timeout_drop", EmoteReference.ERROR);
                 return false;

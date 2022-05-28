@@ -48,7 +48,6 @@ import static net.kodehawa.mantarobot.utils.commands.EmoteReference.BLUE_SMALL_M
 public class HelpCmd {
     private void buildHelp(Context ctx, CommandCategory category) {
         var dbGuild = ctx.getDBGuild();
-        var guildData = dbGuild.getData();
         var dbUser = ctx.getDBUser();
         var languageContext = ctx.getLanguageContext();
 
@@ -66,12 +65,12 @@ public class HelpCmd {
             description.append(languageContext.get("commands.help.patreon"));
         }
 
-        var disabledCommands = guildData.getDisabledCommands();
+        var disabledCommands = dbGuild.getDisabledCommands();
         if (!disabledCommands.isEmpty()) {
             description.append(languageContext.get("commands.help.disabled_commands").formatted(disabledCommands.size()));
         }
 
-        var channelSpecificDisabledCommands = guildData.getChannelSpecificDisabledCommands();
+        var channelSpecificDisabledCommands = dbGuild.getChannelSpecificDisabledCommands();
         var disabledChannelCommands = channelSpecificDisabledCommands.get(ctx.getChannel().getId());
         if (disabledChannelCommands != null && !disabledChannelCommands.isEmpty()) {
             description.append("\n");
@@ -107,7 +106,7 @@ public class HelpCmd {
                 .forEach(c ->
                         embed.addField(
                                 languageContext.get(c.toString()) + " " + languageContext.get("commands.help.commands") + ":",
-                                forType(ctx.getChannel(), guildData, c), false
+                                forType(ctx.getChannel(), dbGuild, c), false
                         )
                 );
 

@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.commands.info;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.kodehawa.mantarobot.core.command.processor.CommandProcessor;
 import net.kodehawa.mantarobot.core.modules.commands.base.CommandCategory;
-import net.kodehawa.mantarobot.db.entities.helpers.GuildData;
+import net.kodehawa.mantarobot.db.entities.DBGuild;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +27,14 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public class HelpUtils {
-    public static String forType(TextChannel channel, GuildData guildData, CommandCategory category) {
+    public static String forType(TextChannel channel, DBGuild guild, CommandCategory category) {
         return forType(
                 CommandProcessor.REGISTRY.commands().entrySet().stream()
                         .filter(entry -> entry.getValue().category() == category)
-                        .filter(entry -> !guildData.getDisabledCategories().contains(entry.getValue().category()))
-                        .filter(c -> !guildData.getDisabledCommands().contains(c.getKey()))
-                        .filter(c -> guildData.getChannelSpecificDisabledCommands().get(channel.getId()) == null || !guildData.getChannelSpecificDisabledCommands().get(channel.getId()).contains(c.getKey()))
-                        .filter(c -> !guildData.getChannelSpecificDisabledCategories().computeIfAbsent(channel.getId(), wew -> new ArrayList<>()).contains(category))
+                        .filter(entry -> !guild.getDisabledCategories().contains(entry.getValue().category()))
+                        .filter(c -> !guild.getDisabledCommands().contains(c.getKey()))
+                        .filter(c -> guild.getChannelSpecificDisabledCommands().get(channel.getId()) == null || !guild.getChannelSpecificDisabledCommands().get(channel.getId()).contains(c.getKey()))
+                        .filter(c -> !guild.getChannelSpecificDisabledCategories().computeIfAbsent(channel.getId(), wew -> new ArrayList<>()).contains(category))
                         .map(Entry::getKey)
                         .collect(Collectors.toList())
         );

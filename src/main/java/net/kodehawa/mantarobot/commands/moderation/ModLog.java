@@ -59,10 +59,10 @@ public class ModLog {
             player.saveUpdating();
         }
 
-        if (guildDB.getData().getGuildLogChannel() != null) {
+        if (guildDB.getGuildLogChannel() != null) {
             var logChannel = MantaroBot.getInstance()
                     .getShardManager()
-                    .getTextChannelById(guildDB.getData().getGuildLogChannel());
+                    .getTextChannelById(guildDB.getGuildLogChannel());
 
             if (logChannel != null) {
                 logChannel.sendMessageEmbeds(embedBuilder.build()).queue();

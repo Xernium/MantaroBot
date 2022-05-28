@@ -19,6 +19,7 @@ package net.kodehawa.mantarobot.data;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.rethinkdb.net.Connection;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
+import net.kodehawa.mantarobot.db.RethonkDatabase;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
 import org.slf4j.Logger;
@@ -81,7 +82,7 @@ public class MantaroData {
 
     public static ManagedDatabase db() {
         if (db == null) {
-            db = new ManagedDatabase(conn());
+            db = new RethonkDatabase(conn());
         }
 
         return db;

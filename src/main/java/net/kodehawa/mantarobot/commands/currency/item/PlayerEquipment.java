@@ -16,109 +16,147 @@
 
 package net.kodehawa.mantarobot.commands.currency.item;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Axe;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.FishRod;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Pickaxe;
 import net.kodehawa.mantarobot.commands.currency.item.special.helpers.Breakable;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Wrench;
+import net.kodehawa.mantarobot.db.ManagedObject;
+import org.jetbrains.annotations.NotNull;
 
-import java.beans.ConstructorProperties;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class PlayerEquipment {
     //int = itemId
-    private final Map<EquipmentType, Integer> equipment;
-    private final Map<EquipmentType, PotionEffect> effects;
-    private final Map<EquipmentType, Integer> durability;
 
-    @JsonCreator
-    @ConstructorProperties({"equipment, effects"})
-    public PlayerEquipment(@JsonProperty("equipment") Map<EquipmentType, Integer> equipment, @JsonProperty("effects") Map<EquipmentType, PotionEffect> effects, @JsonProperty("durability") Map<EquipmentType, Integer> durability) {
-        this.equipment = equipment;
-        this.effects = effects;
-        this.durability = durability == null ? new HashMap<>() : durability; // Workaround because some people will not have this property.
+    public static class PlayerEquippedItem implements ManagedObject, EquipmentTyped {
+        private long id;
+        private final EquipmentType type;
+        private final int itemId;
+        private int durability;
+
+        public PlayerEquippedItem(long id, EquipmentType type, int itemId, int durability) {
+            this.id = id;
+            this.type = type;
+            this.itemId = itemId;
+            this.durability = durability;
+        }
+
+        public int getItemId() {
+            return itemId;
+        }
+
+        public int getDurability() {
+            return durability;
+        }
+
+        public void setDurability(int durability) {
+            this.durability = durability;
+        }
+
+        @NotNull
+        @Override
+        public String getTableName() {
+            return "PlayerEquippedItem";
+        }
+
+        @Override
+        public long getIdLong() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        @Override
+        public EquipmentType getEquipmentType() {
+            return type;
+        }
+
+        // Small hack for Set
+        @Override
+        public boolean equals(Object o) {
+            if (o == null) return false;
+            if (o instanceof PlayerEquippedItem p) {
+                return p.type == this.type;
+            }
+            return false;
+        }
     }
 
-    @JsonIgnore
+    public static interface EquipmentTyped {
+        EquipmentType getEquipmentType();
+    }
+
+
+    private final Set<PlayerEquippedItem> equipped;
+    private final Set<PotionEffect> effects;
+    public PlayerEquipment(Set<PlayerEquippedItem> equipped, Set<PotionEffect> effects) {
+        this.equipped = equipped;
+        this.effects = effects;
+    }
+
     public boolean equipItem(Item item) {
         EquipmentType type = getTypeFor(item);
         if (type == null || type.getType() != 0) {
             return false;
         }
-
-        equipment.put(type, ItemHelper.idOf(item));
-        if (item instanceof Breakable) {
-            durability.put(type, ((Breakable) item).getMaxDurability());
-        }
+        equipped.add(new PlayerEquippedItem(-1, type, ItemHelper.idOf(item), item instanceof Breakable b ? b.getMaxDurability() : -1));
 
         return true;
     }
 
-    @JsonIgnore
     public void applyEffect(PotionEffect effect) {
         EquipmentType type = getTypeFor(ItemHelper.fromId(effect.getPotion()));
         if (type == null || type.getType() != 1) {
             return;
         }
-
-        effects.put(type, effect);
+        // Doesnt collide due to small hack in PotionEffect .equals()
+        effects.add(effect);
     }
 
     //Convenience methods start here.
-    @JsonIgnore
     public void resetOfType(EquipmentType type) {
-        equipment.remove(type);
-        durability.remove(type);
+        find(type, equipped).ifPresent(equipped::remove);
     }
 
-    @JsonIgnore
     public void resetEffect(EquipmentType type) {
-        effects.remove(type);
+        find(type, effects).ifPresent(effects::remove);
     }
 
-    @JsonIgnore
+    public static <T extends EquipmentTyped> Optional<T> find(EquipmentType search, Collection<T> contained){
+        return ImmutableList.copyOf(contained).stream().filter(el -> {return el.getEquipmentType() == search;}).findFirst();
+    }
     public void incrementEffectUses(EquipmentType type) {
-        effects.computeIfPresent(type, (i, effect) -> {
-            effect.setTimesUsed(effect.getTimesUsed() + 1);
-
-            return effect;
-        });
+        find(type, effects).ifPresent(active -> active.setTimesUsed(active.getTimesUsed() + 1));
     }
 
-    @JsonIgnore
     public boolean isEffectActive(EquipmentType type, int maxUses) {
-        PotionEffect effect = effects.get(type);
-        if (effect == null) {
-            return false;
+        Optional<PotionEffect> find = find(type, effects);
+        if (find.isPresent()) {
+            PotionEffect effect = find.get();
+            return effect.getTimesUsed() < maxUses;
         }
-
-        return effect.getTimesUsed() < maxUses;
+        return false;
     }
 
-    @JsonIgnore
     public PotionEffect getCurrentEffect(EquipmentType type) {
-        return effects.get(type);
+        return find(type, effects).orElse(null);
     }
 
-    @JsonIgnore
     public Item getEffectItem(EquipmentType type) {
-        PotionEffect effect = effects.get(type);
+        PotionEffect effect = find(type, effects).orElse(null);
         return effect == null ? null : ItemHelper.fromId(effect.getPotion());
     }
 
-    @JsonIgnore
     public Integer of(EquipmentType type) {
-        Integer id = equipment.get(type);
-        return id == null ? 0 : id;
+        return find(type, equipped).map(PlayerEquippedItem::getItemId).orElse(0);
     }
 
-    @JsonIgnore
-    public EquipmentType getTypeFor(Item item) {
+    public static EquipmentType getTypeFor(Item item) {
         for (EquipmentType type : EquipmentType.values()) {
             if (type.getPredicate().test(item)) {
                 return type;
@@ -128,26 +166,33 @@ public class PlayerEquipment {
         return null;
     }
 
-    @JsonIgnore
     public void resetDurabilityTo(EquipmentType type, int amount) {
-        durability.put(type, amount);
+        find(type, equipped).ifPresent(item -> item.setDurability(amount));
     }
 
-    @JsonIgnore
     public int reduceDurability(EquipmentType type, int amount) {
-        return durability.computeIfPresent(type, (t, a) -> a - amount);
+        Optional<PlayerEquippedItem> item = find(type, equipped);
+        if (item.isPresent()) {
+            item.get().setDurability(item.get().getDurability() - amount);
+            return item.get().getDurability();
+        }
+        return 0;
     }
 
-    public Map<EquipmentType, Integer> getEquipment() {
-        return this.equipment;
+    public boolean containsItem(EquipmentType type) {
+        return find(type, equipped).isPresent();
     }
 
-    public Map<EquipmentType, PotionEffect> getEffects() {
+    public int getItem(EquipmentType type) {
+        return find(type, equipped).map(PlayerEquippedItem::getItemId).orElse(-1);
+    }
+
+    public Set<PlayerEquippedItem> getEquipment() {
+        return this.equipped;
+    }
+
+    public Set<PotionEffect> getEffects() {
         return this.effects;
-    }
-
-    public Map<EquipmentType, Integer> getDurability() {
-        return durability;
     }
 
     public enum EquipmentType {

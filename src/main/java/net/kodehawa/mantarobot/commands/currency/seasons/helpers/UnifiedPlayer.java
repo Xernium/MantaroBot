@@ -16,6 +16,7 @@
 
 package net.kodehawa.mantarobot.commands.currency.seasons.helpers;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.currency.seasons.Season;
@@ -24,7 +25,7 @@ import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
 import net.kodehawa.mantarobot.db.entities.Player;
 
-public class UnifiedPlayer {
+public class UnifiedPlayer implements ISnowflake{
     private static final ManagedDatabase managedDatabase = MantaroData.db();
 
     public Player player;
@@ -37,16 +38,16 @@ public class UnifiedPlayer {
         this.seasonalPlayer = seasonalPlayer;
     }
 
-    public static UnifiedPlayer of(String userId, Season season) {
+    public static UnifiedPlayer of(ISnowflake userId, Season season) {
         return new UnifiedPlayer(managedDatabase.getPlayer(userId), managedDatabase.getPlayerForSeason(userId, season));
     }
 
     public static UnifiedPlayer of(User user, Season season) {
-        return UnifiedPlayer.of(user.getId(), season);
+        return UnifiedPlayer.of(user, season);
     }
 
     public static UnifiedPlayer of(Member member, Season season) {
-        return UnifiedPlayer.of(member.getUser().getId(), season);
+        return UnifiedPlayer.of(member.getUser(), season);
     }
 
     /**
@@ -123,5 +124,10 @@ public class UnifiedPlayer {
 
     public SeasonPlayer getSeasonalPlayer() {
         return this.seasonalPlayer;
+    }
+
+    @Override
+    public long getIdLong() {
+        return player.getIdLong();
     }
 }

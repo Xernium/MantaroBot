@@ -80,10 +80,11 @@ public class ActionCmds {
         ));
 
         //highfive();
-        cr.register("highfive", new ImageActionCmd(
-                "Highfive", "Highfives with the specified user.", EmoteReference.TALKING,
-                "commands.action.highfive", "highfive", "commands.action.lonely.highfive", "commands.action.self.highfive", true
-        ));
+        // Not on RAM api
+        //cr.register("highfive", new ImageActionCmd(
+        //        "Highfive", "Highfives with the specified user.", EmoteReference.TALKING,
+        //        "commands.action.highfive", "highfive", "commands.action.lonely.highfive", "commands.action.self.highfive", true
+        //));
 
         //pout();
         cr.register("pout", new ImageActionCmd(
@@ -98,20 +99,20 @@ public class ActionCmds {
         ));
 
         //teehee();
-        cr.register("teehee", new ImageActionCmd("Teehee", "Teehee~", EmoteReference.EYES,
-                "commands.action.teehee", "teehee", "commands.action.lonely.teehee", "commands.action.self.teehee", true));
+        //cr.register("teehee", new ImageActionCmd("Teehee", "Teehee~", EmoteReference.EYES,
+        //        "commands.action.teehee", "teehee", "commands.action.lonely.teehee", "commands.action.self.teehee", true));
 
         //smile();
-        cr.register("smile", new ImageActionCmd("Smile", "Smiles at someone", EmoteReference.TALKING,
-                "commands.action.smile", "smile", "commands.action.lonely.smile", "commands.action.self.smile", true));
+        //cr.register("smile", new ImageActionCmd("Smile", "Smiles at someone", EmoteReference.TALKING,
+        //        "commands.action.smile", "smile", "commands.action.lonely.smile", "commands.action.self.smile", true));
 
         //stare();
-        cr.register("stare", new ImageActionCmd("Stare", "Stares at someone", EmoteReference.EYES,
-                "commands.action.stare", "stare", "commands.action.lonely.stare", "commands.action.self.stare", true));
+        //cr.register("stare", new ImageActionCmd("Stare", "Stares at someone", EmoteReference.EYES,
+        //        "commands.action.stare", "stare", "commands.action.lonely.stare", "commands.action.self.stare", true));
 
         //holdhands();
-        cr.register("holdhands", new ImageActionCmd("Hold Hands", "Hold someone's hands", EmoteReference.HEART,
-                "commands.action.holdhands", "handholding", "commands.action.lonely.holdhands", "commands.action.self.holdhands", true));
+        //cr.register("holdhands", new ImageActionCmd("Hold Hands", "Hold someone's hands", EmoteReference.HEART,
+        //        "commands.action.holdhands", "handholding", "commands.action.lonely.holdhands", "commands.action.self.holdhands", true));
 
         //cuddle();
         cr.register("cuddle", new ImageActionCmd("Cuddle", "Cuddles someone", EmoteReference.HEART,
@@ -145,7 +146,7 @@ public class ActionCmds {
         cr.register("nom", new ImageCmd("*nom nom*", "nom", "nom", "commands.action.nom"));
 
         //facedesk();
-        cr.register("facedesk", new ImageCmd("When it's just too much to handle.", "facedesk", "banghead",
-                "commands.action.facedesk", true));
+        //cr.register("facedesk", new ImageCmd("When it's just too much to handle.", "facedesk", "banghead",
+        //        "commands.action.facedesk", true));
     }
 }

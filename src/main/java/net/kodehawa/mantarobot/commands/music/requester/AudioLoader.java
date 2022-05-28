@@ -86,7 +86,7 @@ public class AudioLoader implements AudioLoadResultHandler {
             var count = 0;
             var dbGuild = db.getGuild(event.getGuild());
             var user = db.getUser(member);
-            var guildData = dbGuild.getData();
+            var guildData = dbGuild;
             var i18nContext = new I18nContext(language);
 
             for (var track : playlist.getTracks()) {
@@ -153,7 +153,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private void loadSingle(AudioTrack audioTrack, boolean silent, DBGuild dbGuild, DBUser dbUser) {
         final var trackInfo = audioTrack.getInfo();
         final var trackScheduler = musicManager.getTrackScheduler();
-        final var guildData = dbGuild.getData();
+        final var guildData = dbGuild;
         var i18nContext = new I18nContext(language);
 
         audioTrack.setUserData(event.getAuthor().getId());

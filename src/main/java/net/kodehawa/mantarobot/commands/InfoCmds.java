@@ -136,7 +136,7 @@ public class InfoCmds {
             @Override
             protected void call(Context ctx, String content, String[] args) {
                 var guild = ctx.getGuild();
-                var guildData = ctx.getDBGuild().getData();
+                var guildData = ctx.getDBGuild();
 
                 var roles = guild.getRoles().stream()
                         .filter(role -> !guild.getPublicRole().equals(role))
@@ -241,7 +241,7 @@ public class InfoCmds {
                         .map(prefix -> "`" + prefix + "`")
                         .collect(Collectors.joining(" "));
 
-                var guildPrefix = dbGuild.getData().getGuildCustomPrefix();
+                var guildPrefix = dbGuild.getGuildCustomPrefix();
                 var guildPrefixString = ctx.getLanguageContext().get("commands.prefix.none");
                 if (guildPrefix != null) {
                     guildPrefixString = ctx.getLanguageContext().get("commands.prefix.guild_prefix").formatted(guildPrefix);
@@ -273,7 +273,7 @@ public class InfoCmds {
                     if (member == null)
                         return;
 
-                    var guildData = ctx.getDBGuild().getData();
+                    var guildData = ctx.getDBGuild();
                     var user = member.getUser();
 
                     var roles = member.getRoles().stream()
@@ -395,7 +395,7 @@ public class InfoCmds {
                         lang.get("commands.roleinfo.id"),
                         role.getId(),
                         lang.get("commands.roleinfo.created"),
-                        Utils.formatDate(role.getTimeCreated(), ctx.getDBGuild().getData().getLang()),
+                        Utils.formatDate(role.getTimeCreated(), ctx.getDBGuild().getLang()),
                         lang.get("commands.roleinfo.color"),
                         role.getColor() == null ?
                                 lang.get("general.none") :

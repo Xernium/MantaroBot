@@ -104,10 +104,9 @@ public class Poll extends Lobby {
             }
 
             var dbGuild = MantaroData.db().getGuild(getGuild());
-            var data = dbGuild.getData();
             var at = new AtomicInteger();
 
-            data.setRanPolls(data.getRanPolls() + 1L);
+            dbGuild.setRanPolls(dbGuild.getRanPolls() + 1L);
             dbGuild.saveAsync();
 
             var toShow = Stream.of(options)
@@ -123,7 +122,7 @@ public class Poll extends Lobby {
             var user = ctx.getAuthor();
 
             var builder = new EmbedBuilder().setAuthor(String.format(languageContext.get("commands.poll.header"),
-                    data.getRanPolls(), user.getName()), null, user.getAvatarUrl())
+                    dbGuild.getRanPolls(), user.getName()), null, user.getAvatarUrl())
                     .setDescription(String.format(languageContext.get("commands.poll.success"), name))
                     .addField(EmoteReference.PENCIL.toHeaderString() + languageContext.get("general.options"),
                             "```md\n" + toShow + "```", false

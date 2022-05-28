@@ -113,7 +113,7 @@ public class BirthdayCmd {
 
                         //Actually save it to the user's profile.
                         DBUser dbUser = ctx.getDBUser();
-                        dbUser.getData().setBirthday(birthdayFormat);
+                        dbUser.setBirthday(birthdayFormat);
                         dbUser.saveUpdating();
 
                         ctx.sendLocalized("commands.birthday.added_birthdate", EmoteReference.CORRECT, display, extra);
@@ -139,14 +139,13 @@ public class BirthdayCmd {
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
                 var dbGuild = ctx.getDBGuild();
-                var guildData = dbGuild.getData();
 
-                if (guildData.getAllowedBirthdays().contains(ctx.getAuthor().getId())) {
+                if (dbGuild.getAllowedBirthdays().contains(ctx.getAuthor().getId())) {
                     ctx.sendLocalized("commands.birthday.already_allowed", EmoteReference.ERROR);
                     return;
                 }
 
-                guildData.getAllowedBirthdays().add(ctx.getAuthor().getId());
+                dbGuild.getAllowedBirthdays().add(ctx.getAuthor().getId());
                 dbGuild.save();
 
                 var cached = guildBirthdayCache.getIfPresent(ctx.getGuild().getIdLong());
@@ -167,14 +166,13 @@ public class BirthdayCmd {
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
                 var dbGuild = ctx.getDBGuild();
-                var guildData = dbGuild.getData();
 
-                if (!guildData.getAllowedBirthdays().contains(ctx.getAuthor().getId())) {
+                if (!dbGuild.getAllowedBirthdays().contains(ctx.getAuthor().getId())) {
                     ctx.sendLocalized("commands.birthday.already_denied", EmoteReference.CORRECT);
                     return;
                 }
 
-                guildData.getAllowedBirthdays().remove(ctx.getAuthor().getId());
+                dbGuild.getAllowedBirthdays().remove(ctx.getAuthor().getId());
                 dbGuild.save();
 
                 var cached = guildBirthdayCache.getIfPresent(ctx.getGuild().getIdLong());
@@ -195,7 +193,7 @@ public class BirthdayCmd {
             @Override
             protected void call(Context ctx, I18nContext languageContext, String content) {
                 var user = ctx.getDBUser();
-                user.getData().setBirthday(null);
+                user.setBirthday(null);
                 user.save();
 
                 ctx.sendLocalized("commands.birthday.reset", EmoteReference.CORRECT);
@@ -221,7 +219,7 @@ public class BirthdayCmd {
                         }
 
                         var guild = ctx.getGuild();
-                        var data = ctx.getDBGuild().getData();
+                        var data = ctx.getDBGuild();
                         var ids = data.getAllowedBirthdays().stream().map(Long::parseUnsignedLong).collect(Collectors.toList());
 
                         if (ids.isEmpty()) {
@@ -300,7 +298,7 @@ public class BirthdayCmd {
                             return;
                         }
 
-                        var data = ctx.getDBGuild().getData();
+                        var data = ctx.getDBGuild();
                         var ids = data.getAllowedBirthdays().stream().map(Long::parseUnsignedLong).collect(Collectors.toList());
                         var guildCurrentBirthdays = getBirthdayMap(ctx.getGuild().getIdLong(), ids);
 

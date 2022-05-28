@@ -16,9 +16,7 @@
 
 package net.kodehawa.mantarobot.commands.currency.seasons;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.currency.seasons.helpers.SeasonalPlayerData;
@@ -26,7 +24,6 @@ import net.kodehawa.mantarobot.db.ManagedObject;
 import net.kodehawa.mantarobot.db.entities.helpers.Inventory;
 
 import javax.annotation.Nonnull;
-import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,17 +31,14 @@ import static net.kodehawa.mantarobot.db.entities.helpers.Inventory.Resolver.ser
 import static net.kodehawa.mantarobot.db.entities.helpers.Inventory.Resolver.unserialize;
 
 public class SeasonPlayer implements ManagedObject {
-    public static final String DB_TABLE = "seasonalplayers";
     private final SeasonalPlayerData data;
-    private final String id;
+    private final long id;
     private final transient Inventory inventory = new Inventory();
     private Long money;
     private Long reputation;
     private final Season season;
 
-    @JsonCreator
-    @ConstructorProperties({"id", "season", "money", "inventory", "reputation", "data"})
-    public SeasonPlayer(@JsonProperty("id") String id, @JsonProperty("season") Season season, @JsonProperty("money") Long money, @JsonProperty("inventory") Map<Integer, Integer> inventory, @JsonProperty("reputation") Long reputation, @JsonProperty("data") SeasonalPlayerData data) {
+  public SeasonPlayer(long id, Season season, Long money,Map<Integer, Integer> inventory, Long reputation, SeasonalPlayerData data) {
         this.id = id;
         this.money = money == null ? 0 : money;
         this.season = season;
@@ -54,18 +48,18 @@ public class SeasonPlayer implements ManagedObject {
     }
 
     public static SeasonPlayer of(User user, Season season) {
-        return of(user.getId(), season);
+        return of(user, season);
     }
 
     public static SeasonPlayer of(Member member, Season season) {
         return of(member.getUser(), season);
     }
 
-    public static SeasonPlayer of(String userId, Season season) {
-        return new SeasonPlayer(userId + ":" + season, season, 0L, new HashMap<>(), 0L, new SeasonalPlayerData());
+    public static SeasonPlayer of(ISnowflake userId, Season season) {
+        return new SeasonPlayer(userId.getIdLong(), season, 0L, new HashMap<>(), 0L, new SeasonalPlayerData());
     }
 
-    @JsonIgnore
+    
     public String getUserId() {
         return getId().split(":")[0];
     }
@@ -108,23 +102,22 @@ public class SeasonPlayer implements ManagedObject {
         return true;
     }
 
-    @JsonProperty("inventory")
     public Map<Integer, Integer> rawInventory() {
         return serialize(inventory.asList());
     }
 
-    @JsonIgnore
+    
     public Inventory getInventory() {
         return inventory;
     }
 
     //it's 3am and i cba to replace usages of this so whatever
-    @JsonIgnore
+    
     public boolean isLocked() {
         return data.getLockedUntil() - System.currentTimeMillis() > 0;
     }
 
-    @JsonIgnore
+    
     public void setLocked(boolean locked) {
         data.setLockedUntil(locked ? System.currentTimeMillis() + 35000 : 0);
     }
@@ -133,19 +126,19 @@ public class SeasonPlayer implements ManagedObject {
         return this.data;
     }
 
-    @Nonnull
-    public String getId() {
-        return this.id;
+    @Override
+    public long getIdLong() {
+        return id;
     }
 
-    @JsonIgnore
+
     @Override
     @Nonnull
     public String getTableName() {
-        return DB_TABLE;
+        return "SeasonalPlayer";
     }
 
-    @JsonIgnore
+    
     @Nonnull
     @Override
     public String getDatabaseId() {

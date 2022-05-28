@@ -86,7 +86,7 @@ public class Context {
     }
 
     public I18nContext getGuildLanguageContext() {
-        return new I18nContext(getDBGuild().getData(), null);
+        return new I18nContext(getDBGuild(), null);
     }
 
     public List<User> getMentionedUsers() {
@@ -165,7 +165,7 @@ public class Context {
         return managedDatabase.getUser(member);
     }
 
-    public DBUser getDBUser(String id) {
+    public DBUser getDBUser(ISnowflake id) {
         return managedDatabase.getUser(id);
     }
 
@@ -181,7 +181,7 @@ public class Context {
         return managedDatabase.getPlayer(member);
     }
 
-    public Player getPlayer(String id) {
+    public Player getPlayer(ISnowflake id) {
         return managedDatabase.getPlayer(id);
     }
 
@@ -201,7 +201,7 @@ public class Context {
         return managedDatabase.getPlayerStats(getMember());
     }
 
-    public PlayerStats getPlayerStats(String id) {
+    public PlayerStats getPlayerStats(ISnowflake id) {
         return managedDatabase.getPlayerStats(id);
     }
 
@@ -240,8 +240,8 @@ public class Context {
         return StringUtils.parseArguments(getArguments());
     }
 
-    public Marriage getMarriage(UserData userData) {
-        return MantaroData.db().getMarriage(userData.getMarriageId());
+    public Marriage getMarriage(DBUser user) {
+        return MantaroData.db().getMarriage(user.getMarriageId());
     }
 
     public void send(Message message) {
@@ -361,10 +361,10 @@ public class Context {
         return member;
     }
 
-    public Member retrieveMemberById(String id, boolean update) {
+    public Member retrieveMemberById(ISnowflake id, boolean update) {
         Member member = null;
         try {
-            member = getGuild().retrieveMemberById(id, update).complete();
+            member = getGuild().retrieveMemberById(id.getIdLong(), update).complete();
         } catch (Exception ignored) { }
 
         return member;

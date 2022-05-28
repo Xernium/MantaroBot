@@ -106,7 +106,7 @@ public class BirthdayTask {
             for (final var guild : guilds) {
                 // This is quite a db spam, lol
                 final var dbGuild = MantaroData.db().getGuild(guild);
-                final var guildData = dbGuild.getData();
+                final var guildData = dbGuild;
 
                 // If we have a birthday guild and channel here, continue
                 if (guildData.getBirthdayChannel() != null && guildData.getBirthdayRole() != null) {

@@ -16,6 +16,7 @@
 
 package net.kodehawa.mantarobot.commands.moderation;
 
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Member;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -32,7 +33,7 @@ public class MuteTask {
     public static void handle() {
         try {
             MantaroObj data = MantaroData.db().getMantaroData();
-            Map<Long, Pair<String, Long>> mutes = data.getMutes();
+            Map<Long, Pair<ISnowflake, Long>> mutes = data.getMutes();
             log.debug("Checking mutes... data size {}", mutes.size());
             for (var entry : mutes.entrySet()) {
                 try {
@@ -42,21 +43,20 @@ public class MuteTask {
                     var guildId = pair.getLeft();
                     var maxTime = pair.getRight();
 
-                    var guild = MantaroBot.getInstance().getShardManager().getGuildById(guildId);
+                    var guild = MantaroBot.getInstance().getShardManager().getGuildById(guildId.getIdLong());
                     if (guild == null) {
                         //Might be in another instance, or the guild left, either way we can't check properly.
                         continue;
                     }
 
                     var dbGuild = MantaroData.db().getGuild(guildId);
-                    var guildData = dbGuild.getData();
 
                     //I spent an entire month trying to figure out why this didn't work to then come to the conclusion that I'm completely stupid.
                     //I was checking against `id` instead of against the mute role id because I probably was high or something when I did this
                     //It literally took me a fucking month to figure this shit out
                     //What in the name of real fuck.
                     //Please hold me.
-                    if (guild.getRoleById(guildData.getMutedRole()) == null) {
+                    if (guild.getRoleById(dbGuild.getMutedRole()) == null) {
                         data.getMutes().remove(id);
                         data.saveAsync();
                         log.debug("Removed {} because role == null", id);
@@ -65,7 +65,7 @@ public class MuteTask {
                             log.debug("Unmuted {} because time ran out", id);
                             data.getMutes().remove(id);
                             data.save();
-                            var roleById = guild.getRoleById(guildData.getMutedRole());
+                            var roleById = guild.getRoleById(dbGuild.getMutedRole());
 
                             Member member = null;
                             try {
@@ -83,13 +83,13 @@ public class MuteTask {
                                 guild.removeRoleFromMember(member, roleById).queue();
                             }
 
-                            guildData.setCases(guildData.getCases() + 1);
+                            dbGuild.setCases(dbGuild.getCases() + 1);
                             dbGuild.saveAsync();
                             ModLog.log(guild.getSelfMember(),
                                     member.getUser(),
                                     "Mute timeout expired", "none",
                                     ModLog.ModAction.UNMUTE,
-                                    guildData.getCases()
+                                    dbGuild.getCases()
                             );
                         }
                     }

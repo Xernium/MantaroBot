@@ -28,7 +28,7 @@ import net.kodehawa.mantarobot.commands.custom.legacy.DynamicModifiers;
 import net.kodehawa.mantarobot.commands.custom.v3.CCv3;
 import net.kodehawa.mantarobot.commands.custom.v3.Parser;
 import net.kodehawa.mantarobot.core.modules.commands.base.Context;
-import net.kodehawa.mantarobot.db.entities.helpers.GuildData;
+import net.kodehawa.mantarobot.db.entities.DBGuild;
 import net.kodehawa.mantarobot.utils.StringUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
@@ -54,7 +54,7 @@ public class CustomCommandHandler {
         specialHandlers.put("text", (ctx, value, args) -> ctx.send(value));
 
         specialHandlers.put("play", (ctx, value, args) -> {
-            GuildData data = ctx.getDBGuild().getData();
+            DBGuild data = ctx.getDBGuild();
             if (data.getDisabledCommands().contains("play")) {
                 ctx.send(EmoteReference.ERROR + "The play command is disabled on this server. Cannot run this custom command.");
                 return;

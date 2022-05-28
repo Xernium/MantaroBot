@@ -32,7 +32,6 @@ import net.kodehawa.mantarobot.db.entities.DBUser;
 import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.db.entities.helpers.Inventory;
 import net.kodehawa.mantarobot.db.entities.helpers.PlayerData;
-import net.kodehawa.mantarobot.db.entities.helpers.UserData;
 import net.kodehawa.mantarobot.utils.RandomCollection;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
@@ -68,22 +67,21 @@ public class ItemHelper {
             Player player = ctx.getPlayer();
             PlayerData playerData = player.getData();
             DBUser dbUser = ctx.getDBUser();
-            UserData userData = dbUser.getData();
             Inventory playerInventory = player.getInventory();
 
             if (!playerInventory.containsItem(ItemReference.MOP))
                 return false;
 
-            if (userData.getDustLevel() >= 5) {
+            if (dbUser.getDustLevel() >= 5) {
                 playerData.setTimesMopped(playerData.getTimesMopped() + 1);
                 ctx.sendLocalized("general.misc_item_usage.mop", EmoteReference.DUST);
 
-                if (userData.getDustLevel() == 100) {
+                if (dbUser.getDustLevel() == 100) {
                     playerData.addBadgeIfAbsent(Badge.DUSTY);
                 }
 
                 playerInventory.process(new ItemStack(ItemReference.MOP, -1));
-                userData.setDustLevel(0);
+                dbUser.setDustLevel(0);
 
                 player.save();
                 dbUser.save();
@@ -98,10 +96,9 @@ public class ItemHelper {
         ItemReference.POTION_CLEAN.setAction((ctx, season) -> {
             Player player = ctx.getPlayer();
             DBUser dbUser = ctx.getDBUser();
-            UserData userData = dbUser.getData();
             Inventory playerInventory = player.getInventory();
 
-            userData.getEquippedItems().resetEffect(PlayerEquipment.EquipmentType.POTION);
+            dbUser.getEquippedItems().resetEffect(PlayerEquipment.EquipmentType.POTION);
             playerInventory.process(new ItemStack(ItemReference.POTION_CLEAN, -1));
 
             player.save();
@@ -499,9 +496,8 @@ public class ItemHelper {
     public static Pair<Boolean, Pair<Player, DBUser>> handleDurability(Context ctx, Item item,
                                                          Player player, DBUser user, SeasonPlayer seasonPlayer, boolean isSeasonal) {
         var playerInventory = isSeasonal ? seasonPlayer.getInventory() : player.getInventory();
-        var userData = user.getData();
         var seasonPlayerData = seasonPlayer.getData();
-        var equippedItems = isSeasonal ? seasonPlayerData.getEquippedItems() : userData.getEquippedItems();
+        var equippedItems = isSeasonal ? seasonPlayerData.getEquippedItems() : user.getEquippedItems();
         var subtractFrom = 0;
 
         if (handleEffect(PlayerEquipment.EquipmentType.POTION, equippedItems, ItemReference.POTION_STAMINA, user)) {
@@ -511,10 +507,10 @@ public class ItemHelper {
         }
 
         //We do validation before this...
-        var equipmentType = equippedItems.getTypeFor(item);
+        var equipmentType = PlayerEquipment.getTypeFor(item);
 
         //This is important for previously equipped items before we implemented durability.
-        if (!equippedItems.getDurability().containsKey(equipmentType) && item instanceof Breakable) {
+        if (!equippedItems.containsItem(equipmentType) && item instanceof Breakable) {
             equippedItems.resetDurabilityTo(equipmentType, ((Breakable) item).getMaxDurability());
         }
 
@@ -542,7 +538,7 @@ public class ItemHelper {
             }
 
             var toReplace = languageContext.get("commands.mine.item_broke");
-            if (!userData.isAutoEquip() && !isSeasonal) {
+            if (!user.isAutoEquip() && !isSeasonal) {
                 toReplace += "\n" + languageContext.get("commands.mine.item_broke_autoequip");
             }
 
@@ -584,6 +580,7 @@ public class ItemHelper {
         }
     }
 
+    // What in fucks name is this
     public static void handleItemDurability(Item item, Context ctx, Player player, DBUser dbUser,
                                       SeasonPlayer seasonPlayer, String i18n, boolean isSeasonal) {
         var breakage = handleDurability(ctx, item, player, dbUser, seasonPlayer, isSeasonal);
@@ -599,10 +596,9 @@ public class ItemHelper {
         var finalPlayer = breakage.getValue().getKey();
         var finalUser = breakage.getValue().getValue();
         var inventory = finalPlayer.getInventory();
-        var userData = finalUser.getData();
 
-        if (userData.isAutoEquip() && inventory.containsItem(item)) {
-            userData.getEquippedItems().equipItem(item);
+        if (dbUser.isAutoEquip() && inventory.containsItem(item)) {
+            dbUser.getEquippedItems().equipItem(item);
             inventory.process(new ItemStack(item, -1));
 
             finalPlayer.save();

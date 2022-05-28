@@ -28,7 +28,6 @@ import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
-import java.awt.Color;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -38,7 +37,7 @@ public class ImageActionCmd extends NoArgsCommand {
     private final String format;
     private final String lonelyLine;
     private final String name;
-    private final WeebAPIRequester weebapi = new WeebAPIRequester();
+    private final OpenRamAPIRequester weebapi = new OpenRamAPIRequester();
     private final Random rand = new Random();
     private final IncreasingRateLimiter rateLimiter;
     private List<String> images;
@@ -112,7 +111,7 @@ public class ImageActionCmd extends NoArgsCommand {
         var random = "";
         try {
             if (type != null) {
-                var result = weebapi.getRandomImageByType(type, false, "gif");
+                var result = weebapi.getRandomImageByType(type, false);
                 var image = result.getKey();
 
                 if (image == null) {
@@ -145,13 +144,13 @@ public class ImageActionCmd extends NoArgsCommand {
             boolean filtered = false;
             if (mentionedMembers.size() == 1) {
                 final var dbUser = ctx.getDBUser(mentionedMembers.get(0).getId());
-                if (dbUser.getData().isActionsDisabled()) {
+                if (dbUser.isActionsDisabled()) {
                     ctx.sendLocalized("commands.action.actions_disabled", EmoteReference.ERROR);
                     return;
                 }
             } else {
                 var filter = mentionedMembers.stream()
-                        .filter(member -> ctx.getDBUser(member).getData().isActionsDisabled())
+                        .filter(member -> ctx.getDBUser(member).isActionsDisabled())
                         .collect(Collectors.toList());
 
                 // Needs to be mutable.
