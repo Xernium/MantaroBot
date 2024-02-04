@@ -61,6 +61,7 @@ public class Config {
     public int memberCacheSize = 10_000;
     public boolean handleRatelimits = true;
     public boolean testing = false;
+    public boolean musicEnable = false;
 
     public Config() { }
 
@@ -220,9 +221,12 @@ public class Config {
         return testing;
     }
 
-    @JsonIgnore
     public boolean musicEnable() {
-        return isPremiumBot() || isSelfHost() || isTesting();
+        return musicEnable;
+    }
+
+    public void setMusicEnable(boolean musicEnable) {
+        this.musicEnable = musicEnable;
     }
 
     public String getMongoUri() {
