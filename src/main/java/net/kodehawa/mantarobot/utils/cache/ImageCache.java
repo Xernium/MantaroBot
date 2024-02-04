@@ -19,6 +19,7 @@ package net.kodehawa.mantarobot.utils.cache;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import net.kodehawa.mantarobot.commands.action.ActionAPIRequester;
 import net.kodehawa.mantarobot.commands.action.WeebAPIRequester;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
@@ -35,8 +36,6 @@ import java.util.concurrent.TimeUnit;
 public class ImageCache {
     @JsonIgnore
     private static final Random rand = new Random();
-    @JsonIgnore
-    private static final WeebAPIRequester weebAPI = new WeebAPIRequester();
 
     private static final Logger log = LoggerFactory.getLogger(ImageCache.class);
     private final List<ImageCacheType> images = new ArrayList<>();
@@ -53,13 +52,13 @@ public class ImageCache {
     }
 
     @JsonIgnore
-    public static WeebAPIRequester.WeebAPIObject getImage(String type) throws NoSuchElementException, JsonProcessingException {
+    public static ActionAPIRequester.ActionAPIObject getImage(String type) throws NoSuchElementException, JsonProcessingException {
         // Having this on the method call itself caused this to fail prematurely.
-        WeebAPIRequester.WeebAPIObject result = null;
+        ActionAPIRequester.ActionAPIObject result = null;
         try {
-            result = weebAPI.getRandomImageByType(type, false, "gif");
+            result = ActionAPIRequester.getActiveInstance().getRandomImageByType(type, false, "gif");
         } catch (Exception e) {
-            log.debug("Error getting image from WeebAPI, attempting fallback", e);
+            log.debug("Error getting image from active action API, attempting fallback", e);
         }
 
         if (result != null) {
@@ -95,7 +94,7 @@ public class ImageCache {
                     // We probably want to cache the actual image too somewhere? This kinda assumes the API is dead but the CDN isn't, which
                     // isn't always true...
                     // Also, this feels kinda hacky.
-                    result = new WeebAPIRequester.WeebAPIObject(
+                    result = new ActionAPIRequester.ActionAPIObject(
                             res.id(), res.url(), "gif", false, type, Collections.emptyList()
                     );
                 } else {

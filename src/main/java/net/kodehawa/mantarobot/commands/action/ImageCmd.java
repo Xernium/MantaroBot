@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class ImageCmd extends NoArgsCommand {
     private final String desc;
     private final String toSend;
-    private final WeebAPIRequester weebapi = new WeebAPIRequester();
     private final Random rand = new Random();
     private List<String> images;
     private boolean noMentions = false;
@@ -69,7 +68,7 @@ public class ImageCmd extends NoArgsCommand {
         String random;
         try {
             if (type != null) {
-                var result = weebapi.getRandomImageByType(type, false, null);
+                var result = ActionAPIRequester.getActiveInstance().getRandomImageByType(type, false, null);
                 images = Collections.singletonList(result.url());
                 random = images.get(0); //Guaranteed random selection :^).
             } else {

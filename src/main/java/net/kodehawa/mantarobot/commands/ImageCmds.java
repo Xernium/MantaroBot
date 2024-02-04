@@ -31,7 +31,7 @@ import net.kodehawa.lib.imageboards.entities.impl.Rule34Image;
 import net.kodehawa.lib.imageboards.entities.impl.SafeFurryImage;
 import net.kodehawa.lib.imageboards.entities.impl.SafebooruImage;
 import net.kodehawa.lib.imageboards.entities.impl.YandereImage;
-import net.kodehawa.mantarobot.commands.action.WeebAPIRequester;
+import net.kodehawa.mantarobot.commands.action.ActionAPIRequester;
 import net.kodehawa.mantarobot.commands.image.ImageRequestType;
 import net.kodehawa.mantarobot.core.CommandRegistry;
 import net.kodehawa.mantarobot.core.command.meta.Category;
@@ -90,7 +90,7 @@ public class ImageCmds {
     private static final ImageBoard<SafebooruImage> safebooru = DefaultImageBoards.SAFEBOORU;
     private static final ImageBoard<YandereImage> yandere = DefaultImageBoards.YANDERE;
     private static final ImageBoard<GelbooruImage> gelbooru = DefaultImageBoards.GELBOORU;
-    private static final WeebAPIRequester weebAPIRequester = new WeebAPIRequester();
+    private static final ActionAPIRequester ACTION_API_REQUESTER = ActionAPIRequester.getActiveInstance();
     private static final Random random = new Random();
 
     @Subscribe
@@ -120,7 +120,7 @@ public class ImageCmds {
             @Override
             protected void process(SlashContext ctx) {
                 try {
-                    var result = weebAPIRequester.getRandomImageByType("animal_cat", false, null);
+                    var result = ACTION_API_REQUESTER.getRandomImageByType("animal_cat", false, null);
                     var url = result.url();
                     var embed = new EmbedBuilder()
                             .setAuthor(catResponses[random.nextInt(catResponses.length)].replace("%mention%", ctx.getMember().getEffectiveName()),
@@ -144,7 +144,7 @@ public class ImageCmds {
             @Override
             protected void process(SlashContext ctx) {
                 try {
-                    var result = weebAPIRequester.getRandomImageByType("animal_dog", false, null);
+                    var result = ACTION_API_REQUESTER.getRandomImageByType("animal_dog", false, null);
                     var url = result.url();
                     var embed = new EmbedBuilder()
                             .setAuthor(dogResponses[random.nextInt(dogResponses.length)].replace("%mention%", ctx.getMember().getEffectiveName()),
@@ -176,7 +176,7 @@ public class ImageCmds {
             @Override
             protected void process(SlashContext ctx) {
                 try {
-                    var result = weebAPIRequester.getRandomImageByType("neko", false, null);
+                    var result = ACTION_API_REQUESTER.getRandomImageByType("neko", false, null);
                     if (result == null) {
                         ctx.reply("commands.imageboard.catgirl.error");
                         return;

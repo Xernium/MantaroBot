@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class WeebAPIRequester {
+public class WeebAPIRequester extends ActionAPIRequester {
     private static final Logger log = LoggerFactory.getLogger(WeebAPIRequester.class);
     private static final String ALL_TAGS = "/tags";
     private static final String ALL_TYPES = "/types";
@@ -48,7 +48,7 @@ public class WeebAPIRequester {
             .readTimeout(2500, TimeUnit.MILLISECONDS)
             .build();
 
-    public WeebAPIObject getRandomImageByType(String type, boolean nsfw, String filetype) throws JsonProcessingException {
+    public ActionAPIObject getRandomImageByType(String type, boolean nsfw, String filetype) throws JsonProcessingException {
         HashMap<String, Object> queryParams = new HashMap<>();
         queryParams.put("type", type);
 
@@ -68,18 +68,9 @@ public class WeebAPIRequester {
             return null;
         }
 
-        return JsonDataManager.fromJson(req, WeebAPIObject.class);
+        return JsonDataManager.fromJson(req, ActionAPIObject.class);
     }
 
-    @SuppressWarnings("unused")
-    public JSONObject getTypes() {
-        var req = request(ALL_TYPES, null);
-        if (req == null) {
-            return null;
-        }
-
-        return new JSONObject(req);
-    }
 
     @SuppressWarnings("unused")
     public JSONObject getTags() {
@@ -118,8 +109,4 @@ public class WeebAPIRequester {
             return null;
         }
     }
-
-    public record WeebAPIObject(String id, String url, String fileType, boolean nsfw, String type, List<WeebAPITag> tags) { }
-    @SuppressWarnings("unused")
-    public record WeebAPITag(String user, boolean hidden, String name) { }
 }
