@@ -18,7 +18,6 @@
 package net.kodehawa.mantarobot.commands;
 
 import com.google.common.eventbus.Subscribe;
-import dev.arbjerg.lavalink.client.LavalinkNode;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDAInfo;
 import net.kodehawa.mantarobot.MantaroInfo;
@@ -71,9 +70,7 @@ public class DebugCmds {
             var guilds = 0L;
             var users = 0L;
             var clusterTotal = 0L;
-            var players = 0L;
             var totalMemory = 0L;
-            var queueSize = 0L;
             var totalThreadCount = 0L;
             var totalCommandCount = 0L;
 
@@ -94,24 +91,11 @@ public class DebugCmds {
                 for (var cluster : clusters.entrySet()) {
                     var json = new JSONObject(cluster.getValue());
                     totalMemory += json.getLong("used_memory");
-                    queueSize += json.getLong("queue_size");
                     totalThreadCount += json.getLong("thread_count");
                     totalCommandCount += json.getLong("commands_ran");
                 }
 
                 clusterTotal = clusters.size();
-            }
-
-            // We don't need to account for node stats delay here
-            if (config.isPremiumBot()) {
-                queueSize = ctx.getBot().getAudioManager().getTotalQueueSize();
-            }
-
-            List<LavalinkNode> lavaLinkSockets = ctx.getBot().getLavaLink().getNodes();
-            for (var lavaLink : lavaLinkSockets) {
-                if (lavaLink.getAvailable() && lavaLink.getStats() != null) {
-                    players += lavaLink.getStats().getPlayingPlayers();
-                }
             }
 
             var responseTotal = bot.getShardManager().getShardCache()
@@ -164,7 +148,6 @@ public class DebugCmds {
                     + "Shards: " + bot.getShardManager().getShardsTotal() + " (This: " + jda.getShardInfo().getShardId() + ")" + "\n"
                     + "Threads: " + "%,d (Node: %,d)".formatted(totalThreadCount, Thread.activeCount()) + "\n"
                     + "Commands Used: " + "%,d (Node: %,d)".formatted(totalCommandCount, CommandListener.getCommandTotal()) + "\n"
-                    + (ctx.getConfig().musicEnable() ? "Music: " + "[ Players: %,d, Queue: %,d ]".formatted(players, queueSize) + "\n" : "")
                     + "```"
             );
         }

@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.kodehawa.mantarobot.MantaroBot;
-import net.kodehawa.mantarobot.commands.music.MantaroAudioManager;
 import net.kodehawa.mantarobot.core.command.argument.ArgumentParseError;
 import net.kodehawa.mantarobot.core.command.argument.Arguments;
 import net.kodehawa.mantarobot.core.command.argument.MarkedBlock;
@@ -425,10 +424,6 @@ public class NewContext implements IContext {
 
     public Member getSelfMember() {
         return getGuild().getSelfMember();
-    }
-
-    public MantaroAudioManager getAudioManager() {
-        return getBot().getAudioManager();
     }
 
     @Override

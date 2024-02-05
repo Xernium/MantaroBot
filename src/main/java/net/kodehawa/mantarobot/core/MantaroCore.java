@@ -19,7 +19,6 @@ package net.kodehawa.mantarobot.core;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
@@ -40,7 +39,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.dv8tion.jda.api.utils.messages.MessageRequest;
 import net.kodehawa.mantarobot.ExtraRuntimeOptions;
 import net.kodehawa.mantarobot.MantaroBot;
-import net.kodehawa.mantarobot.commands.music.listener.VoiceChannelListener;
 import net.kodehawa.mantarobot.core.cache.EvictingCachePolicy;
 import net.kodehawa.mantarobot.core.command.processor.CommandProcessor;
 import net.kodehawa.mantarobot.core.listeners.MantaroListener;
@@ -97,7 +95,6 @@ import static net.kodehawa.mantarobot.utils.ShutdownCodes.SHARD_FETCH_FAILURE;
 
 public class MantaroCore {
     private static final Logger log = LoggerFactory.getLogger(MantaroCore.class);
-    private static final VoiceChannelListener VOICE_CHANNEL_LISTENER = new VoiceChannelListener();
 
     private LoadState loadState = PRELOAD;
     private final Map<Integer, Shard> shards = new ConcurrentHashMap<>();
@@ -224,39 +221,20 @@ public class MantaroCore {
 
             var enabled = new ArrayList<>(List.of(toEnable));
             EnumSet<CacheFlag> disabledIntents;
-            if (config.musicEnable()) {
-                disabledIntents = EnumSet.of(
-                        CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS,
-                        CacheFlag.ROLE_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.STICKER,
-                        CacheFlag.SCHEDULED_EVENTS, CacheFlag.FORUM_TAGS
-                );
 
-                eventListeners = new Object[]{
-                        VOICE_CHANNEL_LISTENER,
-                        InteractiveOperations.listener(),
-                        ButtonOperations.listener(),
-                        ModalOperations.listener(),
-                        shardStartListener
-                };
+            disabledIntents = EnumSet.of(
+            CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS,
+                    CacheFlag.ROLE_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.STICKER,
+                    CacheFlag.SCHEDULED_EVENTS, CacheFlag.FORUM_TAGS, CacheFlag.VOICE_STATE
+            );
 
-                enabled.add(GatewayIntent.GUILD_VOICE_STATES); // Receive voice states, needed so Member#getVoiceState doesn't return null.
-                log.info("Music has been enabled.");
-            } else {
-                disabledIntents = EnumSet.of(
-                        CacheFlag.ACTIVITY, CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS,
-                        CacheFlag.ROLE_TAGS, CacheFlag.ONLINE_STATUS, CacheFlag.STICKER,
-                        CacheFlag.SCHEDULED_EVENTS, CacheFlag.FORUM_TAGS, CacheFlag.VOICE_STATE
-                );
+            eventListeners = new Object[]{
+                    InteractiveOperations.listener(),
+                    ButtonOperations.listener(),
+                    ModalOperations.listener(),
+                    shardStartListener
+            };
 
-                eventListeners = new Object[]{
-                        InteractiveOperations.listener(),
-                        ButtonOperations.listener(),
-                        ModalOperations.listener(),
-                        shardStartListener
-                };
-
-                log.info("Music has been disabled.");
-            }
 
             log.info("Using intents: {}", enabled.stream()
                     .map(Enum::name)
@@ -284,9 +262,6 @@ public class MantaroCore {
                     .disableCache(disabledIntents)
                     .setActivity(Activity.playing("Hold on to your seatbelts!"));
 
-            if (config.musicEnable()) {
-                shardManager.setVoiceDispatchInterceptor(new JDAVoiceUpdateListener(MantaroBot.getInstance().getLavaLink()));
-            }
 
             /* only create eviction strategies that will get used */
             List<Integer> shardIds;

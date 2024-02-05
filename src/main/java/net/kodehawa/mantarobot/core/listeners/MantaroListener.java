@@ -529,18 +529,11 @@ public class MantaroListener implements EventListener {
             final var jda = event.getJDA();
             final var guild = event.getGuild();
             final var guildBirthdayCache = BirthdayCmd.getGuildBirthdayCache();
-            final var manager = bot.getAudioManager().getMusicManagers().get(guild.getId());
 
             // Clear internal data we don't need anymore.
             guild.getTextChannelCache().stream().forEach(TextChannelGround::delete);
             guildBirthdayCache.invalidate(guild.getIdLong());
             guildBirthdayCache.cleanUp();
-
-            // Clean the internal music data.
-            if (manager != null) {
-                manager.getLavaLink().destroyPlayer().block(Duration.ofMillis(300));
-                bot.getAudioManager().getMusicManagers().remove(guild.getId());
-            }
 
             // Post bot statistics to the main API.
             this.updateStats(jda);

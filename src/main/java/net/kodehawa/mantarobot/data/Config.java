@@ -49,10 +49,6 @@ public class Config {
     public String clientId; //why not ig.
     public String jedisPoolAddress = "127.0.0.1";
     public int jedisPoolPort = 6379;
-    public List<String> lavalinkNodes = new ArrayList<>();
-    public String lavalinkPass;
-    public String ipv6Block = "";
-    public String excludeAddress = "";
     public String dKey = "";
     public String yandexKey = "";
     public int bucketFactor = 4;
@@ -165,22 +161,6 @@ public class Config {
         return this.jedisPoolPort;
     }
 
-    public List<String> getLavalinkNodes() {
-        return this.lavalinkNodes;
-    }
-
-    public String getLavalinkPass() {
-        return this.lavalinkPass;
-    }
-
-    public String getIpv6Block() {
-        return this.ipv6Block;
-    }
-
-    public String getExcludeAddress() {
-        return this.excludeAddress;
-    }
-
     public int getBucketFactor() {
         return this.bucketFactor;
     }
@@ -219,14 +199,6 @@ public class Config {
 
     public boolean isTesting() {
         return testing;
-    }
-
-    public boolean musicEnable() {
-        return musicEnable;
-    }
-
-    public void setMusicEnable(boolean musicEnable) {
-        this.musicEnable = musicEnable;
     }
 
     public String getMongoUri() {

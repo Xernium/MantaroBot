@@ -33,7 +33,6 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.kodehawa.mantarobot.MantaroBot;
-import net.kodehawa.mantarobot.commands.music.MantaroAudioManager;
 import net.kodehawa.mantarobot.core.command.slash.IContext;
 import net.kodehawa.mantarobot.core.modules.commands.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
@@ -178,10 +177,6 @@ public class Context implements IContext {
     @Override
     public GuildMessageChannel getChannel() {
         return event.getGuildChannel();
-    }
-
-    public MantaroAudioManager getAudioManager() {
-        return getBot().getAudioManager();
     }
 
     @Override

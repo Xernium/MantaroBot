@@ -18,7 +18,6 @@
 package net.kodehawa.mantarobot;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.arbjerg.lavalink.client.LavalinkClient;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -27,7 +26,6 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.MiscUtil;
 import net.kodehawa.lib.imageboards.ImageBoard;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
-import net.kodehawa.mantarobot.commands.music.MantaroAudioManager;
 import net.kodehawa.mantarobot.commands.utils.birthday.BirthdayCacher;
 import net.kodehawa.mantarobot.commands.utils.birthday.BirthdayTask;
 import net.kodehawa.mantarobot.commands.utils.polls.PollTask;
@@ -91,9 +89,7 @@ public class MantaroBot {
         }
     }
 
-    private final MantaroAudioManager audioManager;
     private final MantaroCore core;
-    private final LavalinkClient lavaLink;
     private final Config config = MantaroData.config().get();
 
     private final BirthdayCacher birthdayCacher;
@@ -135,19 +131,6 @@ public class MantaroBot {
         birthdayCacher = new BirthdayCacher();
         ItemHelper.setItemActions();
 
-        // Lavalink stuff.
-        lavaLink = new LavalinkClient(
-                Long.parseLong(config.clientId)
-        );
-
-        if (config.musicEnable()) {
-            for (var node : config.getLavalinkNodes()) {
-                // Why name?
-                lavaLink.addNode(String.valueOf(UUID.randomUUID()), new URI(node), config.lavalinkPass);
-            }
-        }
-
-        audioManager = new MantaroAudioManager(lavaLink);
         LogUtils.log("Startup",
                 "Starting up Mantaro %s (Git: %s) in Node %s%nHold your seatbelts! <3"
                         .formatted(MantaroInfo.VERSION, MantaroInfo.GIT_REVISION, getNodeNumber())
@@ -162,18 +145,6 @@ public class MantaroBot {
         MantaroData.config().save();
         ImageBoard.setUserAgent(MantaroInfo.USER_AGENT);
         this.startExecutors();
-
-        if (config.musicEnable()) {
-            var thread = new ThreadFactoryBuilder().setNameFormat("Mantaro Shutdown Hook").build();
-            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
-                log.info("Destroying all active players...");
-                for (var players : audioManager.getMusicManagers().entrySet()) {
-                    players.getValue().getLavaLink().destroyPlayer().block(Duration.ofMillis(300));
-                }
-
-                log.info("Destroyed all players. Not aware of anything holding off shutdown now");
-            }));
-        }
     }
 
     public static void main(String[] args) {
@@ -355,10 +326,6 @@ public class MantaroBot {
         }
     }
 
-    public MantaroAudioManager getAudioManager() {
-        return this.audioManager;
-    }
-
     public MantaroCore getCore() {
         return this.core;
     }
@@ -369,10 +336,6 @@ public class MantaroBot {
 
     public ScheduledExecutorService getExecutorService() {
         return this.executorService;
-    }
-
-    public LavalinkClient getLavaLink() {
-        return this.lavaLink;
     }
 
     public boolean isMasterNode() {
