@@ -196,17 +196,6 @@ public class CommandRegistry {
             return;
         }
 
-        // If we are in the patreon bot, deny all requests from unknown guilds.
-        if (config.isPremiumBot() && !config.isOwner(author) && !dbGuild.isPremium()) {
-            channel.sendMessage("""
-                            :x: Seems like you're trying to use the Patreon bot when this guild is **not** marked as premium.
-                            **If you think this is an error please contact Kodehawa#3457 or poke me on #donators in the support guild**
-                            If you didn't contact Kodehawa prior to adding this bot to this server, please do so so we can link it to your pledge.
-                            """
-            ).queue();
-            return;
-        }
-
         if (!cmd.permission().test(member)) {
             channel.sendMessage(EmoteReference.STOP + "You have no permissions to trigger this command :(").queue();
             return;
@@ -214,7 +203,6 @@ public class CommandRegistry {
         // !! Permission check end
 
         final var dbUser = managedDatabase.getUser(author);
-        renewPremiumKey(managedDatabase, author, dbUser, dbGuild);
 
         // Used a command on the new system?
         // sort-of-fix: remove if statement when we port all commands
@@ -289,16 +277,6 @@ public class CommandRegistry {
 
         final var author = event.getUser();
         final var dbGuild = managedDatabase.getGuild(event.getGuild());
-        // If we are in the patreon bot, deny all requests from unknown guilds.
-        if (config.isPremiumBot() && !config.isOwner(author) && !dbGuild.isPremium()) {
-            event.reply("""
-                            :x: Seems like you're trying to use the Patreon bot when this guild is **not** marked as premium.
-                            **If you think this is an error please contact Kodehawa#3457 or poke me on #donators in the support guild**
-                            If you didn't contact Kodehawa prior to adding this bot to this server, please do so so we can link it to your pledge.
-                            """
-            ).setEphemeral(true).queue();
-            return;
-        }
 
         final var dbUser = managedDatabase.getUser(author);
         cmd.execute(new InteractionContext<>(event, new I18nContext(dbGuild, dbUser)));
@@ -418,17 +396,6 @@ public class CommandRegistry {
             return;
         }
 
-        // If we are in the patreon bot, deny all requests from unknown guilds.
-        if (config.isPremiumBot() && !config.isOwner(author) && !dbGuild.isPremium()) {
-            event.reply("""
-                            :x: Seems like you're trying to use the Patreon bot when this guild is **not** marked as premium.
-                            **If you think this is an error please contact Kodehawa#3457 or poke me on #donators in the support guild**
-                            If you didn't contact Kodehawa prior to adding this bot to this server, please do so so we can link it to your pledge.
-                            """
-            ).setEphemeral(true).queue();
-            return;
-        }
-
         if (!cmd.getPermission().test(member)) {
             event.reply(EmoteReference.STOP + "You have no permissions to trigger this command :(").setEphemeral(true).queue();
             return;
@@ -436,7 +403,6 @@ public class CommandRegistry {
         // !! Permission check end
 
         final var dbUser = managedDatabase.getUser(author);
-        renewPremiumKey(managedDatabase, author, dbUser, dbGuild);
 
         cmd.execute(new SlashContext(event, new I18nContext(dbGuild, dbUser)));
         commandLog.debug("Slash command: {}, User: {} ({}), Guild: {}, Channel: {}, Options: {}" ,
@@ -459,46 +425,6 @@ public class CommandRegistry {
             var sub = command.getSubCommands().get(ctx.getSubCommand());
             if (sub != null) sub.onAutocomplete(ctx);
             else command.onAutocomplete(ctx);
-        }
-    }
-
-    public void renewPremiumKey(ManagedDatabase managedDatabase, User author, MongoUser dbUser, MongoGuild guildData) {
-        if (dbUser.getPremiumKey() != null) {
-            final var currentKey = managedDatabase.getPremiumKey(dbUser.getPremiumKey());
-            if (currentKey != null) {
-                // 10 days before expiration or best fit.
-                if (currentKey.validFor() <= 10 && currentKey.validFor() > 1) {
-                    // Handling is done inside the PremiumKey#renew method. This only gets fired if the key has less than 10 days left.
-                    if (!currentKey.renew() && !dbUser.hasReceivedExpirationWarning()) {
-                        author.openPrivateChannel().queue(privateChannel ->
-                                privateChannel.sendMessage(
-                                        """
-                                        %1$sYour premium key is about to expire in **%2$,d** days**!
-                                        :heart: *If you're still pledging to Mantaro* you can ask Kodehawa#3457 for a key renewal in the #donators channel.*
-                                        In the case that you're not longer a patron, you cannot renew, but I sincerely hope you had a good time with the bot and its features!
-                                        **If you ever want to pledge again you can check the patreon link at <https://patreon.com/mantaro>**
-                                        
-                                        Thanks you so much for your support to keep Mantaro alive! It wouldn't be possible without the help of all of you.
-                                        With love, Kodehawa and the Mantaro team :heart:
-                                        
-                                        This will only be sent once (hopefully). Thanks again!
-                                        """.formatted(EmoteReference.WARNING, Math.max(1, currentKey.validFor()))
-                                ).queue()
-                        );
-                    }
-
-                    dbUser.receivedExpirationWarning(true);
-                    dbUser.updateAllChanged();
-                }
-            }
-        }
-
-        if (guildData.getPremiumKey() != null) {
-            final var guildKey = managedDatabase.getPremiumKey(guildData.getPremiumKey());
-            // Handling is done inside the PremiumKey#renew method. This only gets fired if the key has less than 10 days left.
-            if (guildKey != null && guildKey.validFor() <= 10 && guildKey.validFor() > 1) {
-                guildKey.renew();
-            }
         }
     }
 

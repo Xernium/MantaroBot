@@ -57,10 +57,6 @@ public enum ProfileComponent {
             (holder, i18nContext) -> String.format(Utils.getLocaleFromLanguage(i18nContext), "$ %,d", holder.player().getCurrentMoney()),
             true, false
     ),
-    OLD_CREDITS(EmoteReference.DOLLAR, i18nContext -> i18nContext.get("commands.profile.old_credits"), (holder, i18nContext) ->
-            "$ %,d".formatted(holder.player().getOldMoney()),
-            true, false
-    ),
     REPUTATION(EmoteReference.REP, i18nContext -> i18nContext.get("commands.profile.rep"), (holder, i18nContext) -> String.valueOf(holder.player().getReputation())),
     LEVEL(EmoteReference.ZAP, i18nContext -> i18nContext.get("commands.profile.level"), (holder, i18nContext) -> {
         var player = holder.player();

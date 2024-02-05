@@ -9,7 +9,6 @@ import net.kodehawa.mantarobot.data.annotations.HiddenConfig;
 import net.kodehawa.mantarobot.db.ManagedMongoObject;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Pair;
-import net.kodehawa.mantarobot.utils.patreon.PatreonPledge;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +37,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     @BsonId
     private String id;
-    @HiddenConfig
-    private long premiumUntil = 0L;
     @ConfigName("Autoroles")
     private Map<String, String> autoroles = new HashMap<>();
     @ConfigName("Birthday Announcer Channel")
@@ -214,95 +211,6 @@ public class MongoGuild implements ManagedMongoObject {
         MantaroData.db().updateFieldValues(this, fieldTracker);
     }
 
-    @BsonIgnore
-    public long getPremiumLeft() {
-        return isPremium() ? this.premiumUntil - currentTimeMillis() : 0;
-    }
-
-    @BsonIgnore
-    public boolean isPremium() {
-        PremiumKey key = MantaroData.db().getPremiumKey(getPremiumKey());
-        //Key validation check (is it still active? delete otherwise)
-        if (key != null) {
-            boolean isKeyActive = currentTimeMillis() < key.getExpiration();
-            if (!isKeyActive && LocalDate.now(ZoneId.of("America/Chicago")).getDayOfMonth() > 5) {
-                MongoUser owner = MantaroData.db().getUser(key.getOwner());
-                owner.removeKeyClaimed(getId());
-                owner.updateAllChanged();
-
-                removePremiumKey(key.getOwner(), key.getId());
-                key.delete();
-                return false;
-            }
-
-            //Link key to owner if key == owner and key holder is on patreon.
-            //Sadly gotta skip of holder isn't patron here bc there are some bought keys (paypal) which I can't convert without invalidating
-            Pair<Boolean, String> pledgeInfo = APIUtils.getPledgeInformation(key.getOwner());
-            if (pledgeInfo != null && pledgeInfo.left()) {
-                key.setLinkedTo(key.getOwner());
-                key.insertOrReplace(); //doesn't matter if it doesn't save immediately, will do later anyway (key is usually immutable in db)
-            }
-
-            //If the receipt is not the owner, account them to the keys the owner has claimed.
-            //This has usage later when seeing how many keys can they take. The second/third check is kind of redundant, but necessary anyway to see if it works.
-            String keyLinkedTo = key.getLinkedTo();
-            if (keyLinkedTo != null) {
-                MongoUser owner = MantaroData.db().getUser(keyLinkedTo);
-                if (!owner.getKeysClaimed().containsKey(getId())) {
-                    owner.addKeyClaimed(getId(), key.getId());
-                    owner.updateAllChanged();
-                }
-            }
-        }
-
-        //Patreon bot link check.
-        String linkedTo = getMpLinkedTo();
-        if (config.isPremiumBot() && linkedTo != null && key == null) { //Key should always be null in MP anyway.
-            PatreonPledge pledgeInfo = APIUtils.getFullPledgeInformation(linkedTo);
-            if (pledgeInfo != null && pledgeInfo.getReward().getKeyAmount() >= 3) {
-                // Subscribed to MP properly.
-                return true;
-            }
-        }
-
-        //MP uses the old premium system for some guilds: keep it here.
-        return currentTimeMillis() < premiumUntil || (key != null && currentTimeMillis() < key.getExpiration() && key.getParsedType().equals(PremiumKey.Type.GUILD));
-    }
-
-    @BsonIgnore
-    public PremiumKey generateAndApplyPremiumKey(int days) {
-        String premiumId = UUID.randomUUID().toString();
-        PremiumKey newKey = new PremiumKey(premiumId, TimeUnit.DAYS.toMillis(days),
-                currentTimeMillis() + TimeUnit.DAYS.toMillis(days), PremiumKey.Type.GUILD, true, id, null);
-        premiumKey(premiumId);
-        newKey.insertOrReplace();
-
-        updateAllChanged();
-        return newKey;
-    }
-
-    @BsonIgnore
-    public void removePremiumKey(String keyOwner, String originalKey) {
-        premiumKey(null);
-
-        MongoUser dbUser = MantaroData.db().getUser(keyOwner);
-        dbUser.removePremiumKey(dbUser.getUserIdFromKeyId(originalKey));
-        dbUser.updateAllChanged();
-
-        updateAllChanged();
-    }
-
-    @BsonIgnore
-    public void incrementPremium(long milliseconds) {
-        if (isPremium()) {
-            this.premiumUntil += milliseconds;
-        } else {
-            this.premiumUntil = currentTimeMillis() + milliseconds;
-        }
-
-        fieldTracker.put("premiumUntil", this.premiumUntil);
-    }
-
     public Map<String, String> getAutoroles() {
         return autoroles;
     }
@@ -385,10 +293,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     public Map<String, Poll.PollDatabaseObject> getRunningPolls() {
         return runningPolls;
-    }
-
-    public long getPremiumUntil() {
-        return premiumUntil;
     }
 
     public long getCases() {
@@ -557,10 +461,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     public boolean hasReceivedGreet() {
         return hasReceivedGreet;
-    }
-
-    protected void setPremiumUntil(long premiumUntil) {
-        this.premiumUntil = premiumUntil;
     }
 
     protected void setAutoroles(Map<String, String> autoroles) {
@@ -809,12 +709,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     protected void setLang(String lang) {
         this.lang = lang;
-    }
-
-    // Database helpers to track changes -- the setX methods get called upon serialization so they can't hold the tracker.
-    public void premiumUntil(long premiumUntil) {
-        this.premiumUntil = premiumUntil;
-        fieldTracker.put("premiumUntil", this.premiumUntil);
     }
 
     public void autoroles(Map<String, String> autoroles) {

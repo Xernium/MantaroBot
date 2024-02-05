@@ -249,11 +249,6 @@ public class CurrencyCmds {
     public static class DailyCrate extends SlashCommand {
         @Override
         protected void process(SlashContext ctx) {
-            if (!ctx.getDBUser().isPremium()) {
-                ctx.reply("commands.dailycrate.not_premium", EmoteReference.ERROR);
-                return;
-            }
-
             if (ctx.getOptionAsBoolean("check")) {
                 long rl = dailyCrateRatelimiter.getRemaniningCooldown(ctx.getAuthor());
 
@@ -458,11 +453,6 @@ public class CurrencyCmds {
         cr.register("dailycrate", new SimpleCommand(CommandCategory.CURRENCY) {
             @Override
             protected void call(Context ctx, String content, String[] args) {
-                if (!ctx.getDBUser().isPremium()) {
-                    ctx.sendLocalized("commands.dailycrate.not_premium", EmoteReference.ERROR);
-                    return;
-                }
-
                 if (args.length > 0 && args[0].equalsIgnoreCase("-check")) {
                     long rl = dailyCrateRatelimiter.getRemaniningCooldown(ctx.getAuthor());
 
@@ -777,8 +767,7 @@ public class CurrencyCmds {
                     });
         }
 
-        var toShow = random.nextInt(3) == 0 && !dbUser.isPremium() ? lang.get("general.sellout") : "";
-        DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), toShow);
+        DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), "");
     }
 
     public static void applyPotionEffect(IContext ctx, MongoUser dbUser, Item item, Player player, int amount, boolean isMax) {

@@ -92,20 +92,6 @@ public class LeaderboardCmd {
         public static class Money extends SlashCommand {
             @Override
             protected void process(SlashContext ctx) {
-                if (config.premiumBot) {
-                    var tableName = "players";
-                    var moneyLeaderboard = getLeaderboard(tableName, Player.class, Sorts.descending("oldMoney"));
-                    send(ctx,
-                            generateLeaderboardEmbed(ctx,
-                                    ctx.getLanguageContext().get("commands.leaderboard.inner.money_old").formatted(EmoteReference.MONEY),
-                                    "commands.leaderboard.money", moneyLeaderboard,
-                                    player -> Pair.of(getMember(ctx, player.getId()),
-                                            String.valueOf(player.getOldMoney())), "%s**%s** - $%,d"
-                            ).build()
-                    );
-                    return;
-                }
-
                 var tableName = "players";
                 var moneyLeaderboard = getLeaderboard(tableName, Player.class, Sorts.descending("newMoney"));
                 send(ctx,

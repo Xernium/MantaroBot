@@ -55,7 +55,6 @@ import net.kodehawa.mantarobot.db.entities.MongoUser;
 import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.RandomCollection;
-import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
@@ -78,7 +77,6 @@ public class CurrencyActionCmds {
             .cooldown(5, TimeUnit.MINUTES)
             .maxCooldown(5, TimeUnit.MINUTES)
             .incrementDivider(10)
-            .premiumAware(true)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("mine")
             .build();
@@ -91,7 +89,6 @@ public class CurrencyActionCmds {
             .incrementDivider(10)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("fish")
-            .premiumAware(true)
             .build();
 
     private static final IncreasingRateLimiter chopRateLimiter = new IncreasingRateLimiter.Builder()
@@ -100,7 +97,6 @@ public class CurrencyActionCmds {
             .cooldown(4, TimeUnit.MINUTES)
             .maxCooldown(4, TimeUnit.MINUTES)
             .incrementDivider(10)
-            .premiumAware(true)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("chop")
             .build();
@@ -415,14 +411,6 @@ public class CurrencyActionCmds {
             player.addBadgeIfAbsent(Badge.GEM_FINDER);
         }
 
-        var bonus = money;
-        if (random.nextBoolean()) {
-            bonus = money / 2;
-        }
-
-        if (dbUser.isPremium() && money > 0 && bonus > 0) {
-            money += random.nextInt(bonus);
-        }
 
         // Sparkle find
         var sparkleChance = item.getSparkleLuck();
@@ -442,7 +430,7 @@ public class CurrencyActionCmds {
         }
 
         if (random.nextInt(400) >= 392) {
-            var crate = dbUser.isPremium() ? ItemReference.MINE_PREMIUM_CRATE : ItemReference.MINE_CRATE;
+            var crate = ItemReference.MINE_CRATE;
 
             if (!player.canFitItem(crate)) {
                 message += "\n" + languageContext.get("commands.mine.crate.overflow");
@@ -451,11 +439,6 @@ public class CurrencyActionCmds {
                 message += "\n" + EmoteReference.MEGA + languageContext.get("commands.mine.crate.success")
                         .formatted(crate.getEmojiDisplay(), crate.getName());
             }
-        }
-
-        if (player.shouldSeeCampaign()) {
-            message += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
-            player.markCampaignAsSeen();
         }
 
         money += overflowMoney;
@@ -592,7 +575,7 @@ public class CurrencyActionCmds {
 
             // START OF FISH LOOT CRATE HANDLING
             if (random.nextInt(400) > 380) {
-                var crate = dbUser.isPremium() ? ItemReference.FISH_PREMIUM_CRATE : ItemReference.FISH_CRATE;
+                var crate = ItemReference.FISH_CRATE;
                 if (!player.canFitItem(crate)) {
                     extraMessage += "\n" + languageContext.get("commands.fish.crate.overflow");
                 } else {
@@ -658,19 +641,6 @@ public class CurrencyActionCmds {
                         languageContext.get("commands.fish.fossil_success").formatted(ItemReference.SHELL.getEmojiDisplay());
             }
 
-            var bonus = money;
-            if (random.nextBoolean()) {
-                bonus = money / 2;
-            }
-
-            if (dbUser.isPremium() && money > 0 && bonus > 0) {
-                money += random.nextInt(bonus);
-            }
-
-            if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
-                player.markCampaignAsSeen();
-            }
 
             player.addMoney(money);
             player.incrementFishingExperience(random);
@@ -823,16 +793,12 @@ public class CurrencyActionCmds {
                 bonus = money / 2;
             }
 
-            if (dbUser.isPremium() && money > 0 && bonus > 0) {
-                money += random.nextInt(bonus);
-            }
-
             if (found) {
                 player.addBadgeIfAbsent(Badge.CHOPPER);
             }
 
             if (random.nextInt(400) > 380) {
-                var crate = dbUser.isPremium() ? ItemReference.CHOP_PREMIUM_CRATE : ItemReference.CHOP_CRATE;
+                var crate = ItemReference.CHOP_CRATE;
                 if (!player.canFitItem(crate)) {
                     extraMessage += "\n" + languageContext.get("commands.chop.crate.overflow");
                 } else {
@@ -847,11 +813,6 @@ public class CurrencyActionCmds {
             player.incrementChopExperience(random);
 
             handlePetBadges(player, marriage, pet);
-
-            if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
-                player.markCampaignAsSeen();
-            }
 
             // Show a message depending on the outcome.
             if (money > 0 && !found) {

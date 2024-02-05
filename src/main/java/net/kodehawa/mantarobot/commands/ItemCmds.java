@@ -50,7 +50,6 @@ import net.kodehawa.mantarobot.db.entities.PlayerStats;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
-import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
@@ -304,11 +303,6 @@ public class ItemCmds {
                     player.addBadgeIfAbsent(Badge.HOT_CHOPPER);
 
                 var message = "";
-                if (player.shouldSeeCampaign()) {
-                    message += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), user.isPremium());
-                    player.markCampaignAsSeen();
-                }
-
                 user.increaseDustLevel(3);
                 user.updateAllChanged();
 

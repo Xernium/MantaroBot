@@ -436,10 +436,6 @@ public class HelpCmd {
         var description = new StringBuilder();
         description.append(languageContext.get("commands.help.base"));
 
-        if (!dbUser.isPremium() && !dbGuild.isPremium()) {
-            description.append(languageContext.get("commands.help.patreon"));
-        }
-
         var disabledCommands = dbGuild.getDisabledCommands();
         if (!disabledCommands.isEmpty()) {
             description.append(languageContext.get("commands.help.disabled_commands").formatted(disabledCommands.size()));
@@ -502,10 +498,6 @@ public class HelpCmd {
             description.append(languageContext.get("commands.help.base_category")
                     .formatted(languageContext.get(category.toString()))
             );
-        }
-
-        if (!dbUser.isPremium() && !dbGuild.isPremium()) {
-            description.append(languageContext.get("commands.help.patreon"));
         }
 
         var disabledCommands = dbGuild.getDisabledCommands();

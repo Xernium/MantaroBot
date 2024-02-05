@@ -478,9 +478,6 @@ public class CustomCmds {
 
                             final var values = c.getValues();
                             var customLimit = 50;
-                            if (ctx.getConfig().isPremiumBot() || ctx.getDBGuild().isPremium()) {
-                                customLimit = 100;
-                            }
 
                             if (values.size() > customLimit) {
                                 event.reply(lang.get("commands.custom.add.too_many_responses").formatted(EmoteReference.ERROR2, values.size()))
@@ -492,7 +489,7 @@ public class CustomCmds {
                             custom.getValues().addAll(values);
                         } else {
                             // Are the first two checks redundant?
-                            if (!ctx.getConfig().isPremiumBot() && !ctx.getDBGuild().isPremium() && ctx.db().getCustomCommands(ctx.getGuild()).size() > 100) {
+                            if (ctx.db().getCustomCommands(ctx.getGuild()).size() > 100) {
                                 event.reply(lang.get("commands.custom.add.too_many_commands").formatted(EmoteReference.ERROR2))
                                         .setEphemeral(true)
                                         .queue();
@@ -1387,9 +1384,6 @@ public class CustomCmds {
 
             final var values = c.getValues();
             var customLimit = 50;
-            if (ctx.getConfig().isPremiumBot() || ctx.getDBGuild().isPremium()) {
-                customLimit = 100;
-            }
 
             if (values.size() > customLimit) {
                 ctx.sendLocalized("commands.custom.add.too_many_responses", EmoteReference.ERROR, values.size());
@@ -1399,7 +1393,7 @@ public class CustomCmds {
             custom.getValues().addAll(values);
         } else {
             // Are the first two checks redundant?
-            if (!ctx.getConfig().isPremiumBot() && !ctx.getDBGuild().isPremium() && ctx.db().getCustomCommands(ctx.getGuild()).size() > 100) {
+            if (ctx.db().getCustomCommands(ctx.getGuild()).size() > 100) {
                 ctx.sendLocalized("commands.custom.add.too_many_commands", EmoteReference.ERROR);
                 return;
             }

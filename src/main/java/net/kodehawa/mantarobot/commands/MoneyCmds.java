@@ -44,7 +44,6 @@ import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.CustomFinderUtil;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
-import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
@@ -73,7 +72,6 @@ public class MoneyCmds {
             .cooldown(3, TimeUnit.MINUTES)
             .maxCooldown(3, TimeUnit.MINUTES)
             .randomIncrement(false)
-            .premiumAware(true)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("loot")
             .build();
@@ -397,17 +395,6 @@ public class MoneyCmds {
             dailyMoney += bonus;
         }
 
-        // If the author is premium, make daily double.
-        if (authorDBUser.isPremium()) {
-            dailyMoney *=2;
-        }
-
-        // Sellout + this is always a day apart, so we can just send campaign.
-        if (random.nextBoolean()) {
-            returnMessage.add(Campaign.TWITTER.getStringFromCampaign(languageContext, true));
-        } else {
-            returnMessage.add(Campaign.PREMIUM_DAILY.getStringFromCampaign(languageContext, authorDBUser.isPremium()));
-        }
 
         // Careful not to overwrite yourself ;P
         // Save streak and items
@@ -479,18 +466,7 @@ public class MoneyCmds {
             moneyFound = Math.max(10, moneyFound);
         }
 
-        if (dbUser.isPremium() && moneyFound > 0) {
-            int extra = (int) (moneyFound * 1.5);
-            moneyFound += random.nextInt(extra);
-        }
-
         var extraMessage = "";
-
-        // Sellout
-        if (player.shouldSeeCampaign()){
-            extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
-            player.markCampaignAsSeen();
-        }
 
 
         if (!loot.isEmpty()) {

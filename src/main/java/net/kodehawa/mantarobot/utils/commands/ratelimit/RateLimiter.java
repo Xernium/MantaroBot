@@ -84,7 +84,6 @@ public class RateLimiter {
 
     //Basically where you get b1nzy'd.
     public boolean process(String key) {
-        boolean isPremium = isPremiumAware && MantaroData.db().getUser(key).isPremium();
         Pair<AtomicInteger, Long> p = usersRateLimited.get(key);
 
         // Put the user on the RL map if they aren't here already, but we already let them pass.
@@ -102,10 +101,10 @@ public class RateLimiter {
 
         Long tryAgain = p.second;
         if (tryAgain == null || tryAgain < now) {
-            p.second = now + (isPremium ? (long) (timeout * 0.75) : timeout);
+            p.second = now + timeout;
         }
 
-        ses.schedule(a::decrementAndGet, isPremium ? (long) (timeout * 0.75) : timeout, TimeUnit.MILLISECONDS);
+        ses.schedule(a::decrementAndGet, timeout, TimeUnit.MILLISECONDS);
         return true;
     }
 

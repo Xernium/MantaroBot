@@ -57,18 +57,15 @@ import net.kodehawa.mantarobot.core.listeners.helpers.WelcomeUtils;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
-import net.kodehawa.mantarobot.utils.log.LogUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.Color;
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -120,10 +117,6 @@ public class MantaroListener implements EventListener {
             return;
         }
 
-        if (event instanceof GuildMemberRoleAddEvent evt) {
-            handleNewPatron(evt);
-            return;
-        }
         // !! Member events end
 
         // !! Events needed for the log feature start
@@ -193,71 +186,6 @@ public class MantaroListener implements EventListener {
         }
 
         // !! Internal event end
-    }
-
-    /**
-     * Handles automatic deliver of patreon keys. Should only deliver keys when
-     * - A user was already in the guild or just joined and got the "Patreon" role assigned by the Patreon bot
-     * - The user hasn't re-joined to get the role re-assigned
-     * - The user hasn't received any keys
-     * - The user pledged, obviously
-     *
-     * @param event The event that says that a role got added, obv.
-     */
-    private void handleNewPatron(GuildMemberRoleAddEvent event) {
-        //Only in Mantaro's guild...
-        if (event.getGuild().getIdLong() == 213468583252983809L && !CONFIG.isPremiumBot()) {
-            threadPool.execute(() -> {
-                var hasPatronRole = event.getMember().getRoles().stream().anyMatch(r -> r.getId().equals("290257037072531466"));
-                // No patron role to be seen here.
-                if (!hasPatronRole) {
-                    return;
-                }
-
-                // We don't need to fetch anything unless the user got a Patron role.
-                var user = event.getUser();
-                var dbUser = DATABASE.getUser(user);
-                var currentKey = DATABASE.getPremiumKey(dbUser.getPremiumKey());
-
-                // Already received key.
-                if (dbUser.hasReceivedFirstKey()) {
-                    return;
-                }
-
-                // They still have a valid key.
-                if (currentKey != null && currentKey.validFor() > 10) {
-                    return;
-                }
-
-                user.openPrivateChannel().queue(channel -> channel.sendMessage(
-                        EmoteReference.EYES + "Thanks you for donating, we'll deliver your premium key shortly! :heart:"
-                ).queue(message -> {
-                    message.editMessage(
-                            """
-                            %1$sYou received a premium key due to your donation to Mantaro.
-                            If you have any doubts or questions, please contact Kodehawa#3457 or ask in the support server.
-                            
-                            Instructions: **Apply this key to yourself!**. This key is a subscription to Mantaro Premium, and will last as long as you pledge.
-                            If you want more keys (>$2 donation) or want to enable the patreon bot (>$4 donation) you need to contact Kodehawa to deliver your keys.
-                            To apply this key, run the following command in any channel where Mantaro can reply: `/premium activate %2$s`
-                            
-                            Thanks you so much for pledging and helping to keep Mantaro alive and well :heart:
-                            You should now see a #donators channel in Mantaro Hub. Thanks again for your help!
-                            """.formatted(
-                                    EmoteReference.POPPER, PremiumKey.generatePremiumKey(user.getId(), PremiumKey.Type.USER, false).getId()
-                            )
-                    ).queue(sent -> {
-                                dbUser.receivedFirstKey(true);
-                                dbUser.updateAllChanged();
-                            }
-                    );
-
-                    Metrics.PATRON_COUNTER.inc();
-                    //Celebrate internally! \ o /
-                    LogUtils.log("Delivered premium key to %s(%s)".formatted(user.getName(), user.getId()));
-                }, error -> LogUtils.log("Failed to deliver premium key to %s(%s). Maybe they had DMs disabled?".formatted(Utils.getTagOrDisplay(user), user.getId()))));
-            });
-        }
     }
 
     private void logDelete(MessageDeleteEvent event) {
@@ -463,12 +391,10 @@ public class MantaroListener implements EventListener {
         Metrics.GUILD_ACTIONS.labels("join").inc();
 
         try {
-            // Don't send greet message for MP. Not necessary.
-            if (!CONFIG.isPremiumBot()) {
-                final var embedBuilder = new EmbedBuilder()
-                        .setThumbnail(jda.getSelfUser().getEffectiveAvatarUrl())
-                        .setColor(Color.PINK)
-                        .setDescription("""
+            final var embedBuilder = new EmbedBuilder()
+                    .setThumbnail(jda.getSelfUser().getEffectiveAvatarUrl())
+                    .setColor(Color.PINK)
+                    .setDescription("""
                                 Welcome to **Mantaro**, a fun, quirky and complete Discord bot! Thanks for adding me to your server, I highly appreciate it <3
                                 We have music, currency (money/economy), games and way more stuff you can check out!
                                 Make sure you use the `~>help` command to make yourself comfy and to get started with the bot!
@@ -476,47 +402,46 @@ public class MantaroListener implements EventListener {
                                 If you're interested in supporting Mantaro, check out our Patreon page below, it'll greatly help to improve the bot.
                                 Check out the links below for some help resources and quick start guides.
                                 This message will only be shown once.""")
-                        .addField(EmoteReference.PENCIL.toHeaderString() + "Important Links",
-                        """
-                                [Support Server](https://support.mantaro.site) - The place to check if you're lost or if there's an issue with the bot.
-                                [Official Wiki](https://www.mantaro.site/mantaro-wiki) - Good place to check if you're lost.
-                                [Custom Commands](https://www.mantaro.site/mantaro-wiki/guides/custom-commands) - Great customizability for your server needs!
-                                [Currency Guide](https://www.mantaro.site/mantaro-wiki/currency/101) - A lot of fun to be had!
-                                [Configuration](https://www.mantaro.site/mantaro-wiki/basics/server-configuration) -  Customizability for your server needs!
-                                [Patreon](https://patreon.com/mantaro) - Help Mantaro's development directly by donating a small amount of money each month.
-                                [Official Website](https://mantaro.site) - A cool website.""",
-                                true
-                        ).setFooter("We hope you enjoy using Mantaro! For any questions, go to our support server.");
+                    .addField(EmoteReference.PENCIL.toHeaderString() + "Important Links",
+                            """
+                                    [Support Server](https://support.mantaro.site) - The place to check if you're lost or if there's an issue with the bot.
+                                    [Official Wiki](https://www.mantaro.site/mantaro-wiki) - Good place to check if you're lost.
+                                    [Custom Commands](https://www.mantaro.site/mantaro-wiki/guides/custom-commands) - Great customizability for your server needs!
+                                    [Currency Guide](https://www.mantaro.site/mantaro-wiki/currency/101) - A lot of fun to be had!
+                                    [Configuration](https://www.mantaro.site/mantaro-wiki/basics/server-configuration) -  Customizability for your server needs!
+                                    [Patreon](https://patreon.com/mantaro) - Help Mantaro's development directly by donating a small amount of money each month.
+                                    [Official Website](https://mantaro.site) - A cool website.""",
+                            true
+                    ).setFooter("We hope you enjoy using Mantaro! For any questions, go to our support server.");
 
-                final var dbGuild = DATABASE.getGuild(guild);
-                final var guildChannels = guild.getChannels();
+            final var dbGuild = DATABASE.getGuild(guild);
+            final var guildChannels = guild.getChannels();
 
-                // Find a suitable channel to greeet send the message to.
-                guildChannels.stream().filter(
-                        channel -> channel.getType() == ChannelType.TEXT &&
-                        CHANNEL_NAMES.contains(channel.getName())
-                ).findFirst().ifPresentOrElse(ch -> {
-                    var channel = (TextChannel) ch;
-                    if (channel.canTalk() && !dbGuild.hasReceivedGreet()) {
-                        channel.sendMessageEmbeds(embedBuilder.build()).queue();
-                        dbGuild.receivedGreet(true);
-                        dbGuild.updateAllChanged();
-                    }
-                }, () -> {
-                    // Attempt to find the first channel we can talk to.
-                    var channel = (TextChannel) guildChannels.stream()
-                            .filter(guildChannel -> guildChannel.getType() == ChannelType.TEXT && ((TextChannel) guildChannel).canTalk())
-                            .findFirst()
-                            .orElse(null);
+            // Find a suitable channel to greeet send the message to.
+            guildChannels.stream().filter(
+                    channel -> channel.getType() == ChannelType.TEXT &&
+                            CHANNEL_NAMES.contains(channel.getName())
+            ).findFirst().ifPresentOrElse(ch -> {
+                var channel = (TextChannel) ch;
+                if (channel.canTalk() && !dbGuild.hasReceivedGreet()) {
+                    channel.sendMessageEmbeds(embedBuilder.build()).queue();
+                    dbGuild.receivedGreet(true);
+                    dbGuild.updateAllChanged();
+                }
+            }, () -> {
+                // Attempt to find the first channel we can talk to.
+                var channel = (TextChannel) guildChannels.stream()
+                        .filter(guildChannel -> guildChannel.getType() == ChannelType.TEXT && ((TextChannel) guildChannel).canTalk())
+                        .findFirst()
+                        .orElse(null);
 
-                    // Basically same code as above, but w/e.
-                    if (channel != null && !dbGuild.hasReceivedGreet()) {
-                        channel.sendMessageEmbeds(embedBuilder.build()).queue();
-                        dbGuild.receivedGreet(true);
-                        dbGuild.updateAllChanged();
-                    }
-                });
-            }
+                // Basically same code as above, but w/e.
+                if (channel != null && !dbGuild.hasReceivedGreet()) {
+                    channel.sendMessageEmbeds(embedBuilder.build()).queue();
+                    dbGuild.receivedGreet(true);
+                    dbGuild.updateAllChanged();
+                }
+            });
         } catch (InsufficientPermissionException | NullPointerException | IllegalArgumentException ignored) {
             // We don't need to catch those
         } catch (Exception e) {

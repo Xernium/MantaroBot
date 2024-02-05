@@ -220,7 +220,6 @@ public class OptsCmd {
 
                     //Assign everything all over again
                     var newDbGuild = MongoGuild.of(dbGuild.getId());
-                    newDbGuild.premiumUntil(dbGuild.getPremiumUntil());
                     newDbGuild.gameTimeoutExpectedAt(gameTimeoutExpectedAt);
                     newDbGuild.ranPolls(ranPolls);
                     newDbGuild.cases(cases);
