@@ -51,8 +51,9 @@ import java.util.function.Predicate;
 
 import static net.kodehawa.mantarobot.utils.Utils.createLinkedList;
 
-@Module
+//@Module
 public class GameCmds {
+  /* Turn this off temporarily
     public static final IncreasingRateLimiter triviaRatelimiter = new IncreasingRateLimiter.Builder()
             .spamTolerance(1)
             .limit(1)
@@ -184,5 +185,5 @@ public class GameCmds {
 
         // not currently running
         return false;
-    }
+    }*/
 }

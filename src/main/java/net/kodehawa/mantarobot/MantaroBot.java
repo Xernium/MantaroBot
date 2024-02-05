@@ -104,29 +104,6 @@ public class MantaroBot {
 
         instance = this;
 
-        if (config.needApi) {
-            try {
-                Request request = new Request.Builder()
-                        .url(config.apiTwoUrl + "/mantaroapi/ping")
-                        .build();
-
-                Response httpResponse = Utils.httpClient.newCall(request).execute();
-                if (httpResponse.code() != 200) {
-                    log.error(
-                            "Cannot connect to the API! Wrong status code? Returned: {}, Expected: 200",
-                            httpResponse.code()
-                    );
-
-                    System.exit(API_HANDSHAKE_FAILURE);
-                }
-
-                httpResponse.close();
-            } catch (ConnectException e) {
-                log.error("Cannot connect to the API! Exiting...", e);
-                System.exit(API_HANDSHAKE_FAILURE);
-            }
-        }
-
         core = new MantaroCore(config, ExtraRuntimeOptions.DEBUG);
         birthdayCacher = new BirthdayCacher();
         ItemHelper.setItemActions();

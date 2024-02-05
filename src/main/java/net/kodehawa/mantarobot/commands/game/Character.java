@@ -26,7 +26,6 @@ import net.kodehawa.mantarobot.commands.game.core.lobby.GameLobby;
 import net.kodehawa.mantarobot.core.listeners.operations.InteractiveOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.InteractiveOperation;
 import net.kodehawa.mantarobot.core.modules.commands.i18n.I18nContext;
-import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import org.slf4j.Logger;
@@ -76,7 +75,8 @@ public class Character extends ImageGame {
     public boolean onStart(GameLobby lobby) {
         final I18nContext languageContext = lobby.getLanguageContext();
         try {
-            var data = JsonDataManager.fromJson(APIUtils.getFrom("/mantaroapi/bot/character"), AnimeGameData.class);
+            //TODO: Replace with LocalDataManager in Database
+            var data = JsonDataManager.fromJson("fixme", AnimeGameData.class);
             characterNameL = new ArrayList<>();
             characterName = data.getName();
             var imageUrl = data.getImage();

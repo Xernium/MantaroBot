@@ -35,17 +35,13 @@ import net.kodehawa.mantarobot.core.modules.Module;
 import net.kodehawa.mantarobot.core.modules.commands.base.CommandCategory;
 import net.kodehawa.mantarobot.core.modules.commands.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import redis.clients.jedis.Jedis;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.kodehawa.mantarobot.commands.info.AsyncInfoMonitor.*;
@@ -103,10 +99,6 @@ public class DebugCmds {
                     .mapToLong(JDA::getResponseTotal)
                     .sum();
 
-            var mApiRequests = 0;
-            try {
-                mApiRequests = new JSONObject(APIUtils.getFrom("/mantaroapi/ping")).getInt("requests_served");
-            } catch (IOException | JSONException ignored) { }
 
             // Get the master node.
             var node = new JSONObject(nodeData);
@@ -137,7 +129,7 @@ public class DebugCmds {
                             .filter(command -> command.getCategory() != null)
                             .count() + " ]"
                     + "\n\n --------- Debug Information --------- \n\n"
-                    + "Replies: " + "[ Discord: %,d, MAPI: %,d ]".formatted(responseTotal, mApiRequests) + "\n"
+                    + "Replies: " + "[ Discord: %,d ]".formatted(responseTotal) + "\n"
                     + "Nodes: " + "%,d (Current: %,d)".formatted(clusterTotal, ctx.getBot().getNodeNumber()) + "\n"
                     + "CPU: " + "%.2f%% (Cores: %,d)".formatted(getInstanceCPUUsage() * 100, getAvailableProcessors()) + "\n"
                     + "Memory: " +  Utils.formatMemoryAmount(totalMemory) +

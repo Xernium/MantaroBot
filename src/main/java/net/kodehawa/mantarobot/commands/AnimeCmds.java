@@ -17,42 +17,9 @@
 
 package net.kodehawa.mantarobot.commands;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.eventbus.Subscribe;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.kodehawa.mantarobot.commands.anime.AnimeData;
-import net.kodehawa.mantarobot.commands.anime.CharacterData;
-import net.kodehawa.mantarobot.commands.anime.KitsuRetriever;
-import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.meta.Category;
-import net.kodehawa.mantarobot.core.command.meta.Defer;
-import net.kodehawa.mantarobot.core.command.meta.Description;
-import net.kodehawa.mantarobot.core.command.meta.Help;
-import net.kodehawa.mantarobot.core.command.meta.Name;
-import net.kodehawa.mantarobot.core.command.meta.Options;
-import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
-import net.kodehawa.mantarobot.core.modules.Module;
-import net.kodehawa.mantarobot.core.modules.commands.base.CommandCategory;
-import net.kodehawa.mantarobot.core.modules.commands.i18n.I18nContext;
-import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.utils.APIUtils;
-import net.kodehawa.mantarobot.utils.StringUtils;
-import net.kodehawa.mantarobot.utils.Utils;
-import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
-import net.kodehawa.mantarobot.utils.commands.EmoteReference;
-import org.apache.commons.text.StringEscapeUtils;
-
-import java.awt.Color;
-import java.net.SocketTimeoutException;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-@Module
+//@Module
 public class AnimeCmds {
+  /* Turn this off temporarily
     @Subscribe
     public void register(CommandRegistry cr) {
         cr.registerSlash(Anime.class);
@@ -289,5 +256,5 @@ public class AnimeCmds {
                 .setFooter(lang.get("commands.anime.information_notice"), ctx.getAuthor().getEffectiveAvatarUrl());
 
         ctx.edit(embed.build());
-    }
+    }*/
 }

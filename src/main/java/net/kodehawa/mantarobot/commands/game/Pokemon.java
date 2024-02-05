@@ -23,7 +23,6 @@ import net.kodehawa.mantarobot.commands.game.core.PokemonGameData;
 import net.kodehawa.mantarobot.commands.game.core.lobby.GameLobby;
 import net.kodehawa.mantarobot.core.listeners.operations.InteractiveOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.InteractiveOperation;
-import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import org.slf4j.Logger;
@@ -75,7 +74,8 @@ public class Pokemon extends ImageGame {
         final var lang = lobby.getLanguageContext();
 
         try {
-            var data = JsonDataManager.fromJson(APIUtils.getFrom("/mantaroapi/bot/pokemon"), PokemonGameData.class);
+            //TODO: Replace with LocalDataManager in Database
+            var data = JsonDataManager.fromJson("fixme", PokemonGameData.class);
             expectedAnswer = data.getNames();
             sendEmbedImage(lobby.getContext(), data.getImage(), eb ->
                     eb.setAuthor(lang.get("commands.game.pokemon.header"), null, lobby.getContext().getAuthor().getEffectiveAvatarUrl())
