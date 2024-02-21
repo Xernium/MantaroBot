@@ -70,7 +70,6 @@ public class GameCmds {
             .cooldownPenaltyIncrease(5, TimeUnit.SECONDS)
             .maxCooldown(10, TimeUnit.MINUTES)
             .pool(MantaroData.getDefaultJedisPool())
-            .premiumAware(true)
             .prefix("game")
             .build();
 

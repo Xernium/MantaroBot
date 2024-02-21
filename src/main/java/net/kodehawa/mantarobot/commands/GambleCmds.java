@@ -74,7 +74,6 @@ public class GambleCmds {
             .maxCooldown(10, TimeUnit.MINUTES)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("gamble")
-            .premiumAware(true)
             .build();
     private static final IncreasingRateLimiter slotsRatelimiter = new IncreasingRateLimiter.Builder()
             .spamTolerance(4)
@@ -83,7 +82,6 @@ public class GambleCmds {
             .cooldownPenaltyIncrease(5, TimeUnit.SECONDS)
             .maxCooldown(5, TimeUnit.MINUTES)
             .pool(MantaroData.getDefaultJedisPool())
-            .premiumAware(true)
             .prefix("slots")
             .build();
 

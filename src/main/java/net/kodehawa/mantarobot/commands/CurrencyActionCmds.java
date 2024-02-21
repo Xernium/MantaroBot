@@ -54,7 +54,6 @@ import net.kodehawa.mantarobot.db.entities.MongoUser;
 import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.RandomCollection;
-import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
@@ -77,7 +76,6 @@ public class CurrencyActionCmds {
             .cooldown(5, TimeUnit.MINUTES)
             .maxCooldown(5, TimeUnit.MINUTES)
             .incrementDivider(10)
-            .premiumAware(true)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("mine")
             .build();
@@ -90,7 +88,6 @@ public class CurrencyActionCmds {
             .incrementDivider(10)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("fish")
-            .premiumAware(true)
             .build();
 
     private static final IncreasingRateLimiter chopRateLimiter = new IncreasingRateLimiter.Builder()
@@ -99,7 +96,6 @@ public class CurrencyActionCmds {
             .cooldown(4, TimeUnit.MINUTES)
             .maxCooldown(4, TimeUnit.MINUTES)
             .incrementDivider(10)
-            .premiumAware(true)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("chop")
             .build();
@@ -431,11 +427,6 @@ public class CurrencyActionCmds {
             }
         }
 
-        if (player.shouldSeeCampaign()) {
-            message += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
-            player.markCampaignAsSeen();
-        }
-
         money += overflowMoney;
 
         player.incrementMiningExperience(random);
@@ -645,11 +636,6 @@ public class CurrencyActionCmds {
                 money += random.nextInt(bonus);
             }
 
-            if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
-                player.markCampaignAsSeen();
-            }
-
             player.addMoney(money);
             player.incrementFishingExperience(random);
 
@@ -795,7 +781,6 @@ public class CurrencyActionCmds {
             var itemDisplay = ItemStack.toString(reduced);
             player.processItems(reduced);
 
-            // Ah yes, sellout
             var bonus = money;
             if (random.nextBoolean()) {
                 bonus = money / 2;
@@ -825,11 +810,6 @@ public class CurrencyActionCmds {
             player.incrementChopExperience(random);
 
             handlePetBadges(player, marriage, pet);
-
-            if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
-                player.markCampaignAsSeen();
-            }
 
             // Show a message depending on the outcome.
             if (money > 0 && !found) {

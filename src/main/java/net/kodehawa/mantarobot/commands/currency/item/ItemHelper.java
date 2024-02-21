@@ -74,7 +74,6 @@ public class ItemHelper {
             .randomIncrement(false)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("lootcrate")
-            .premiumAware(true)
             .build();
     public static void setItemActions() {
         log.info("Registering item actions...");

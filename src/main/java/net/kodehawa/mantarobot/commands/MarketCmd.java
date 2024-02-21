@@ -54,7 +54,6 @@ import net.kodehawa.mantarobot.core.command.slash.SlashContext;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
-import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
@@ -77,7 +76,6 @@ public class MarketCmd {
             .maxCooldown(10, TimeUnit.SECONDS)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("buy")
-            .premiumAware(true)
             .build();
 
     private static final IncreasingRateLimiter sellRatelimiter = new IncreasingRateLimiter.Builder()
@@ -87,7 +85,6 @@ public class MarketCmd {
             .maxCooldown(10, TimeUnit.SECONDS)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("sell")
-            .premiumAware(true)
             .build();
 
     private static final IncreasingRateLimiter dumpRatelimit = new IncreasingRateLimiter.Builder()
@@ -97,7 +94,6 @@ public class MarketCmd {
             .maxCooldown(10, TimeUnit.SECONDS)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("dump")
-            .premiumAware(true)
             .build();
 
     private static final IncreasingRateLimiter marketRatelimiter = new IncreasingRateLimiter.Builder()
@@ -107,7 +103,6 @@ public class MarketCmd {
             .maxCooldown(10, TimeUnit.SECONDS)
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("market")
-            .premiumAware(true)
             .build();
 
     @Subscribe
@@ -657,11 +652,6 @@ public class MarketCmd {
             var removedMoney = player.removeMoney(value);
             if (removedMoney) {
                 var warn = "";
-                if (player.shouldSeeCampaign()) {
-                    var user = ctx.getDBUser();
-                    warn += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), true) + "\n";
-                    player.markCampaignAsSeen();
-                }
 
                 player.processItem(itemToBuy, itemNumber);
                 player.addBadgeIfAbsent(Badge.BUYER);
@@ -742,7 +732,7 @@ public class MarketCmd {
         embed.setColor(Color.MAGENTA).setAuthor("Mantaro's Market", null, ctx.getAuthor().getEffectiveAvatarUrl())
                 .setDescription(String.format(languageContext.get("general.buy_sell_paged_react"),
                         String.format(languageContext.get("general.reaction_timeout"), 200) + "\n")
-                        + (true ? "" : languageContext.get("general.sellout")) + languageContext.get("commands.market.reference")
+                        + languageContext.get("commands.market.reference")
         );
 
         DiscordUtils.listButtons(ctx.getUtilsContext(), 200, embed, splitFields);

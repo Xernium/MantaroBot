@@ -593,7 +593,7 @@ public class CurrencyCmds {
                 .formatted(
                         EmoteReference.POPPER,
                         crate.getName()
-                ) + "\n" + languageContext.get("commands.daily.sellout.already_premium");
+                );
 
         ctx.send(successMessage);
     }
@@ -702,8 +702,7 @@ public class CurrencyCmds {
                     });
         }
 
-        var toShow = random.nextInt(3) == 0 && !true ? lang.get("general.sellout") : "";
-        DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), toShow);
+        DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), "");
     }
 
     public static void applyPotionEffect(IContext ctx, MongoUser dbUser, Item item, Player player, int amount, boolean isMax) {

@@ -82,7 +82,6 @@ public class Player implements ManagedMongoObject {
     private long sharksCaught;
     private boolean waifuout;
     private int lastCrateGiven = 69;
-    private long lastSeenCampaign;
     private boolean resetWarning = false;
     private InventorySortType inventorySortType = InventorySortType.AMOUNT;
     private boolean hiddenLegacy = false;
@@ -394,11 +393,6 @@ public class Player implements ManagedMongoObject {
     }
 
     @SuppressWarnings("unused")
-    protected void setLastSeenCampaign(long lastSeenCampaign) {
-        this.lastSeenCampaign = lastSeenCampaign;
-    }
-
-    @SuppressWarnings("unused")
     protected void setPetChoice(PetChoice petChoice) {
         this.petChoice = petChoice;
     }
@@ -567,10 +561,6 @@ public class Player implements ManagedMongoObject {
         return serialize(inventoryObject.asList());
     }
 
-    public long getLastSeenCampaign() {
-        return lastSeenCampaign;
-    }
-
     @SuppressWarnings("unused")
     public boolean isResetWarning() {
         return resetWarning;
@@ -710,17 +700,6 @@ public class Player implements ManagedMongoObject {
         } else {
             return getPetChoice();
         }
-    }
-
-    @BsonIgnore
-    public boolean shouldSeeCampaign() {
-        return System.currentTimeMillis() > (getLastSeenCampaign() + TimeUnit.HOURS.toMillis(3));
-    }
-
-    @BsonIgnore
-    public void markCampaignAsSeen() {
-        this.lastSeenCampaign = System.currentTimeMillis();
-        fieldTracker.put("lastSeenCampaign", lastSeenCampaign);
     }
 
     /**

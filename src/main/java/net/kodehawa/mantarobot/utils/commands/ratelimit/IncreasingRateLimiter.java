@@ -146,16 +146,10 @@ public class IncreasingRateLimiter {
         private int spamTolerance;
         private int maxCooldown;
         private boolean randomIncrement = true;
-        private boolean premiumAware = false;
         private int incrementDivider = 4;
 
         public Builder pool(JedisPool pool) {
             this.pool = pool;
-            return this;
-        }
-
-        public Builder premiumAware(boolean aware) {
-            this.premiumAware = aware;
             return this;
         }
 

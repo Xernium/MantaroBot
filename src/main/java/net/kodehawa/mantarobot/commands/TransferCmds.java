@@ -60,7 +60,6 @@ public class TransferCmds {
             .cooldown(10, TimeUnit.MINUTES)
             .randomIncrement(false)
             .pool(MantaroData.getDefaultJedisPool())
-            .premiumAware(false)
             .prefix("transferparty")
             .build();
 
@@ -71,7 +70,6 @@ public class TransferCmds {
             .cooldownPenaltyIncrease(5, TimeUnit.SECONDS)
             .maxCooldown(20, TimeUnit.MINUTES)
             .pool(MantaroData.getDefaultJedisPool())
-            .premiumAware(true)
             .prefix("itemtransfer")
             .build();
 

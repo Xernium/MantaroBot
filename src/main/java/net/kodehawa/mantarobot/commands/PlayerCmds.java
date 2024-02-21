@@ -418,9 +418,7 @@ public class PlayerCmds {
                 }
 
                 var common = lang.get("commands.badges.profile_notice") + lang.get("commands.badges.info_notice") +
-                        ((r.nextInt(2) == 0 && !true ? lang.get("commands.badges.donate_notice") : "\n") +
-                                String.format(lang.get("commands.badges.total_badges"), badges.size())
-                        );
+                        (("\n") + String.format(lang.get("commands.badges.total_badges"), badges.size()));
 
                 DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), embed, DiscordUtils.divideFields(6, fields), common);
             }
