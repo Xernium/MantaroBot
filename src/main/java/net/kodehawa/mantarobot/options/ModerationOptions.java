@@ -276,7 +276,7 @@ public class ModerationOptions extends OptionHandler {
         });
 
         registerOption("defaultmutetimeout:reset", "Default mute timeout reset",
-            "Resets the default mute timeout which was set previously with `defaultmusictimeout set`", "Resets the default mute timeout.", ctx -> {
+            "Resets the default mute timeout which was set previously with `defaultmutetimeout set`", "Resets the default mute timeout.", ctx -> {
                 var dbGuild = ctx.getDBGuild();
                 dbGuild.modTimeout(0L);
                 dbGuild.updateAllChanged();

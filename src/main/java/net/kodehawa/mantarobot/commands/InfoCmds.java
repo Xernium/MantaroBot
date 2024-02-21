@@ -127,7 +127,7 @@ public class InfoCmds {
                         .setColor(Color.PINK)
                         .setDescription("""
                                 Welcome to **Mantaro**, a fun, quirky and complete Discord bot! Thanks for adding me to your server, I highly appreciate it <3
-                                We have music, currency (money/economy), games and way more stuff you can check out!
+                                We have currency (money/economy), games and way more stuff you can check out!
                                 Make sure you use the `~>help` command to make yourself comfy and to get started with the bot!
 
                                 If you're interested in supporting Mantaro, check out our Patreon page below, it'll greatly help to improve the bot.

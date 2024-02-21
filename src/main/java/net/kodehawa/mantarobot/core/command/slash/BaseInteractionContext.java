@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.kodehawa.mantarobot.commands.music.MantaroAudioManager;
 import net.kodehawa.mantarobot.core.command.helpers.IContext;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
@@ -439,10 +438,6 @@ public abstract class BaseInteractionContext<T extends GenericCommandInteraction
 
     public User retrieveUserById(String id) {
         return event.getJDA().retrieveUserById(id).complete();
-    }
-
-    public MantaroAudioManager getAudioManager() {
-        return getBot().getAudioManager();
     }
 
     public void setForceEphemeral(boolean force) {

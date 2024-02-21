@@ -46,12 +46,6 @@ public class EvictingCachePolicy implements MemberCachePolicy {
     
     @Override
     public boolean cacheMember(@NotNull Member member) {
-        var voiceState = member.getVoiceState();
-        // Always cache users in VC if music is enabled.
-        if (config.musicEnable() && (voiceState != null && voiceState.getChannel() != null)) {
-            return true;
-        }
-
         long evict;
         // This can be called from ws threads or requester threads
         var shard = member.getJDA().getShardInfo().getShardId();
@@ -81,14 +75,7 @@ public class EvictingCachePolicy implements MemberCachePolicy {
                     return;
                 }
 
-                // Only remove if voice state is null, or channel in the voice state is null, or the member is not pending.
-                if (config.musicEnable()) {
-                    if (evicted.getVoiceState() == null || evicted.getVoiceState().getChannel() == null) {
-                        g.unloadMember(evict);
-                    }
-                } else {
-                    g.unloadMember(evict); // We don't need to account for music if it's not enabled.
-                }
+                g.unloadMember(evict);
             });
         }
 

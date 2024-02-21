@@ -82,10 +82,6 @@ public class MongoGuild implements ManagedMongoObject {
     private int maxFairQueue = 4;
     @ConfigName("Modlog: Ignored people")
     private Set<String> modlogBlacklistedPeople = new HashSet<>();
-    @ConfigName("Music Announce")
-    private boolean musicAnnounce = true;
-    @ConfigName("Channel (id): lock to specific music channel")
-    private String musicChannel = null;
     @ConfigName("Role for the mute command")
     private String mutedRole = null;
     @ConfigName("Action commands ping (for giver)")
@@ -118,8 +114,6 @@ public class MongoGuild implements ManagedMongoObject {
     private Map<String, List<String>> roleSpecificDisabledCommands = new HashMap<>();
     @ConfigName("Server language")
     private String lang = "en_US";
-    @ConfigName("Music vote toggle")
-    private boolean musicVote = true;
     @ConfigName("Extra join messages")
     private List<String> extraJoinMessages = new ArrayList<>();
     @ConfigName("Extra leave messages")
@@ -161,10 +155,6 @@ public class MongoGuild implements ManagedMongoObject {
     private boolean notifiedFromBirthdayChange = false;
     @ConfigName("Disable questionable/explicit imageboard search")
     private boolean disableExplicit = false;
-    @ConfigName("Custom DJ role.")
-    private String djRoleId;
-    @ConfigName("Custom music queue size limit.")
-    private Long musicQueueSizeLimit = null;
     @HiddenConfig // its a list of polls
     private Map<String, Poll.PollDatabaseObject> runningPolls = new HashMap<>();
 
@@ -423,14 +413,6 @@ public class MongoGuild implements ManagedMongoObject {
         return maxFairQueue;
     }
 
-    public boolean isMusicAnnounce() {
-        return musicAnnounce;
-    }
-
-    public String getMusicChannel() {
-        return musicChannel;
-    }
-
     public String getMutedRole() {
         return mutedRole;
     }
@@ -477,10 +459,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     public String getLang() {
         return lang;
-    }
-
-    public boolean isMusicVote() {
-        return musicVote;
     }
 
     public String getBirthdayMessage() {
@@ -535,16 +513,8 @@ public class MongoGuild implements ManagedMongoObject {
         return notifiedFromBirthdayChange;
     }
 
-    public String getDjRoleId() {
-        return djRoleId;
-    }
-
     public boolean isDisableExplicit() {
         return disableExplicit;
-    }
-
-    public Long getMusicQueueSizeLimit() {
-        return musicQueueSizeLimit;
     }
 
     public String getBirthdayRole() {
@@ -643,14 +613,6 @@ public class MongoGuild implements ManagedMongoObject {
         this.modlogBlacklistedPeople = modlogBlacklistedPeople;
     }
 
-    protected void setMusicAnnounce(boolean musicAnnounce) {
-        this.musicAnnounce = musicAnnounce;
-    }
-
-    protected void setMusicChannel(String musicChannel) {
-        this.musicChannel = musicChannel;
-    }
-
     protected void setMutedRole(String mutedRole) {
         this.mutedRole = mutedRole;
     }
@@ -705,10 +667,6 @@ public class MongoGuild implements ManagedMongoObject {
 
     protected void setRoleSpecificDisabledCommands(Map<String, List<String>> roleSpecificDisabledCommands) {
         this.roleSpecificDisabledCommands = roleSpecificDisabledCommands;
-    }
-
-    protected void setMusicVote(boolean musicVote) {
-        this.musicVote = musicVote;
     }
 
     protected void setExtraJoinMessages(List<String> extraJoinMessages) {
@@ -787,16 +745,8 @@ public class MongoGuild implements ManagedMongoObject {
         this.notifiedFromBirthdayChange = notifiedFromBirthdayChange;
     }
 
-    protected void setDjRoleId(String djRoleId) {
-        this.djRoleId = djRoleId;
-    }
-
     protected void setDisableExplicit(boolean disableExplicit) {
         this.disableExplicit = disableExplicit;
-    }
-
-    protected void setMusicQueueSizeLimit(Long musicQueueSizeLimit) {
-        this.musicQueueSizeLimit = musicQueueSizeLimit;
     }
 
     protected void setRunningPolls(Map<String, Poll.PollDatabaseObject> polls) {
@@ -882,16 +832,6 @@ public class MongoGuild implements ManagedMongoObject {
         fieldTracker.put("maxFairQueue", this.maxFairQueue);
     }
 
-    public void musicAnnounce(boolean musicAnnounce) {
-        this.musicAnnounce = musicAnnounce;
-        fieldTracker.put("musicAnnounce", this.musicAnnounce);
-    }
-
-    public void musicChannel(String musicChannel) {
-        this.musicChannel = musicChannel;
-        fieldTracker.put("musicChannel", this.musicChannel);
-    }
-
     public void mutedRole(String mutedRole) {
         this.mutedRole = mutedRole;
         fieldTracker.put("mutedRole", this.mutedRole);
@@ -945,11 +885,6 @@ public class MongoGuild implements ManagedMongoObject {
     public void ignoreBotsWelcomeMessage(boolean ignoreBotsWelcomeMessage) {
         this.ignoreBotsWelcomeMessage = ignoreBotsWelcomeMessage;
         fieldTracker.put("ignoreBotsWelcomeMessage", this.ignoreBotsWelcomeMessage);
-    }
-
-    public void musicVote(boolean musicVote) {
-        this.musicVote = musicVote;
-        fieldTracker.put("musicVote", this.musicVote);
     }
 
     public void customAdminLockNew(boolean customAdminLockNew) {
@@ -1012,19 +947,9 @@ public class MongoGuild implements ManagedMongoObject {
         fieldTracker.put("notifiedFromBirthdayChange", this.notifiedFromBirthdayChange);
     }
 
-    public void djRoleId(String djRoleId) {
-        this.djRoleId = djRoleId;
-        fieldTracker.put("djRoleId", this.djRoleId);
-    }
-
     public void disableExplicit(boolean disableExplicit) {
         this.disableExplicit = disableExplicit;
         fieldTracker.put("disableExplicit", this.disableExplicit);
-    }
-
-    public void musicQueueSizeLimit(Long musicQueueSizeLimit) {
-        this.musicQueueSizeLimit = musicQueueSizeLimit;
-        fieldTracker.put("musicQueueSizeLimit", this.musicQueueSizeLimit);
     }
 
     public void logLeaveChannel(String logLeaveChannel) {

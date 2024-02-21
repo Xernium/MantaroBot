@@ -29,7 +29,6 @@ public enum OptionType {
     CHANNEL,
     @SuppressWarnings("unused")
     USER,
-    MUSIC,
     MODERATION;
 
     @Override
