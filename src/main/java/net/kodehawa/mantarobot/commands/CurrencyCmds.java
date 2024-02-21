@@ -252,11 +252,6 @@ public class CurrencyCmds {
     public static class DailyCrate extends SlashCommand {
         @Override
         protected void process(SlashContext ctx) {
-            if (!ctx.getDBUser().isPremium()) {
-                ctx.reply("commands.dailycrate.not_premium", EmoteReference.ERROR);
-                return;
-            }
-
             if (ctx.getOptionAsBoolean("check")) {
                 long rl = dailyCrateRatelimiter.getRemaniningCooldown(ctx.getAuthor());
 
@@ -429,11 +424,6 @@ public class CurrencyCmds {
     public static class DailyCrateText extends TextCommand {
         @Override
         protected void process(TextContext ctx) {
-            if (!ctx.getDBUser().isPremium()) {
-                ctx.sendLocalized("commands.dailycrate.not_premium", EmoteReference.ERROR);
-                return;
-            }
-
             var arg = ctx.tryArgument(Parsers.string());
             if (arg.isPresent() && arg.get().equals("-check")) { // This is hacky, but it's not much different than it was before.
                 long rl = dailyCrateRatelimiter.getRemaniningCooldown(ctx.getAuthor());
@@ -712,7 +702,7 @@ public class CurrencyCmds {
                     });
         }
 
-        var toShow = random.nextInt(3) == 0 && !dbUser.isPremium() ? lang.get("general.sellout") : "";
+        var toShow = random.nextInt(3) == 0 && !true ? lang.get("general.sellout") : "";
         DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), toShow);
     }
 

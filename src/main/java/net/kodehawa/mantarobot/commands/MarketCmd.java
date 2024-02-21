@@ -659,7 +659,7 @@ public class MarketCmd {
                 var warn = "";
                 if (player.shouldSeeCampaign()) {
                     var user = ctx.getDBUser();
-                    warn += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), user.isPremium()) + "\n";
+                    warn += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), true) + "\n";
                     player.markCampaignAsSeen();
                 }
 
@@ -742,7 +742,7 @@ public class MarketCmd {
         embed.setColor(Color.MAGENTA).setAuthor("Mantaro's Market", null, ctx.getAuthor().getEffectiveAvatarUrl())
                 .setDescription(String.format(languageContext.get("general.buy_sell_paged_react"),
                         String.format(languageContext.get("general.reaction_timeout"), 200) + "\n")
-                        + (user.isPremium() ? "" : languageContext.get("general.sellout")) + languageContext.get("commands.market.reference")
+                        + (true ? "" : languageContext.get("general.sellout")) + languageContext.get("commands.market.reference")
         );
 
         DiscordUtils.listButtons(ctx.getUtilsContext(), 200, embed, splitFields);

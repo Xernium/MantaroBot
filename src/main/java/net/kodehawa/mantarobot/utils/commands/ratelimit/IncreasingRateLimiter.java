@@ -69,12 +69,11 @@ public class IncreasingRateLimiter {
     private final int maxCooldown;
     private String scriptSha;
     private final boolean randomIncrement;
-    private final boolean premiumAware;
     private final int incrementDivider;
 
     private IncreasingRateLimiter(JedisPool pool, String prefix, int limit, int cooldown,
                                   int spamBeforeCooldownIncrease, int cooldownIncrease, int maxCooldown,
-                                  boolean randomIncrement, boolean premiumAware, int incrementDivider) {
+                                  boolean randomIncrement, int incrementDivider) {
         this.pool = pool;
         this.prefix = prefix;
         this.limit = limit;
@@ -83,7 +82,6 @@ public class IncreasingRateLimiter {
         this.cooldownIncrease = cooldownIncrease;
         this.maxCooldown = maxCooldown;
         this.randomIncrement = randomIncrement;
-        this.premiumAware = premiumAware;
         this.incrementDivider = incrementDivider;
     }
 
@@ -96,15 +94,14 @@ public class IncreasingRateLimiter {
 
             long start = Instant.now().toEpochMilli();
             List<Long> result;
-            boolean premiumAwareness = premiumAware && config.isPremiumBot();
             try {
-                int cd = cooldown + (randomIncrement && !premiumAwareness ? ThreadLocalRandom.current().nextInt(cooldown / incrementDivider) : 0);
+                int cd = cooldown;
                 result = (List<Long>) j.evalsha(scriptSha,
                         Collections.singletonList(key),
                         Arrays.asList(
                                 String.valueOf(limit),
                                 String.valueOf(start),
-                                String.valueOf(premiumAwareness ? cd - ThreadLocalRandom.current().nextInt(cooldown / 4) : cd),
+                                String.valueOf(cd - ThreadLocalRandom.current().nextInt(cooldown / 4)),
                                 String.valueOf(spamBeforeCooldownIncrease),
                                 String.valueOf(cooldownIncrease),
                                 String.valueOf(maxCooldown)
@@ -245,7 +242,7 @@ public class IncreasingRateLimiter {
             return new IncreasingRateLimiter(
                     pool, prefix, limit, cooldown, spamTolerance,
                     cooldownPenaltyIncrease, maxCooldown,
-                    randomIncrement, premiumAware, incrementDivider
+                    randomIncrement, incrementDivider
             );
         }
     }

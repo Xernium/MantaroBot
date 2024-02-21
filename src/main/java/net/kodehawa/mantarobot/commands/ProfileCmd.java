@@ -99,7 +99,7 @@ public class ProfileCmd {
 
     // A small white square.
     private static final String LIST_MARKER = "\u25AB\uFE0F";
-    private static final List<ProfileComponent> defaultOrder;
+    private static final List<ProfileComponent> defaultOrder = createLinkedList(HEADER, CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
     private static final List<ProfileComponent> noOldOrder = createLinkedList(HEADER, CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
     private static final IncreasingRateLimiter profileRatelimiter = new IncreasingRateLimiter.Builder()
             .limit(2) //twice every 10m
@@ -110,15 +110,6 @@ public class ProfileCmd {
             .pool(MantaroData.getDefaultJedisPool())
             .prefix("profile")
             .build();
-
-    static {
-        final var config = MantaroData.config().get();
-        if (config.isPremiumBot() || config.isSelfHost()) {
-            defaultOrder = createLinkedList(HEADER, CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
-        } else {
-            defaultOrder = createLinkedList(HEADER, CREDITS, OLD_CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
-        }
-    }
 
     @Subscribe
     public void register(CommandRegistry cr) {
@@ -341,10 +332,7 @@ public class ProfileCmd {
                 }
 
                 var dbUser = ctx.getDBUser();
-                var MAX_LENGTH = 300;
-                if (dbUser.isPremium()) {
-                    MAX_LENGTH = 500;
-                }
+                var MAX_LENGTH = 500;
 
                 var lang = ctx.getLanguageContext();
                 var description = ctx.getPlayer().getDescription();
@@ -479,11 +467,6 @@ public class ProfileCmd {
             protected void process(SlashContext ctx) {
                 var user = ctx.getDBUser();
                 var lang = ctx.getLanguageContext();
-
-                if (!user.isPremium()) {
-                    ctx.replyEphemeral("commands.profile.display.not_premium", EmoteReference.ERROR);
-                    return;
-                }
 
                 var player = ctx.getPlayer();
                 if (ctx.getOptionAsBoolean("reset")) {
@@ -631,9 +614,9 @@ public class ProfileCmd {
                         ctx.getAuthor().getEffectiveAvatarUrl()
                 );
 
-        var hasCustomOrder = dbUser.isPremium() && !player.getProfileComponents().isEmpty();
+        var hasCustomOrder = true && !player.getProfileComponents().isEmpty();
         var usedOrder = hasCustomOrder ? player.getProfileComponents() : defaultOrder;
-        if ((!config.isPremiumBot() && player.getOldMoney() < 5000 && !hasCustomOrder) ||
+        if ((!true && player.getOldMoney() < 5000 && !hasCustomOrder) ||
                 (player.isHiddenLegacy() && !hasCustomOrder)) {
             usedOrder = noOldOrder;
         }

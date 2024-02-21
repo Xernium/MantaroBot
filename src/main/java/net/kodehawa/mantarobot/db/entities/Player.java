@@ -61,7 +61,6 @@ public class Player implements ManagedMongoObject {
     private long oldMoney;
     private long reputation;
     private long experience = 0;
-    private long newMoney = 0L;
     private long dailyStreak;
     private String description = null;
     private long gamesWon = 0;
@@ -361,10 +360,6 @@ public class Player implements ManagedMongoObject {
         this.lastCrateGiven = lastCrateGiven;
     }
 
-    protected void setNewMoney(long newMoney) {
-        this.newMoney = newMoney;
-    }
-
     @SuppressWarnings("unused")
     protected void setInventorySortType(InventorySortType inventorySortType) {
         this.inventorySortType = inventorySortType;
@@ -572,10 +567,6 @@ public class Player implements ManagedMongoObject {
         return serialize(inventoryObject.asList());
     }
 
-    public long getNewMoney() {
-        return newMoney;
-    }
-
     public long getLastSeenCampaign() {
         return lastSeenCampaign;
     }
@@ -723,9 +714,6 @@ public class Player implements ManagedMongoObject {
 
     @BsonIgnore
     public boolean shouldSeeCampaign() {
-        if (config.isPremiumBot())
-            return false;
-
         return System.currentTimeMillis() > (getLastSeenCampaign() + TimeUnit.HOURS.toMillis(3));
     }
 
@@ -743,20 +731,14 @@ public class Player implements ManagedMongoObject {
      */
     @BsonIgnore
     public boolean addMoney(long toAdd) {
-        boolean useOld = config.isPremiumBot() || config.isSelfHost();
-        long money = useOld ? this.oldMoney : newMoney;
+        long money = this.oldMoney;
         if (toAdd < 0)
             return false;
 
         money = Math.addExact(money, toAdd);
 
-        if (useOld) {
-            setOldMoney(money);
-            fieldTracker.put("oldMoney", money);
-        } else {
-            setNewMoney(money);
-            fieldTracker.put("newMoney", money);
-        }
+        setOldMoney(money);
+        fieldTracker.put("oldMoney", money);
 
         return true;
     }
@@ -779,21 +761,15 @@ public class Player implements ManagedMongoObject {
      * @param toRemove How much?
      */
     public boolean removeMoney(long toRemove) {
-        boolean useOld = config.isPremiumBot() || config.isSelfHost();
-        long money = useOld ? this.oldMoney : newMoney;
+        long money = this.oldMoney;
         if (money - toRemove < 0) {
             return false;
         }
 
         money -= toRemove;
 
-        if (useOld) {
-            setOldMoney(money);
-            fieldTracker.put("oldMoney", money);
-        } else {
-            setNewMoney(money);
-            fieldTracker.put("newMoney", money);
-        }
+        setOldMoney(money);
+        fieldTracker.put("oldMoney", money);
 
         return true;
     }
@@ -834,24 +810,13 @@ public class Player implements ManagedMongoObject {
 
     @BsonIgnore
     public Long getCurrentMoney() {
-        boolean useOld = config.isPremiumBot() || config.isSelfHost();
-        if (useOld) {
-            return oldMoney;
-        } else {
-            return newMoney;
-        }
+        return oldMoney;
     }
 
     @BsonIgnore
     public void currentMoney(long money) {
-        boolean useOld = config.isPremiumBot() || config.isSelfHost();
-        if (useOld) {
-            setOldMoney(money < 0 ? 0 : money);
-            fieldTracker.put("oldMoney", this.oldMoney);
-        } else {
-            setNewMoney(money < 0 ? 0 : money);
-            fieldTracker.put("newMoney", this.newMoney);
-        }
+        setOldMoney(money < 0 ? 0 : money);
+        fieldTracker.put("oldMoney", this.oldMoney);
     }
 
     @BsonIgnore

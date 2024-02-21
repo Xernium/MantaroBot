@@ -57,17 +57,12 @@ public class MongoUser implements ManagedMongoObject {
 
     @BsonId
     private String id;
-    private long premiumUntil;
     private String birthday;
-    private boolean receivedFirstKey;
-    private String premiumKey;
     private int remindedTimes;
     private String timezone;
     private String lang;
     private int dustLevel; //percentage
     private PlayerEquipment equippedItems = new PlayerEquipment(new EnumMap<>(PlayerEquipment.EquipmentType.class), new EnumMap<>(PlayerEquipment.EquipmentType.class), new EnumMap<>(PlayerEquipment.EquipmentType.class)); //hashmap is type -> itemId
-    private boolean receivedExpirationWarning = false; //premium key about to expire!
-    private Map<String, String> keysClaimed = new HashMap<>(); //Map of user -> key. Will be used to account for keys the user can create themselves.
 
     // NEW MARRIAGE SYSTEM
     private String marriageId;
@@ -89,22 +84,17 @@ public class MongoUser implements ManagedMongoObject {
     public MongoUser() { }
 
     @SuppressWarnings("SameParameterValue")
-    protected MongoUser(String id, long premiumUntil) {
+    protected MongoUser(String id) {
         this.id = id;
-        this.premiumUntil = premiumUntil;
     }
 
     public static MongoUser of(String id) {
-        return new MongoUser(id, 0);
+        return new MongoUser(id);
     }
 
     // --- Getters
     public String getBirthday() {
         return this.birthday;
-    }
-
-    public String getPremiumKey() {
-        return this.premiumKey;
     }
 
     public int getRemindedTimes() {
@@ -151,18 +141,6 @@ public class MongoUser implements ManagedMongoObject {
         return actionsDisabled;
     }
 
-    public boolean getReceivedFirstKey() {
-        return this.receivedFirstKey;
-    }
-
-    public boolean getReceivedExpirationWarning() {
-        return this.receivedExpirationWarning;
-    }
-
-    public long getPremiumUntil() {
-        return this.premiumUntil;
-    }
-
     // DO NOT INTERACT DIRECTLY WITH, CHANGES TO THE MAP FROM THIS METHOD WILL NOT BE UPDATED
     // Can't make getters protected!
     @BsonProperty("waifus")
@@ -170,26 +148,10 @@ public class MongoUser implements ManagedMongoObject {
         return this.waifus;
     }
 
-    // DO NOT INTERACT DIRECTLY WITH, CHANGES TO THE MAP FROM THIS METHOD WILL NOT BE UPDATED
-    // Needed to be public: need to access for non-modifying iterations, making another method would be superfluous.
-    public Map<String, String> getKeysClaimed() {
-        return this.keysClaimed;
-    }
-
     // DO NOT INTERACT DIRECTLY WITH, CHANGES TO THE LIST FROM THIS METHOD WILL NOT BE UPDATED
     // Needed to be public: need to access for non-modifying iterations, making another method would be superfluous.
     public List<String> getReminders() {
         return this.reminders;
-    }
-
-    @BsonIgnore
-    public boolean hasReceivedFirstKey() {
-        return this.receivedFirstKey;
-    }
-
-    @BsonIgnore
-    public boolean hasReceivedExpirationWarning() {
-        return this.receivedExpirationWarning;
     }
 
     // --- Setters needed for serialization (unless I want to make the structure more rigid and use a constructor)
@@ -199,10 +161,6 @@ public class MongoUser implements ManagedMongoObject {
 
     protected void setBirthday(String birthday) {
         this.birthday = birthday;
-    }
-
-    protected void setPremiumKey(String premiumKey) {
-        this.premiumKey = premiumKey;
     }
 
     protected void setTimezone(String timezone) {
@@ -237,14 +195,6 @@ public class MongoUser implements ManagedMongoObject {
         this.actionsDisabled = actionsDisabled;
     }
 
-    protected void setReceivedFirstKey(boolean hasReceivedFirstKey) {
-        this.receivedFirstKey = hasReceivedFirstKey;
-    }
-
-    protected void setReceivedExpirationWarning(boolean receivedExpirationWarning) {
-        this.receivedExpirationWarning = receivedExpirationWarning;
-    }
-
     // --- Unused (?) setters, also definitely needed for serialization.
     protected void setWaifus(Map<String, Long> waifus) {
         this.waifus = waifus;
@@ -262,27 +212,11 @@ public class MongoUser implements ManagedMongoObject {
         this.equippedItems = equippedItems;
     }
 
-    public void setKeysClaimed(Map<String, String> keysClaimed) {
-        this.keysClaimed = keysClaimed;
-    }
-
     // --- Track changes to use update
     @BsonIgnore
     public void actionsDisabled(boolean actionsDisabled) {
         this.actionsDisabled = actionsDisabled;
         fieldTracker.put("actionsDisabled", this.actionsDisabled);
-    }
-
-    @BsonIgnore
-    public void receivedFirstKey(boolean hasReceivedFirstKey) {
-        this.receivedFirstKey = hasReceivedFirstKey;
-        fieldTracker.put("receivedFirstKey", this.hasReceivedFirstKey());
-    }
-
-    @BsonIgnore
-    public void receivedExpirationWarning(boolean receivedExpirationWarning) {
-        this.receivedExpirationWarning = receivedExpirationWarning;
-        fieldTracker.put("receivedExpirationWarning", this.receivedExpirationWarning);
     }
 
     @BsonIgnore
@@ -331,25 +265,6 @@ public class MongoUser implements ManagedMongoObject {
     public void birthday(String birthday) {
         this.birthday = birthday;
         fieldTracker.put("birthday", this.birthday);
-    }
-
-    @BsonIgnore
-    public void premiumKey(String premiumKey) {
-        this.premiumKey = premiumKey;
-        fieldTracker.put("premiumKey", this.premiumKey);
-    }
-
-    // --- Helpers
-    @BsonIgnore
-    public MongoUser incrementPremium(long milliseconds) {
-        if (isPremium()) {
-            this.premiumUntil += milliseconds;
-        } else {
-            this.premiumUntil = currentTimeMillis() + milliseconds;
-        }
-
-        fieldTracker.put("premiumUntil", this.premiumUntil);
-        return this;
     }
 
     // Waifu helpers: needed to not interact with the Map directly.
@@ -413,11 +328,6 @@ public class MongoUser implements ManagedMongoObject {
     }
 
     @BsonIgnore
-    public long getPremiumLeft() {
-        return isPremium() ? this.premiumUntil - currentTimeMillis() : 0;
-    }
-
-    @BsonIgnore
     public Marriage getMarriage() {
         //we're going full round trip here
         return MantaroData.db().getMarriage(marriageId);
@@ -446,122 +356,6 @@ public class MongoUser implements ManagedMongoObject {
     public void incrementTimesClaimed() {
         timesClaimed += 1;
         fieldTracker.put("timesClaimed", this.timesClaimed);
-    }
-
-    @BsonIgnore
-    public void addKeyClaimed(String userId, String keyId) {
-        keysClaimed.put(userId, keyId);
-        fieldTracker.put("keysClaimed", this.keysClaimed);
-    }
-
-    @BsonIgnore
-    public void removeKeyClaimed(String userId) {
-        keysClaimed.remove(userId);
-        fieldTracker.put("keysClaimed",this. keysClaimed);
-    }
-
-    @BsonIgnore
-    public String getUserIdFromKeyId(String keyId) {
-        return Utils.getKeyByValue(keysClaimed, keyId);
-    }
-
-    @BsonIgnore
-    //Slowly convert old key system to new key system (link old accounts).
-    public boolean isPremium() {
-        //Return true if this is running in MP, as all users are considered Premium on it.
-        if (config.isPremiumBot())
-            return true;
-
-        PremiumKey key = MantaroData.db().getPremiumKey(getPremiumKey());
-        boolean isActive = false;
-
-        if (key != null) {
-            //Check for this because there's no need to check if this key is active.
-            boolean isKeyActive = currentTimeMillis() < key.getExpiration();
-            if (!isKeyActive && LocalDate.now(ZoneId.of("America/Chicago")).getDayOfMonth() > 5) {
-                MongoUser owner = MantaroData.db().getUser(key.getOwner());
-                //Remove from owner's key ownership storage if key owner != key holder.
-                if (!key.getOwner().equals(getId())) {
-                    owner.removeKeyClaimed(getId());
-                    owner.updateAllChanged();
-                }
-
-                //Handle this so we don't go over this check again. Remove premium key from user object.
-                removePremiumKey(key.getId());
-
-                // Send a message if the user was premium but the key expired.
-                // This has a 5-day leeway. This means it won't kill your key if the day of the month is before or the 5th of X month.
-                // This is because Patreon can take up to the 5th to process pledges.
-                if (key.getOwner().equals(getId())) {
-                    MantaroBot.getInstance().getShardManager()
-                            .retrieveUserById(key.getOwner())
-                            .flatMap(User::openPrivateChannel)
-                            .flatMap(privateChannel ->
-                                    privateChannel.sendMessage("""
-                                            Hello! Your key(s) seems to have expired, this usually only happens when your Patreon subscription is over (aka you cancelled it). If you didn't cancel your Patreon subscription, please check Patreon to see if your pledge went through.
-                                            If you bought this key via PayPal, you can ignore this message.
-                                            Thanks you for supporting Mantaro and I hope you have a good day! :heart:."""
-                                    )
-                            ).queue();
-
-                }
-
-                // Delete key.
-                key.delete();
-
-                // User is not premium.
-                return false;
-            }
-
-            //Link key to owner if key == owner and key holder is on patreon.
-            //Sadly gotta skip of holder isnt patron here bc there are some bought keys (paypal) which I can't convert without invalidating
-            Pair<Boolean, String> pledgeInfo = APIUtils.getPledgeInformation(key.getOwner());
-            if (pledgeInfo != null && pledgeInfo.left()) {
-                key.setLinkedTo(key.getOwner());
-                key.insertOrReplace(); //doesn't matter if it doesnt save immediately, will do later anyway (key is usually immutable in db)
-            }
-
-            //If the receipt is not the owner, account them to the keys the owner has claimed.
-            //This has usage later when seeing how many keys can they take. The second/third check is kind of redundant, but necessary anyway to see if it works.
-            String keyLinkedTo = key.getLinkedTo();
-            if (!getId().equals(key.getOwner()) && keyLinkedTo != null && keyLinkedTo.equals(key.getOwner())) {
-                MongoUser owner = MantaroData.db().getUser(key.getOwner());
-                if (!owner.getKeysClaimed().containsKey(getId())) {
-                    owner.addKeyClaimed(getId(), key.getId());
-                    owner.updateAllChanged();
-                }
-            }
-
-            isActive = key.getLinkedTo() == null || (pledgeInfo != null ? pledgeInfo.left() : true); //default to true if no link
-        }
-
-        if (!isActive && key != null && LocalDate.now(ZoneId.of("America/Chicago")).getDayOfMonth() > 5) {
-            //Handle this so we don't go over this check again. Remove premium key from user object.
-            removePremiumKey(key.getId());
-            key.delete();
-        }
-
-        return key != null && currentTimeMillis() < key.getExpiration() && key.getParsedType().equals(PremiumKey.Type.USER) && isActive;
-    }
-
-    @BsonIgnore
-    public PremiumKey generateAndApplyPremiumKey(int days, String owner) {
-        String premiumId = UUID.randomUUID().toString();
-        PremiumKey newKey = new PremiumKey(premiumId, TimeUnit.DAYS.toMillis(days), currentTimeMillis() + TimeUnit.DAYS.toMillis(days), PremiumKey.Type.USER, true, owner, null);
-        newKey.insertOrReplace();
-
-        premiumKey(premiumId);
-        updateAllChanged();
-        return newKey;
-    }
-
-    @BsonIgnore
-    public void removePremiumKey(String originalKey) {
-        premiumKey(null);
-        receivedFirstKey(false);
-        removeKeyClaimed(getUserIdFromKeyId(originalKey));
-
-        updateAllChanged();
     }
 
     @Override

@@ -89,7 +89,6 @@ public class CoreOptions extends OptionHandler {
             var temp = ctx.getDBGuild();
 
             //The persistent data we wish to maintain.
-            var premiumKey = temp.getPremiumKey();
             var gameTimeoutExpectedAt = temp.getGameTimeoutExpectedAt();
             var cases = temp.getCases();
             var ranPolls = temp.getRanPolls();
@@ -99,11 +98,9 @@ public class CoreOptions extends OptionHandler {
 
             //Assign everything all over again
             var newDbGuild = MongoGuild.of(dbGuild.getId());
-            newDbGuild.premiumUntil(dbGuild.getPremiumUntil());
             newDbGuild.gameTimeoutExpectedAt(gameTimeoutExpectedAt);
             newDbGuild.ranPolls(ranPolls);
             newDbGuild.cases(cases);
-            newDbGuild.premiumKey(premiumKey);
             newDbGuild.getAllowedBirthdays().addAll(allowedBirthdays);
             newDbGuild.notifiedFromBirthdayChange(notified);
             newDbGuild.receivedGreet(greetReceived);

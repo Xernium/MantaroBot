@@ -22,8 +22,6 @@ import net.kodehawa.mantarobot.MantaroInfo;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.utils.patreon.PatreonPledge;
-import net.kodehawa.mantarobot.utils.patreon.PatreonReward;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -89,93 +87,6 @@ public class APIUtils {
             }
 
             return body.string();
-        }
-    }
-
-    public static PatreonPledge getFullPledgeInformation(String user) {
-        if (!config.needApi) {
-            return null; //nothing to query on.
-        }
-
-        try {
-            var request = new Request.Builder()
-                    .url(config.apiTwoUrl + "/mantaroapi/bot/patreon/checknew")
-                    .addHeader("Authorization", config.getApiAuthKey())
-                    .addHeader("User-Agent", MantaroInfo.USER_AGENT)
-                    .post(RequestBody.create(
-                            new JSONObject()
-                                    .put("id", user)
-                                    .put("context", config.isPremiumBot())
-                                    .toString(),
-                            okhttp3.MediaType.parse("application/json")
-                    ))
-                    .build();
-
-            try(var response = httpClient.newCall(request).execute()) {
-                var body = response.body();
-                if (body == null) {
-                    throw new IllegalStateException("Body is null");
-                }
-
-                var reply = new JSONObject(new JSONTokener(body.byteStream()));
-                return mapper.readValue(reply.toString(), PatreonPledge.class);
-            }
-
-        } catch (Exception ex) {
-            // Don't disable premium if the api is wonky, no need to be a meanie.
-            ex.printStackTrace();
-
-            if (config.isPremiumBot()) {
-                // Same as above, but send pledge = false but an amount of 4. This is to signal the
-                // handler that we have a wrong reply.
-                return new PatreonPledge(10000, false, PatreonReward.PATREON_BOT);
-            } else {
-                return null;
-            }
-        }
-    }
-
-    public static Pair<Boolean, String> getPledgeInformation(String user) {
-        if (!config.needApi) {
-            return null; //nothing to query on.
-        }
-
-        try {
-            var request = new Request.Builder()
-                    .url(config.apiTwoUrl + "/mantaroapi/bot/patreon/check")
-                    .addHeader("Authorization", config.getApiAuthKey())
-                    .addHeader("User-Agent", MantaroInfo.USER_AGENT)
-                    .post(RequestBody.create(
-                            new JSONObject()
-                                    .put("id", user)
-                                    .put("context", config.isPremiumBot())
-                                    .toString(),
-                            okhttp3.MediaType.parse("application/json")
-                    ))
-                    .build();
-
-            try(var response = httpClient.newCall(request).execute()) {
-                var body = response.body();
-                if (body == null) {
-                    throw new IllegalStateException("Body is null");
-                }
-
-                var reply = new JSONObject(new JSONTokener(body.byteStream()));
-
-                return new Pair<>(reply.getBoolean("active"), reply.getString("amount"));
-            }
-
-        } catch (Exception ex) {
-            // Don't disable premium if the api is wonky, no need to be a meanie.
-            ex.printStackTrace();
-
-            if (config.isPremiumBot()) {
-                // Same as above, but send pledge = false but an amount of 4. This is to signal the
-                // handler that we have a wrong reply.
-                return Pair.of(false, "100000");
-            } else {
-                return null;
-            }
         }
     }
 }

@@ -305,7 +305,7 @@ public class ItemCmds {
 
                 var message = "";
                 if (player.shouldSeeCampaign()) {
-                    message += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), user.isPremium());
+                    message += Campaign.PREMIUM.getStringFromCampaign(ctx.getLanguageContext(), true);
                     player.markCampaignAsSeen();
                 }
 

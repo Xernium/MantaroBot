@@ -38,7 +38,6 @@ import net.kodehawa.mantarobot.db.entities.Marriage;
 import net.kodehawa.mantarobot.db.entities.MongoUser;
 import net.kodehawa.mantarobot.db.entities.Player;
 import net.kodehawa.mantarobot.db.entities.PlayerStats;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -243,26 +242,6 @@ public class ManagedDatabase {
     public List<Marriage> getMarriages() {
         log("Requesting all Marriages from MongoDB");
         return Lists.newArrayList(dbMantaro().getCollection(Marriage.DB_TABLE, Marriage.class).find());
-    }
-
-    @SuppressWarnings("unused")
-    @Nonnull
-    @CheckReturnValue
-    public List<PremiumKey> getPremiumKeys() {
-        log("Requesting all Premium Keys from MongoDB");
-        var collection = dbMantaro().getCollection(PremiumKey.DB_TABLE, PremiumKey.class);
-        return Lists.newArrayList(collection.find());
-    }
-
-    //Also tests if the key is valid or not!
-    @Nullable
-    @CheckReturnValue
-    public PremiumKey getPremiumKey(@Nullable String id) {
-        log("Requesting Premium Key {} from MongoDB", id);
-        if (id == null) return null;
-
-        var collection = dbMantaro().getCollection(PremiumKey.DB_TABLE, PremiumKey.class);
-        return collection.find().filter(Filters.eq(id)).first();
     }
 
     @Nonnull

@@ -382,17 +382,13 @@ public class MoneyCmds {
 
             dailyMoney += bonus;
         }
-
-        // If the author is premium, make daily double.
-        if (authorDBUser.isPremium()) {
-            dailyMoney *=2;
-        }
+        dailyMoney *=2;
 
         // Sellout + this is always a day apart, so we can just send campaign.
         if (random.nextBoolean()) {
             returnMessage.add(Campaign.TWITTER.getStringFromCampaign(languageContext, true));
         } else {
-            returnMessage.add(Campaign.PREMIUM_DAILY.getStringFromCampaign(languageContext, authorDBUser.isPremium()));
+            returnMessage.add(Campaign.PREMIUM_DAILY.getStringFromCampaign(languageContext, true));
         }
 
         // Careful not to overwrite yourself ;P
@@ -465,7 +461,7 @@ public class MoneyCmds {
             moneyFound = Math.max(10, moneyFound);
         }
 
-        if (dbUser.isPremium() && moneyFound > 0) {
+        if (moneyFound > 0) {
             int extra = (int) (moneyFound * 1.5);
             moneyFound += random.nextInt(extra);
         }
@@ -474,7 +470,7 @@ public class MoneyCmds {
 
         // Sellout
         if (player.shouldSeeCampaign()){
-            extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
+            extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
             player.markCampaignAsSeen();
         }
 

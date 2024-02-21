@@ -48,7 +48,6 @@ public class RateLimiter {
     private final long max;
     private final long timeout;
     private final ConcurrentHashMap<String, Pair<AtomicInteger, Long>> usersRateLimited = new ConcurrentHashMap<>();
-    private boolean isPremiumAware = false;
 
     /**
      * Default constructor normally used in Currency commands to ratelimit all people.
@@ -57,18 +56,6 @@ public class RateLimiter {
      */
     public RateLimiter(TimeUnit timeUnit, int timeout) {
         this.max = 1;
-        this.timeout = timeUnit.toMillis(timeout);
-    }
-
-    /**
-     * Defines a premium-aware ratelimiter.
-     * Premium users enjoy 25% less ratelimits on the bot in some commands.
-     *
-     * @param timeout How much time until the ratelimit gets lifted
-     */
-    public RateLimiter(TimeUnit timeUnit, int timeout, boolean isPremiumAware) {
-        this.max = 1;
-        this.isPremiumAware = isPremiumAware;
         this.timeout = timeUnit.toMillis(timeout);
     }
 
@@ -84,7 +71,6 @@ public class RateLimiter {
 
     //Basically where you get b1nzy'd.
     public boolean process(String key) {
-        boolean isPremium = isPremiumAware && MantaroData.db().getUser(key).isPremium();
         Pair<AtomicInteger, Long> p = usersRateLimited.get(key);
 
         // Put the user on the RL map if they aren't here already, but we already let them pass.
@@ -102,10 +88,10 @@ public class RateLimiter {
 
         Long tryAgain = p.second;
         if (tryAgain == null || tryAgain < now) {
-            p.second = now + (isPremium ? (long) (timeout * 0.75) : timeout);
+            p.second = now + ((long) (timeout * 0.75));
         }
 
-        ses.schedule(a::decrementAndGet, isPremium ? (long) (timeout * 0.75) : timeout, TimeUnit.MILLISECONDS);
+        ses.schedule(a::decrementAndGet, (long) (timeout * 0.75), TimeUnit.MILLISECONDS);
         return true;
     }
 

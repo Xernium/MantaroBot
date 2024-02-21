@@ -40,7 +40,6 @@ import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.entities.MantaroObject;
 import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -70,12 +69,7 @@ public class OwnerCmd {
         cr.register(DataRequest.class);
         cr.register(AddBadge.class);
         cr.register(RemoveBadge.class);
-        cr.register(RefreshPledges.class);
-        cr.register(AddOwnerPremium.class);
         cr.register(Blacklist.class);
-        cr.register(Link.class);
-        cr.register(CreateKey.class);
-        cr.register(InvalidateKey.class);
         cr.register(Eval.class);
     }
 
@@ -314,50 +308,6 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class RefreshPledges extends TextCommand {
-        @Override
-        protected void process(TextContext ctx) {
-            try {
-                APIUtils.getFrom("/mantaroapi/bot/patreon/refresh");
-                ctx.send("Refreshed Patreon pledges successfully.");
-            } catch (Exception e) {
-                ctx.send("Somehow this failed. Pretty sure that just always returned ok...");
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Permission(CommandPermission.OWNER)
-    @Category(CommandCategory.OWNER)
-    public static class AddOwnerPremium extends TextCommand {
-        @Override
-        protected void process(TextContext ctx) {
-            final var guild = ctx.argument(Parsers.strictLong()
-                            .map(String::valueOf), "Invalid guild"
-            );
-
-            final var days = ctx.argument(Parsers.strictLong(),
-                    "Invalid day amount"
-            );
-
-            var guildObject = MantaroBot.getInstance().getShardManager().getGuildById(guild);
-            if (guildObject == null) {
-                ctx.send("Invalid guild.");
-                return;
-            }
-
-            var dbGuild = MantaroData.db().getGuild(guild);
-            dbGuild.incrementPremium(TimeUnit.DAYS.toMillis(days));
-            dbGuild.updateAllChanged();
-
-            ctx.send("%sThe premium feature for guild %s (%s) was extended for %s days".formatted(
-                    EmoteReference.CORRECT, guild, guildObject.getName(), days
-            ));
-        }
-    }
-
-    @Permission(CommandPermission.OWNER)
-    @Category(CommandCategory.OWNER)
     @Help(
             description = "Blacklists a user (user argument) or a guild (guild argument) by id.\n" +
                 "Examples: `~>blacklist user add/remove 293884638101897216`, `~>blacklist guild add/remove 305408763915927552`",
@@ -554,102 +504,6 @@ public class OwnerCmd {
                             null
                     ).build()
             );
-        }
-    }
-
-    @Name("link")
-    @Permission(CommandPermission.OWNER)
-    @Category(CommandCategory.OWNER)
-    public static class Link extends TextCommand {
-        @Override
-        protected void process(TextContext ctx) {
-            final var config = ctx.getConfig();
-            if (!config.isPremiumBot()) {
-                ctx.send("This command can only be ran in MP, as it'll link a guild to an MP holder.");
-                return;
-            }
-
-            var userId = ctx.argument(Parsers.strictLong(), "Missing user id.", "Couldn't parse user id.");
-            var guildId = ctx.argument(Parsers.strictLong(), "Missing guild id.", "Couldn't parse guild id.");
-            var user = ctx.retrieveUserById(userId);
-            var guild = MantaroBot.getInstance().getShardManager().getGuildById(guildId);
-
-            if (guild == null || user == null) {
-                ctx.send("User or guild not found.");
-                return;
-            }
-
-            final var dbGuild = MantaroData.db().getGuild(String.valueOf(guildId));
-
-            var unlink = ctx.tryArgument(Parsers.matching("^-u$"));
-            if (unlink.isPresent()) {
-                dbGuild.mpLinkedTo(null);
-                dbGuild.updateAllChanged();
-
-                ctx.sendFormat("Un-linked MP for guild %s (%s).", guild.getName(), guild.getId());
-                return;
-            }
-
-            var pledgeInfo = APIUtils.getFullPledgeInformation(user.getId());
-
-            // Guaranteed to be an integer
-            if (pledgeInfo == null || !pledgeInfo.isActive() || pledgeInfo.getReward().getKeyAmount() < 3) {
-                ctx.send("Pledge not found, pledge amount not enough or pledge was cancelled.");
-                return;
-            }
-
-            //Guild assignment.
-            dbGuild.mpLinkedTo(String.valueOf(userId)); // Patreon check will run from this user.
-            dbGuild.updateAllChanged();
-
-            ctx.sendFormat("Linked MP for guild %s (%s) to user %s (%s). Including this guild in pledge check (id -> user -> pledge). User tier: %s",
-                    guild.getName(), guild.getId(), user.getName(), user.getId(), pledgeInfo.getReward()
-            );
-
-        }
-    }
-
-    @Name("invalidatekey")
-    @Permission(CommandPermission.OWNER)
-    @Category(CommandCategory.OWNER)
-    public static class InvalidateKey extends TextCommand {
-        @Override
-        protected void process(TextContext ctx) {
-            var keyString = ctx.argument(Parsers.string(), "Give me a key to invalidate.", "Couldn't parse key.");
-            var key = MantaroData.db().getPremiumKey(keyString);
-            if (key == null) {
-                ctx.send("Invalid key.");
-                return;
-            }
-
-            var dbUser = MantaroData.db().getUser(key.getOwner());
-            dbUser.removeKeyClaimed(dbUser.getUserIdFromKeyId(key.getId()));
-            dbUser.updateAllChanged();
-            key.delete();
-
-            ctx.send("Invalidated key " + keyString);
-        }
-    }
-
-    @Name("createkey")
-    @Permission(CommandPermission.OWNER)
-    @Category(CommandCategory.OWNER)
-    public static class CreateKey extends TextCommand {
-        @Override
-        protected void process(TextContext ctx) {
-            var scope = ctx.argument(Parsers.toEnum(PremiumKey.Type.class), "Missing scope (Valid ones are: `user` or `guild`)", "Invalid scope (Valid ones are: `user` or `guild`)");
-            var owner = ctx.argument(Parsers.strictLong(), "Missing owner id.", "Failed to parse owner.");
-            var linked = ctx.argument(Parsers.bool(), "Missing linked.", "Failed to parse linked.");
-            var mobile = ctx.tryArgument(Parsers.matching("^mobile$"));
-
-            //This method generates a premium key AND saves it on the database! Please use this result!
-            var generated = PremiumKey.generatePremiumKey(String.valueOf(owner), scope, linked);
-            if (mobile.isPresent()) {
-                ctx.send(generated.getId());
-            } else {
-                ctx.send(EmoteReference.CORRECT + String.format("Generated: `%s` (S: %s) **[NOT ACTIVATED]** (Linked: %s)",
-                        generated.getId(), generated.getParsedType(), linked));
-            }
         }
     }
 

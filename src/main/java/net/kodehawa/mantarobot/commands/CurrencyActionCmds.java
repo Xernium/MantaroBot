@@ -398,7 +398,7 @@ public class CurrencyActionCmds {
             bonus = money / 2;
         }
 
-        if (dbUser.isPremium() && money > 0 && bonus > 0) {
+        if (money > 0 && bonus > 0) {
             money += random.nextInt(bonus);
         }
 
@@ -420,7 +420,7 @@ public class CurrencyActionCmds {
         }
 
         if (random.nextInt(400) >= 392) {
-            var crate = dbUser.isPremium() ? ItemReference.MINE_PREMIUM_CRATE : ItemReference.MINE_CRATE;
+            var crate = ItemReference.MINE_PREMIUM_CRATE;
 
             if (!player.canFitItem(crate)) {
                 message += "\n" + languageContext.get("commands.mine.crate.overflow");
@@ -432,7 +432,7 @@ public class CurrencyActionCmds {
         }
 
         if (player.shouldSeeCampaign()) {
-            message += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
+            message += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
             player.markCampaignAsSeen();
         }
 
@@ -570,7 +570,7 @@ public class CurrencyActionCmds {
 
             // START OF FISH LOOT CRATE HANDLING
             if (random.nextInt(400) > 380) {
-                var crate = dbUser.isPremium() ? ItemReference.FISH_PREMIUM_CRATE : ItemReference.FISH_CRATE;
+                var crate = ItemReference.FISH_PREMIUM_CRATE;
                 if (!player.canFitItem(crate)) {
                     extraMessage += "\n" + languageContext.get("commands.fish.crate.overflow");
                 } else {
@@ -641,12 +641,12 @@ public class CurrencyActionCmds {
                 bonus = money / 2;
             }
 
-            if (dbUser.isPremium() && money > 0 && bonus > 0) {
+            if (money > 0 && bonus > 0) {
                 money += random.nextInt(bonus);
             }
 
             if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
+                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
                 player.markCampaignAsSeen();
             }
 
@@ -801,7 +801,7 @@ public class CurrencyActionCmds {
                 bonus = money / 2;
             }
 
-            if (dbUser.isPremium() && money > 0 && bonus > 0) {
+            if (money > 0 && bonus > 0) {
                 money += random.nextInt(bonus);
             }
 
@@ -810,7 +810,7 @@ public class CurrencyActionCmds {
             }
 
             if (random.nextInt(400) > 380) {
-                var crate = dbUser.isPremium() ? ItemReference.CHOP_PREMIUM_CRATE : ItemReference.CHOP_CRATE;
+                var crate = ItemReference.CHOP_PREMIUM_CRATE;
                 if (!player.canFitItem(crate)) {
                     extraMessage += "\n" + languageContext.get("commands.chop.crate.overflow");
                 } else {
@@ -827,7 +827,7 @@ public class CurrencyActionCmds {
             handlePetBadges(player, marriage, pet);
 
             if (player.shouldSeeCampaign()) {
-                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, dbUser.isPremium());
+                extraMessage += Campaign.PREMIUM.getStringFromCampaign(languageContext, true);
                 player.markCampaignAsSeen();
             }
 

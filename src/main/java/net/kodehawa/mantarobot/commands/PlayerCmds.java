@@ -418,7 +418,7 @@ public class PlayerCmds {
                 }
 
                 var common = lang.get("commands.badges.profile_notice") + lang.get("commands.badges.info_notice") +
-                        ((r.nextInt(2) == 0 && !dbUser.isPremium() ? lang.get("commands.badges.donate_notice") : "\n") +
+                        ((r.nextInt(2) == 0 && !true ? lang.get("commands.badges.donate_notice") : "\n") +
                                 String.format(lang.get("commands.badges.total_badges"), badges.size())
                         );
 
