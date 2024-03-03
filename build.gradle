@@ -58,6 +58,8 @@ dependencies {
     // Database
     implementation 'org.mongodb:mongodb-driver-sync:4.11.1'
     implementation 'redis.clients:jedis:5.1.0'
+    implementation group: 'org.jdbi', name: 'jdbi3-core', version: '3.45.0'
+    implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.45.0'
 
     // Utilities
     implementation 'org.apache.commons:commons-lang3:3.14.0'

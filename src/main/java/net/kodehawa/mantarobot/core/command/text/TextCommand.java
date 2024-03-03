@@ -20,6 +20,7 @@ package net.kodehawa.mantarobot.core.command.text;
 import net.kodehawa.mantarobot.core.command.helpers.AnnotatedCommand;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
+import org.jdbi.v3.core.Jdbi;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,9 +59,9 @@ public abstract class TextCommand extends AnnotatedCommand<TextContext> {
     }
 
     @Override
-    public final void execute(TextContext ctx) {
+    public final Throwable execute(TextContext ctx, Jdbi dbCon) {
         if (!getPredicate().test(ctx)) {
-            return;
+            return null;
         }
 
         var args = ctx.arguments();
@@ -71,12 +72,11 @@ public abstract class TextCommand extends AnnotatedCommand<TextContext> {
                 child = children.get(childrenAliases.getOrDefault(name, ""));
             }
             if (child != null) {
-                child.execute(ctx);
-                return;
+                return child.execute(ctx, dbCon);
             }
             args.back();
         }
-        process(ctx);
+        return preProcess(ctx, dbCon);
     }
 
     public Predicate<TextContext> getPredicate() {

@@ -40,6 +40,10 @@ import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.I18n;
 import net.kodehawa.mantarobot.data.MantaroData;
+import net.kodehawa.mantarobot.db.rel.help.DataAccess;
+import net.kodehawa.mantarobot.db.rel.help.DataMode;
+import net.kodehawa.mantarobot.db.rel.help.DataResult;
+import net.kodehawa.mantarobot.db.rel.meta.DataAccessMode;
 import net.kodehawa.mantarobot.utils.StringUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
@@ -71,30 +75,20 @@ public class InfoCmds {
     @Description("Shows useful bot information (not statistics).")
     @Category(CommandCategory.INFO)
     @Help(description = "Shows useful bot information.")
+    @DataAccessMode(DataMode.NO_ACCESS)
     public static class Information extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected DataResult process(SlashContext ctx, DataAccess dao) {return DataResult.COMMIT_SUCCESS;}
 
         @Name("support")
         @Description("Shows a link to the support server")
         @Help(description = "Shows a link to the support server")
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class Support extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 ctx.replyEphemeral("commands.support.info", EmoteReference.POPPER);
-            }
-        }
-
-        @Name("donate")
-        @Description("Shows the donation methods in case you want to support Mantaro.")
-        @Help(description = "Shows the donation methods in case you want to support Mantaro.")
-        public static class Donate extends SlashCommand {
-            @Override
-            protected void process(SlashContext ctx) {
-                ctx.replyEphemeral("commands.donate.beg", EmoteReference.HEART,
-                        ctx.getLanguageContext().get("commands.donate.methods")
-                                .formatted("https://patreon.com/mantaro", "https://paypal.me/kodemantaro")
-                );
+                return DataResult.COMMIT_SUCCESS;
             }
         }
 
@@ -108,20 +102,23 @@ public class InfoCmds {
                 Use the command to get a list of language codes.
                 """
         )
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class Language extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 ctx.replyEphemeral("commands.lang.info", EmoteReference.ZAP,
                         String.join(", ", I18n.LANGUAGES).replace(".json", "")
                 );
+                return null;
             }
         }
 
         @Description("Shows the message the bot sends when it's added to a server.")
         @Help(description = "Shows the message the bot sends when it's added to a server.")
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class Welcome extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 final var embedBuilder = new EmbedBuilder()
                         .setThumbnail(ctx.getJDA().getSelfUser().getEffectiveAvatarUrl())
                         .setColor(Color.PINK)
@@ -146,14 +143,16 @@ public class InfoCmds {
                         ).setFooter("We hope you enjoy using Mantaro! For any questions, go to our support server.");
 
                 ctx.replyEphemeral(embedBuilder.build());
+                return null;
             }
         }
         @Name("invite")
         @Description("Gives you a bot OAuth invite link and some other important links.")
         @Help(description = "Gives you a bot OAuth invite link and some other important links.")
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class Invite extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 var languageContext = ctx.getLanguageContext();
 
                 ctx.replyEphemeral(new EmbedBuilder()
@@ -179,6 +178,7 @@ public class InfoCmds {
                         .setFooter(languageContext.get("commands.invite.footer"), ctx.getSelfUser().getAvatarUrl())
                         .build()
                 );
+                return null;
             }
         }
 
@@ -187,9 +187,10 @@ public class InfoCmds {
         @Ephemeral
         @Description("Returns information about shards.")
         @Help(description = "Returns information about shards.")
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class ShardInfo extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 StringBuilder builder = new StringBuilder();
                 Map<String, String> stats;
 
@@ -230,15 +231,17 @@ public class InfoCmds {
                 }
 
                 DiscordUtils.listButtons(ctx.getUtilsContext(), 150, messages);
+                return null;
             }
         }
 
         @Name("shard")
         @Description("Returns in what shard I am.")
         @Help(description = "Returns in what shard I am.")
+        @DataAccessMode(DataMode.NO_ACCESS)
         public static class Shard extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected DataResult process(SlashContext ctx, DataAccess dao) {
                 long nodeAmount;
                 try(Jedis jedis = MantaroData.getDefaultJedisPool().getResource()) {
                     nodeAmount = jedis.hlen("node-stats-" + ctx.getConfig().getClientId());
@@ -254,6 +257,7 @@ public class InfoCmds {
                         guildCache.size(), jda.getUserCache().size(),
                         guildCache.stream().mapToLong(guild -> guild.getMemberCache().size()).sum()
                 );
+                return null;
             }
         }
     }

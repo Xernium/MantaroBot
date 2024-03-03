@@ -20,7 +20,6 @@ package net.kodehawa.mantarobot.commands;
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
@@ -38,9 +37,8 @@ import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.utils.APIUtils;
+import net.kodehawa.mantarobot.db.entities.done.MantaroObject;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
@@ -54,7 +52,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -194,11 +191,9 @@ public class OwnerCmd {
 
                 if (e.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
                     transferToPlayer.currentMoney(transferredPlayer.getCurrentMoney());
-                    transferToPlayer.level(transferredPlayer.getLevel());
                     transferToPlayer.reputation(transferredPlayer.getReputation());
                     transferToPlayer.mergeInventory(transferredPlayer.getInventoryList());
 
-                    transferToPlayer.setExperience(transferredPlayer.getExperience());
                     transferToPlayer.setBadges(transferredPlayer.getBadges());
                     transferToPlayer.showBadge(transferredPlayer.isShowBadge());
                     transferToPlayer.marketUsed(transferredPlayer.getMarketUsed());

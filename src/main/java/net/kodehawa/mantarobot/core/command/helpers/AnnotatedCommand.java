@@ -9,8 +9,16 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Permission;
 import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.db.rel.help.DataAccess;
+import net.kodehawa.mantarobot.db.rel.help.DataMode;
+import net.kodehawa.mantarobot.db.rel.help.DataResult;
+import net.kodehawa.mantarobot.db.rel.help.DatabaseRollbackException;
+import net.kodehawa.mantarobot.db.rel.meta.DataAccessMode;
+import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.core.Jdbi;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class AnnotatedCommand<T extends IContext> {
     protected CommandCategory category;
@@ -18,6 +26,7 @@ public abstract class AnnotatedCommand<T extends IContext> {
     protected final String name;
     protected final CommandPermission permission;
     protected HelpContent help;
+    protected final DataMode dataMode;
 
     public AnnotatedCommand() {
         var clazz = getClass();
@@ -38,6 +47,13 @@ public abstract class AnnotatedCommand<T extends IContext> {
             this.permission = getDefaultPermission();
         } else {
             this.permission = p.value();
+        }
+
+        var l = clazz.getAnnotation(DataAccessMode.class);
+        if (l == null) {
+            this.dataMode = DataMode.getDefault();
+        } else {
+            this.dataMode = l.value();
         }
 
         var h = clazz.getAnnotation(Help.class);
@@ -75,8 +91,34 @@ public abstract class AnnotatedCommand<T extends IContext> {
     }
 
     @SuppressWarnings("unused")
-    public abstract void execute(T ctx);
-    protected abstract void process(T ctx);
+    public abstract Throwable execute(T ctx, Jdbi dbCon);
+    protected final Throwable preProcess(T ctx, Jdbi dbCon) {
+        if (dataMode.isDataAccess()) {
+            AtomicReference<Throwable> t = new AtomicReference<>();
+            dbCon.inTransaction(dataMode.getLevel(), handle -> {
+                try {
+                    DataResult r = process(ctx, new DataAccess(handle, dataMode));
+                    if (r == DataResult.ROLLBACK) {
+                        DatabaseRollbackException.throwThis();
+                    }
+                    return r == DataResult.COMMIT_SUCCESS;
+                } catch (Throwable e) {
+                    t.set(e);
+                    DatabaseRollbackException.throwThis();
+                }
+                return false;
+            });
+            return t.get();
+        } else {
+            try {
+                process(ctx, null);
+                return null;
+            } catch (Throwable t) {
+                return t;
+            }
+        }
+    }
+    protected abstract DataResult process(T ctx, DataAccess dao);
 
     public void setCategory(CommandCategory category) {
         this.category = category;

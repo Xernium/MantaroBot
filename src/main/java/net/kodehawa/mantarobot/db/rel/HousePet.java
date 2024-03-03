@@ -15,25 +15,21 @@
  *
  */
 
-package net.kodehawa.mantarobot.commands.currency.pets;
+package net.kodehawa.mantarobot.db.rel;
 
+import net.kodehawa.mantarobot.commands.currency.pets.HousePetType;
+import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
-import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.Map;
 
-@SuppressWarnings("unused")
 public class HousePet {
-    @BsonIgnore
     private static final SecureRandom random = new SecureRandom();
-
-    @BsonIgnore
     public static int attributeCeiling = 120;
 
+    private long id;
+    private NewUser owner;
+    private PetChoice relationship;
     private String name;
     private HousePetType type;
 
@@ -50,11 +46,9 @@ public class HousePet {
     private int dust = 0;
     private int patCounter;
     private long experience;
-    private long level = 1;
-    @BsonIgnore
-    public Map<String, Object> fieldTracker = new HashMap<>();
+    private long expLevel = 1;
 
-    // Serialization constructor
+
     public HousePet() { }
 
     public HousePet(String name, HousePetType type) {
@@ -133,7 +127,6 @@ public class HousePet {
         }
 
         this.health = Math.max(1, health - defaultDecrease);
-        fieldTracker.put("pet.health", this.health);
     }
 
     public void decreaseStamina() {
@@ -143,7 +136,6 @@ public class HousePet {
         }
 
         this.stamina = Math.max(1, stamina - defaultDecrease);
-        fieldTracker.put("pet.stamina", this.stamina);
     }
 
     public void decreaseHunger() {
@@ -153,7 +145,6 @@ public class HousePet {
         }
 
         this.hunger = Math.max(1, hunger - defaultDecrease);
-        fieldTracker.put("pet.hunger", this.hunger);
     }
 
     public void decreaseThirst() {
@@ -163,7 +154,6 @@ public class HousePet {
         }
 
         this.thirst = Math.max(1, thirst - defaultDecrease);
-        fieldTracker.put("pet.thirst", this.thirst);
     }
 
     public void increaseHealth() {
@@ -174,7 +164,6 @@ public class HousePet {
 
         var defaultIncrease = 10;
         this.health = Math.min(maxHealth, health + defaultIncrease);
-        fieldTracker.put("pet.health", this.health);
     }
 
     public void increaseStamina() {
@@ -185,7 +174,6 @@ public class HousePet {
 
         var defaultIncrease = 30;
         this.stamina = Math.min(maxStamina, stamina + defaultIncrease);
-        fieldTracker.put("pet.stamina", this.stamina);
     }
 
     public void increaseHunger(int by) {
@@ -195,7 +183,6 @@ public class HousePet {
         }
 
         this.hunger = Math.min(maxHunger, hunger + by);
-        fieldTracker.put("pet.hunger", this.hunger);
     }
 
     public void increaseThirst(int by) {
@@ -205,7 +192,6 @@ public class HousePet {
         }
 
         this.thirst = Math.min(maxThirst, thirst + by);
-        fieldTracker.put("pet.thirst", this.thirst);
     }
 
     public void increaseDust() {
@@ -216,7 +202,6 @@ public class HousePet {
         }
 
         this.dust = Math.min(100, dust + defaultIncrease);
-        fieldTracker.put("pet.dust", this.dust);
     }
 
     public void decreaseDust(int by) {
@@ -225,12 +210,10 @@ public class HousePet {
         }
 
         this.dust = Math.max(1, dust - by);
-        fieldTracker.put("pet.dust", this.dust);
     }
 
     public void increasePats() {
         this.patCounter += 1;
-        fieldTracker.put("pet.patCounter", this.patCounter);
     }
 
     public void increaseMaxHealth(int by) {
@@ -239,7 +222,6 @@ public class HousePet {
         }
 
         this.maxHealth = Math.min(attributeCeiling, maxHealth + by);
-        fieldTracker.put("pet.maxHealth", this.maxHealth);
     }
 
     public void increaseMaxHunger(int by) {
@@ -248,7 +230,6 @@ public class HousePet {
         }
 
         this.maxHunger = Math.min(attributeCeiling, maxHunger + by);
-        fieldTracker.put("pet.maxHunger", this.maxHunger);
     }
 
     public void increaseMaxStamina(int by) {
@@ -257,7 +238,6 @@ public class HousePet {
         }
 
         this.maxStamina = Math.min(attributeCeiling, maxStamina + by);
-        fieldTracker.put("pet.maxStamina", this.maxStamina);
     }
 
     public void increaseMaxThirst(int by) {
@@ -266,7 +246,6 @@ public class HousePet {
         }
 
         this.maxThirst = Math.min(attributeCeiling, maxThirst + by);
-        fieldTracker.put("pet.maxThirst", this.maxThirst);
     }
 
     public int getHunger() {
@@ -297,12 +276,12 @@ public class HousePet {
         this.experience = experience;
     }
 
-    public long getLevel() {
-        return level;
+    public long getExpLevel() {
+        return expLevel;
     }
 
-    public void setLevel(long level) {
-        this.level = level;
+    public void setExpLevel(long expLevel) {
+        this.expLevel = expLevel;
     }
 
     public int getDust() {
@@ -313,29 +292,51 @@ public class HousePet {
         this.dust = dust;
     }
 
-    @BsonIgnore
+    public NewUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(NewUser owner) {
+        this.owner = owner;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public PetChoice getRelationship() {
+        return relationship;
+    }
+
+    public void setRelationship(PetChoice relationship) {
+        this.relationship = relationship;
+    }
+
+    public void setPatCounter(int patCounter) {
+        this.patCounter = patCounter;
+    }
+
     public long experienceToNextLevel() {
-        var level = getLevel();
+        var level = getExpLevel();
         var toNext = (long) ((level * Math.log10(level) * 1000) + (50 * level / 2D));
-        if (getLevel() > 300) {
+        if (getExpLevel() > 300) {
             toNext = (long) ((level * Math.log10(level) * 1400) + (200 * level / 2D));
         }
 
         return toNext;
     }
 
-    @BsonIgnore
     public void increaseExperience() {
         this.experience += Math.max(10, random.nextInt(40));
         var toNextLevel = experienceToNextLevel();
         if (experience > toNextLevel)
-            level += 1;
-
-        fieldTracker.put("pet.experience", this.experience);
-        fieldTracker.put("pet.level", this.level);
+            expLevel += 1;
     }
 
-    @BsonIgnore
     public ActivityResult handleAbility(HousePetType.HousePetAbility neededAbility) {
         if (!type.getAbilities().contains(neededAbility))
             return ActivityResult.NO_ABILITY;
@@ -366,7 +367,6 @@ public class HousePet {
         return neededAbility.getPassActivity();
     }
 
-    @BsonIgnore
     public boolean handleStatIncrease(SecureRandom random) {
         boolean didIncrease = false;
         // get chance is a gradual increase
@@ -399,7 +399,6 @@ public class HousePet {
         return didIncrease;
     }
 
-    @BsonIgnore
     private static float getChance(int attribute) {
         if (attribute >= attributeCeiling) return 0;
         if (attribute >= 110) return 0.005f;
@@ -412,22 +411,14 @@ public class HousePet {
         return (20f - ((20f - 5f) / 10000f) * ((attribute - 100f) * 1000)) / 1000;
     }
 
-    @BsonIgnore
-    public void updateAllChanged(ManagedMongoObject database) {
-        MantaroData.db().updateFieldValues(database, fieldTracker);
-    }
-
-    @BsonIgnore
     public String buildMessage(ActivityResult result, I18nContext language, int money, int items) {
         return String.format(language.get(result.getLanguageString()), getType().getEmoji(), getName(), money, items);
     }
 
-    @BsonIgnore
     public HousePetType.PlayReaction handlePlay(HousePetType type) {
         return HousePetType.PlayReaction.getReactionForPlay(type);
     }
 
-    @BsonIgnore
     public HousePetType.PatReaction handlePat() {
         if (getType() == HousePetType.CAT) {
             return random.nextBoolean() ? HousePetType.PatReaction.CUTE : HousePetType.PatReaction.SCARE;

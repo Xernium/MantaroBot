@@ -21,11 +21,11 @@ import net.dv8tion.jda.internal.utils.IOUtil;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
-import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
+import net.kodehawa.mantarobot.db.entities.done.PlayerEquipment;
 import net.kodehawa.mantarobot.commands.currency.pets.HousePetType;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PlayerStats;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.db.entities.done.Player;
+import net.kodehawa.mantarobot.db.entities.done.PlayerStats;
+import net.kodehawa.mantarobot.db.entities.done.MongoUser;
 import net.kodehawa.mantarobot.utils.TriPredicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,12 +140,6 @@ public enum Badge {
             ((player, stats, dbUser) -> false), false, false
     ),
     // --- END OF FIRST SEASON BADGES (Top 2 - 5) ---
-
-    MARATHON_WINNER("Marathon Winner", "\uD83C\uDFC5",
-            "Get to level 200.",
-            91, 92,
-            (player, stats, dbUser) -> player.getLevel() >= 200, false
-    ),
 
     DEPTHS_OF_HELL("Depths of Hell", "\uD83D\uDE08", "Have all 3 Hellfire tools equipped",
             91, 92, (player, stats, dbUser) -> {
@@ -262,18 +256,6 @@ public enum Badge {
    LEGENDARY_PET_OWNER("Legendary Pet Owner", "\uD83C\uDFE2", "Get your pet to level 300",
             91, 92,
             (player, stats, dbUser) -> false, false
-    ),
-
-    MARATHON_RUNNER("Marathon Runner", "\uD83C\uDF96",
-            "Get to level 150.",
-            91, 92,
-            (player, stats, dbUser) -> player.getLevel() >= 150, false
-    ),
-
-    FAST_RUNNER("Fast Runner", "\uD83D\uDEA9",
-            "Get to level 100.",
-            91, 92,
-            (player, stats, dbUser) -> player.getLevel() >= 100, false
     ),
 
     BADGE_HUNTER("Badge Hunter", "\uD83C\uDFF5",
@@ -449,12 +431,6 @@ public enum Badge {
             (player, stats, dbUser) -> player.getTimesMopped() > 50, false
     ),
 
-    RUNNER("Runner", "\uD83D\uDCCD",
-            "Get to level 50.",
-            91, 92,
-            (player, stats, dbUser) -> player.getLevel() >= 50, false
-    ),
-
     CASTER("Caster", "<:sparkle_wrench:551979816262434819>", "Cast more than 50 items",
             91, 92,
             (player, stats, dbUser) -> stats.getCraftedItems() >= 50, false
@@ -486,12 +462,6 @@ public enum Badge {
             "Get more than 1,000 chopping experience.",
             91, 92,
             ((player, stats, dbUser) -> player.getChopExperience() > 1000), false
-    ),
-
-    WALKER("Walker", "\uD83C\uDFF7",
-            "Get to level 10.",
-            91, 92,
-            (player, stats, dbUser) -> player.getLevel() >= 10, false
     ),
 
     MINER("Miner", "\u26cf",

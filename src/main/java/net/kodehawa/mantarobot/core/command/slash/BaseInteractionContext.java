@@ -18,7 +18,7 @@ import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
+import net.kodehawa.mantarobot.db.entities.done.MantaroObject;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.UtilsContext;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RateLimitContext;
@@ -437,6 +437,10 @@ public abstract class BaseInteractionContext<T extends GenericCommandInteraction
     }
 
     public User retrieveUserById(String id) {
+        return event.getJDA().retrieveUserById(id).complete();
+    }
+
+    public User retrieveUserById(long id) {
         return event.getJDA().retrieveUserById(id).complete();
     }
 

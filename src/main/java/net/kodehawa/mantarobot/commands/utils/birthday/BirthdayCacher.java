@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.commands.utils.birthday;
 
 import net.kodehawa.mantarobot.commands.BirthdayCmd;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.db.entities.done.MongoUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

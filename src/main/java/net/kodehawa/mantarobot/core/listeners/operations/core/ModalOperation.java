@@ -18,7 +18,8 @@
 package net.kodehawa.mantarobot.core.listeners.operations.core;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.kodehawa.mantarobot.db.rel.help.DataAccess;
 
 public interface ModalOperation extends Operation {
-    int modal(ModalInteractionEvent event);
+    int modal(ModalInteractionEvent event, DataAccess dao);
 }

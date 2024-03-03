@@ -18,7 +18,11 @@
 package net.kodehawa.mantarobot.core.command.slash;
 
 import net.kodehawa.mantarobot.MantaroBot;
+import net.kodehawa.mantarobot.db.rel.help.DataResult;
+import net.kodehawa.mantarobot.db.rel.help.DatabaseRollbackException;
+import org.jdbi.v3.core.Jdbi;
 
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public abstract class ContextCommand<T> extends DeferrableCommand<InteractionContext<T>> {
@@ -39,11 +43,11 @@ public abstract class ContextCommand<T> extends DeferrableCommand<InteractionCon
     }
 
     @Override
-    public final void execute(InteractionContext<T> ctx) {
+    public final Throwable execute(InteractionContext<T> ctx, Jdbi dbCon) {
         // If this is over 2500ms, we should attempt to defer instead, as discord might be lagging.
         var averageLatencyMax = MantaroBot.getInstance().getCore().getRestPing() * 4;
         if (!getPredicate().test(ctx)) {
-            return;
+            return null;
         }
 
         if ((defer() || averageLatencyMax > 2500) && !modal) {
@@ -51,6 +55,6 @@ public abstract class ContextCommand<T> extends DeferrableCommand<InteractionCon
         }
 
         ctx.setForceEphemeral(true);
-        process(ctx);
+        return preProcess(ctx, dbCon);
     }
 }

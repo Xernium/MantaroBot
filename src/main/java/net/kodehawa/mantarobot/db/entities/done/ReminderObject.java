@@ -15,7 +15,7 @@
  *
  */
 
-package net.kodehawa.mantarobot.commands.utils.reminders;
+package net.kodehawa.mantarobot.db.entities.done;
 
 //This just exists for the sake of serializing (!)
 public class ReminderObject {

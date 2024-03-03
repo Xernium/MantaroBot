@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.utils.SplitUtil;
 import net.kodehawa.mantarobot.commands.utils.reminders.Reminder;
-import net.kodehawa.mantarobot.commands.utils.reminders.ReminderObject;
+import net.kodehawa.mantarobot.db.entities.done.ReminderObject;
 import net.kodehawa.mantarobot.core.CommandRegistry;
 import net.kodehawa.mantarobot.core.command.text.TextCommand;
 import net.kodehawa.mantarobot.core.command.text.TextContext;

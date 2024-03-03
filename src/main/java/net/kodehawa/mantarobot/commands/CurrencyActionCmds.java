@@ -23,14 +23,14 @@ import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
 import net.kodehawa.mantarobot.commands.currency.item.ItemType;
-import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
+import net.kodehawa.mantarobot.db.entities.done.PlayerEquipment;
 import net.kodehawa.mantarobot.commands.currency.item.special.gems.CastedGem;
 import net.kodehawa.mantarobot.commands.currency.item.special.gems.Gem;
 import net.kodehawa.mantarobot.commands.currency.item.special.helpers.attributes.GemType;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Axe;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.FishRod;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Pickaxe;
-import net.kodehawa.mantarobot.commands.currency.pets.HousePet;
+import net.kodehawa.mantarobot.db.rel.HousePet;
 import net.kodehawa.mantarobot.commands.currency.pets.HousePetType;
 import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
@@ -49,9 +49,9 @@ import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.db.entities.done.Marriage;
+import net.kodehawa.mantarobot.db.entities.done.MongoUser;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.RandomCollection;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
@@ -852,12 +852,12 @@ public class CurrencyActionCmds {
             pet.handleStatIncrease(random);
 
             var itemIncrease = 0;
-            var buildup = pet.getType().getMaxItemBuildup(pet.getLevel());
+            var buildup = pet.getType().getMaxItemBuildup(pet.getExpLevel());
             if (needsItem && buildup > 0) {
                 itemIncrease = random.nextInt(buildup + 1);
             }
 
-            var coinBuildup = pet.getType().getMaxCoinBuildup(pet.getLevel());
+            var coinBuildup = pet.getType().getMaxCoinBuildup(pet.getExpLevel());
             var moneyIncrease = Math.max(1, random.nextInt(coinBuildup + 1));
             var message = "\n" + pet.buildMessage(ability, languageContext, moneyIncrease, itemIncrease);
 
@@ -892,15 +892,15 @@ public class CurrencyActionCmds {
             player.addBadgeIfAbsent(Badge.BEST_FRIEND);
         }
 
-        if (pet.getLevel() >= 50) {
+        if (pet.getExpLevel() >= 50) {
             player.addBadgeIfAbsent(Badge.EXPERIENCED_PET_OWNER);
         }
 
-        if (pet.getLevel() >= 100) {
+        if (pet.getExpLevel() >= 100) {
             player.addBadgeIfAbsent(Badge.EXPERT_PET_OWNER);
         }
 
-        if (pet.getLevel() >= 300) {
+        if (pet.getExpLevel() >= 300) {
             player.addBadgeIfAbsent(Badge.LEGENDARY_PET_OWNER);
         }
     }

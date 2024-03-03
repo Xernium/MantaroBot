@@ -33,7 +33,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
-import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
+import net.kodehawa.mantarobot.db.entities.done.PlayerEquipment;
 import net.kodehawa.mantarobot.commands.currency.item.special.helpers.Breakable;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent;
@@ -82,7 +82,6 @@ import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent
 import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.HEADER;
 import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.INVENTORY;
 import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.MARRIAGE;
-import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.OLD_CREDITS;
 import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.PET;
 import static net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent.REPUTATION;
 import static net.kodehawa.mantarobot.utils.Utils.createLinkedList;
@@ -100,7 +99,6 @@ public class ProfileCmd {
     // A small white square.
     private static final String LIST_MARKER = "\u25AB\uFE0F";
     private static final List<ProfileComponent> defaultOrder = createLinkedList(HEADER, CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
-    private static final List<ProfileComponent> noOldOrder = createLinkedList(HEADER, CREDITS, EXPERIENCE, BIRTHDAY, REPUTATION, MARRIAGE, INVENTORY, BADGES, PET);
     private static final IncreasingRateLimiter profileRatelimiter = new IncreasingRateLimiter.Builder()
             .limit(2) //twice every 10m
             .spamTolerance(2)
@@ -167,19 +165,6 @@ public class ProfileCmd {
                 }
 
                 dbUser.updateAllChanged();
-            }
-        }
-
-        @Description("Toggles the display of legacy credits.")
-        public static class ToggleLegacy extends SlashCommand {
-            @Override
-            protected void process(SlashContext ctx) {
-                final var player = ctx.getPlayer();
-                var toSet = !player.isHiddenLegacy();
-                player.hiddenLegacy(toSet);
-
-                player.updateAllChanged();
-                ctx.replyEphemeral("commands.profile.hidelegacy", EmoteReference.CORRECT, player.isHiddenLegacy());
             }
         }
 
@@ -614,12 +599,9 @@ public class ProfileCmd {
                         ctx.getAuthor().getEffectiveAvatarUrl()
                 );
 
-        var hasCustomOrder = true && !player.getProfileComponents().isEmpty();
+        var hasCustomOrder = !player.getProfileComponents().isEmpty();
         var usedOrder = hasCustomOrder ? player.getProfileComponents() : defaultOrder;
-        if ((!true && player.getOldMoney() < 5000 && !hasCustomOrder) ||
-                (player.isHiddenLegacy() && !hasCustomOrder)) {
-            usedOrder = noOldOrder;
-        }
+
 
         for (var component : usedOrder) {
             profileBuilder.addField(

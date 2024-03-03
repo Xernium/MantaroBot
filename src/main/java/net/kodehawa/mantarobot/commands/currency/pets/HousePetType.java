@@ -17,6 +17,7 @@
 
 package net.kodehawa.mantarobot.commands.currency.pets;
 
+import net.kodehawa.mantarobot.db.rel.HousePet;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 

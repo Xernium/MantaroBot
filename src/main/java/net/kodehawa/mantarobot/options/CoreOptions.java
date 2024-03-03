@@ -3,8 +3,7 @@ package net.kodehawa.mantarobot.options;
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
+import net.kodehawa.mantarobot.db.entities.done.MongoGuild;
 import net.kodehawa.mantarobot.options.annotations.Option;
 import net.kodehawa.mantarobot.options.core.OptionHandler;
 import net.kodehawa.mantarobot.options.core.OptionType;
@@ -13,11 +12,9 @@ import net.kodehawa.mantarobot.utils.StringUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
-import net.kodehawa.mantarobot.utils.commands.FinderUtils;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static net.kodehawa.mantarobot.utils.Utils.mapConfigObjects;
 

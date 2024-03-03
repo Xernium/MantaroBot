@@ -26,7 +26,7 @@ import net.kodehawa.mantarobot.commands.currency.item.Item;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.special.Food;
-import net.kodehawa.mantarobot.commands.currency.pets.HousePet;
+import net.kodehawa.mantarobot.db.rel.HousePet;
 import net.kodehawa.mantarobot.commands.currency.pets.HousePetType;
 import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
@@ -40,8 +40,8 @@ import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.db.entities.done.Marriage;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.Pair;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -208,7 +208,7 @@ public class PetCmds {
                 }
 
                 ctx.replyStripped("commands.pet.level.success",
-                        EmoteReference.ZAP, pet.getName(), pet.getLevel(), pet.getExperience(), pet.experienceToNextLevel()
+                        EmoteReference.ZAP, pet.getName(), pet.getExpLevel(), pet.getExperience(), pet.experienceToNextLevel()
                 );
             }
         }
@@ -261,7 +261,7 @@ public class PetCmds {
                                 pet.getType().getStringAbilities(), false
                         )
                         .addField(EmoteReference.ZAP.toHeaderString() + language.get("commands.pet.status.level"),
-                                "**%,d** (XP: %,d)".formatted(pet.getLevel(), pet.getExperience()), false
+                                "**%,d** (XP: %,d)".formatted(pet.getExpLevel(), pet.getExperience()), false
                         );
 
                 // This is needed else we'll run into people thinking pets with no catch ability have a item buildup.
@@ -270,13 +270,13 @@ public class PetCmds {
                     status.addField(EmoteReference.STAR.toHeaderString() + language.get("commands.pet.status.buildup"),
                             language.get("commands.pet.status.buildup_stats")
                                     .formatted(
-                                            pet.getType().getMaxCoinBuildup(pet.getLevel()),
-                                            pet.getType().getMaxItemBuildup(pet.getLevel())
+                                            pet.getType().getMaxCoinBuildup(pet.getExpLevel()),
+                                            pet.getType().getMaxItemBuildup(pet.getExpLevel())
                                     ), false
                     );
                 } else {
                     status.addField(EmoteReference.POUCH.toHeaderString() + language.get("commands.pet.status.buildup_coin"),
-                            language.get("commands.pet.status.buildup_stats_credits").formatted(pet.getType().getMaxCoinBuildup(pet.getLevel())
+                            language.get("commands.pet.status.buildup_stats_credits").formatted(pet.getType().getMaxCoinBuildup(pet.getExpLevel())
                             ), false
                     );
                 }

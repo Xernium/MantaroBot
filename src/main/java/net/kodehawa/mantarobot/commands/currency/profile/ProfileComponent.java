@@ -21,12 +21,12 @@ import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.Item;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
-import net.kodehawa.mantarobot.commands.currency.pets.HousePet;
+import net.kodehawa.mantarobot.db.rel.HousePet;
 import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.db.entities.done.Marriage;
+import net.kodehawa.mantarobot.db.entities.done.MongoUser;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
@@ -62,10 +62,6 @@ public enum ProfileComponent {
             true, false
     ),
     REPUTATION(EmoteReference.REP, i18nContext -> i18nContext.get("commands.profile.rep"), (holder, i18nContext) -> String.valueOf(holder.player().getReputation())),
-    LEVEL(EmoteReference.ZAP, i18nContext -> i18nContext.get("commands.profile.level"), (holder, i18nContext) -> {
-        var player = holder.player();
-        return String.format(Utils.getLocaleFromLanguage(i18nContext), "%d (%s: %,d)", player.getLevel(), i18nContext.get("commands.profile.xp"), player.getExperience());
-    }, true, false),
     EXPERIENCE(EmoteReference.ZAP, i18nContext -> i18nContext.get("commands.profile.activity_xp"), (holder, i18nContext) -> {
         var data = holder.player();
         var mine = Utils.roundPrefixNumber(data.getMiningExperience());
@@ -160,7 +156,7 @@ public enum ProfileComponent {
         return "%s**%s** [%s: %,d, XP: %,d]"
                 .formatted(
                         pet.getType().getEmoji(), pet.getName(),
-                        i18nContext.get("commands.profile.level"), pet.getLevel(), pet.getExperience()
+                        i18nContext.get("commands.profile.level"), pet.getExpLevel(), pet.getExperience()
                 );
     }, true, false),
     FOOTER(null, null, (holder, i18nContext) -> {

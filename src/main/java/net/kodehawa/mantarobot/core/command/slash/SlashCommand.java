@@ -26,6 +26,7 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.NSFW;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
+import org.jdbi.v3.core.Jdbi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,14 +149,14 @@ public abstract class SlashCommand extends DeferrableCommand<SlashContext> {
     }
 
     @Override
-    public final void execute(SlashContext ctx) {
+    public final Throwable execute(SlashContext ctx, Jdbi dbCon) {
         var sub = getSubCommands().get(ctx.getSubCommand());
         // If this is over 2500ms, we should attempt to defer instead, as discord might be lagging.
         var averageLatencyMax = MantaroBot.getInstance().getCore().getRestPing() * 4;
 
         // Predicate failure
         if (!getPredicate().test(ctx)) {
-            return;
+            return null;
         }
 
         var forceDefer = averageLatencyMax > 2500 && !modal;
@@ -166,7 +167,7 @@ public abstract class SlashCommand extends DeferrableCommand<SlashContext> {
             }
 
             ctx.setForceEphemeral(sub.isEphemeral());
-            sub.process(ctx);
+            return sub.preProcess(ctx, dbCon);
         } else {
             if ((defer() || forceDefer) && !modal) {
                 if (isEphemeral()) ctx.deferEphemeral();
@@ -174,7 +175,7 @@ public abstract class SlashCommand extends DeferrableCommand<SlashContext> {
             }
 
             ctx.setForceEphemeral(isEphemeral());
-            process(ctx);
+            return preProcess(ctx, dbCon);
         }
     }
 

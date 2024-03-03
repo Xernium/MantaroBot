@@ -249,21 +249,6 @@ public class GuildOptions extends OptionHandler {
             ctx.sendLocalized("options.lobby.disable.success", EmoteReference.CORRECT);
         });
 
-        registerOption("commands:lobby:enable", "Enables game multiple and lobby.",
-                "Enables game multiple and lobby.",
-                "Enables game multiple and lobby.", (ctx, args) -> {
-            var dbGuild = ctx.getDBGuild();
-            if (!dbGuild.isGameMultipleDisabled()) {
-                ctx.sendLocalized("options.lobby.enable.already_enabled", EmoteReference.CORRECT);
-                return;
-            }
-
-            dbGuild.gameMultipleDisabled(false);
-            dbGuild.updateAllChanged();
-
-            ctx.sendLocalized("options.lobby.enable.success", EmoteReference.CORRECT);
-        });
-
         registerOption("imageboard:disableexplicit", "Disables explicit searches",
             "Disables explicit/questionable searches, regardless of the channel type.",
             "Disables explicit searches.", (ctx, args) -> {

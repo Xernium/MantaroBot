@@ -25,7 +25,9 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.kodehawa.mantarobot.core.listeners.operations.core.ButtonOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
+import net.kodehawa.mantarobot.db.rel.help.DataMode;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
+import org.jdbi.v3.core.Jdbi;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -66,7 +68,7 @@ public class ButtonOperations {
         return o == null ? null : o.future;
     }
 
-    public static Future<Void> create(Message message, long timeoutSeconds, ButtonOperation operation, Button... defaultButtons) {
+    public static Future<Void> create(DataMode mode, Jdbi db, Message message, long timeoutSeconds, ButtonOperation operation, Button... defaultButtons) {
         if (!message.getAuthor().equals(message.getJDA().getSelfUser())) {
             throw new IllegalArgumentException("Must provide a message sent by the bot");
         }
@@ -175,8 +177,8 @@ public class ButtonOperations {
                 }
 
                 // Forward this event to the anonymous class.
-                evt.deferEdit().queue();
-                int i = o.operation.click(evt);
+                evt.deferEdit().queue(); // NG TODO: DBIFY
+                int i = o.operation.click(evt, null);
                 if (i == Operation.COMPLETED) {
                     //Operation has been completed. We can remove this from the running operations list and go on.
                     OPERATIONS.remove(messageId);

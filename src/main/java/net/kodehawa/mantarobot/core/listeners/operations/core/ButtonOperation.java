@@ -18,7 +18,8 @@
 package net.kodehawa.mantarobot.core.listeners.operations.core;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.kodehawa.mantarobot.db.rel.help.DataAccess;
 
 public interface ButtonOperation extends Operation {
-    int click(ButtonInteractionEvent event);
+    int click(ButtonInteractionEvent event, DataAccess dao);
 }

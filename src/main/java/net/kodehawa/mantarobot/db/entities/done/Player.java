@@ -15,14 +15,13 @@
  *
  */
 
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.db.entities.done;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.currency.item.Item;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
-import net.kodehawa.mantarobot.commands.currency.item.PotionEffect;
-import net.kodehawa.mantarobot.commands.currency.pets.HousePet;
+import net.kodehawa.mantarobot.db.rel.HousePet;
 import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent;
@@ -41,9 +40,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
-import static net.kodehawa.mantarobot.db.entities.Inventory.serialize;
+import static net.kodehawa.mantarobot.db.entities.done.Inventory.serialize;
 
 public class Player implements ManagedMongoObject {
     @BsonIgnore
@@ -57,10 +55,8 @@ public class Player implements ManagedMongoObject {
 
     @BsonId
     private String id;
-    private long level;
     private long oldMoney;
     private long reputation;
-    private long experience = 0;
     private long dailyStreak;
     private String description = null;
     private long gamesWon = 0;
@@ -70,9 +66,6 @@ public class Player implements ManagedMongoObject {
     private Badge mainBadge = null;
     private long marketUsed;
     private boolean showBadge = true;
-    private PotionEffect activePotion;
-    private PotionEffect activeBuff;
-    private long waifuCachedValue;
     private boolean claimLocked = false;
     private long miningExperience;
     private long fishingExperience;
@@ -82,9 +75,7 @@ public class Player implements ManagedMongoObject {
     private long sharksCaught;
     private boolean waifuout;
     private int lastCrateGiven = 69;
-    private boolean resetWarning = false;
     private InventorySortType inventorySortType = InventorySortType.AMOUNT;
-    private boolean hiddenLegacy = false;
     private boolean newPlayerNotice = false;
     private long petSlots = 4;
     private PetChoice petChoice = null;
@@ -97,9 +88,8 @@ public class Player implements ManagedMongoObject {
     public Player() {}
 
     @SuppressWarnings("SameParameterValue")
-    private Player(String id, Long level, Long oldMoney, Long reputation, Map<String, Integer> inventory) {
+    private Player(String id, Long oldMoney, Long reputation, Map<String, Integer> inventory) {
         this.id = id;
-        this.level = level == null ? 0 : level;
         this.oldMoney = oldMoney == null ? 0 : oldMoney;
         this.reputation = reputation == null ? 0 : reputation;
         this.inventoryObject.replaceWith(Inventory.unserialize(inventory));
@@ -133,7 +123,7 @@ public class Player implements ManagedMongoObject {
      * @return The new Player.
      */
     public static Player of(String userId) {
-        return new Player(userId, 0L, 0L, 0L, new HashMap<>());
+        return new Player(userId, 0L, 0L, new HashMap<>());
     }
 
     @BsonIgnore
@@ -143,10 +133,6 @@ public class Player implements ManagedMongoObject {
 
     public boolean isClaimLocked() {
         return claimLocked;
-    }
-
-    public long getExperience() {
-        return this.experience;
     }
 
     public List<Badge> getBadges() {
@@ -184,21 +170,6 @@ public class Player implements ManagedMongoObject {
     public boolean isShowBadge() {
         return this.showBadge;
     }
-
-    @SuppressWarnings("unused")
-    public PotionEffect getActivePotion() {
-        return this.activePotion;
-    }
-
-    @SuppressWarnings("unused")
-    public PotionEffect getActiveBuff() {
-        return this.activeBuff;
-    }
-
-    public long getWaifuCachedValue() {
-        return this.waifuCachedValue;
-    }
-
     public List<ProfileComponent> getProfileComponents() {
         return this.profileComponents;
     }
@@ -248,11 +219,6 @@ public class Player implements ManagedMongoObject {
     @SuppressWarnings("unused")
     protected void setClaimLocked(boolean claimLocked) {
         this.claimLocked = claimLocked;
-    }
-
-    // Unused, only used for migration
-    public void setExperience(long experience) {
-        this.experience = experience;
     }
 
     // Unused, only used for migration
@@ -310,21 +276,6 @@ public class Player implements ManagedMongoObject {
     }
 
     @SuppressWarnings("unused")
-    protected void setActivePotion(PotionEffect activePotion) {
-        this.activePotion = activePotion;
-    }
-
-    @SuppressWarnings("unused")
-    protected void setActiveBuff(PotionEffect activeBuff) {
-        this.activeBuff = activeBuff;
-    }
-
-    @SuppressWarnings("unused")
-    protected void setWaifuCachedValue(long waifuCachedValue) {
-        this.waifuCachedValue = waifuCachedValue;
-    }
-
-    @SuppressWarnings("unused")
     protected void setProfileComponents(List<ProfileComponent> profileComponents) {
         this.profileComponents = profileComponents;
     }
@@ -365,11 +316,6 @@ public class Player implements ManagedMongoObject {
     }
 
     @SuppressWarnings("unused")
-    protected void setHiddenLegacy(boolean hiddenLegacy) {
-        this.hiddenLegacy = hiddenLegacy;
-    }
-
-    @SuppressWarnings("unused")
     protected void setNewPlayerNotice(boolean newPlayerNotice) {
         this.newPlayerNotice = newPlayerNotice;
     }
@@ -380,11 +326,6 @@ public class Player implements ManagedMongoObject {
 
     protected void setReputation(Long reputation) {
         this.reputation = reputation;
-    }
-
-    @SuppressWarnings("unused")
-    protected void setLevel(long level) {
-        this.level = level;
     }
 
     @SuppressWarnings("unused")
@@ -433,13 +374,6 @@ public class Player implements ManagedMongoObject {
         this.inventorySortType = inventorySortType;
         fieldTracker.put("inventorySortType", this.inventorySortType);
     }
-
-    @BsonIgnore
-    public void hiddenLegacy(boolean hiddenLegacy) {
-        this.hiddenLegacy = hiddenLegacy;
-        fieldTracker.put("hiddenLegacy", this.hiddenLegacy);
-    }
-
     @BsonIgnore
     public void newPlayerNotice(boolean newPlayerNotice) {
         this.newPlayerNotice = newPlayerNotice;
@@ -453,21 +387,9 @@ public class Player implements ManagedMongoObject {
     }
 
     @BsonIgnore
-    public void level(long level) {
-        this.level = level;
-        fieldTracker.put("level", this.level);
-    }
-
-    @BsonIgnore
     public void cratesOpened(long cratesOpened) {
         this.cratesOpened = cratesOpened;
         fieldTracker.put("cratesOpened", this.cratesOpened);
-    }
-
-    @BsonIgnore
-    public void waifuCachedValue(long waifuCachedValue) {
-        this.waifuCachedValue = waifuCachedValue;
-        fieldTracker.put("waifuCachedValue", this.waifuCachedValue);
     }
 
     @BsonIgnore
@@ -561,22 +483,8 @@ public class Player implements ManagedMongoObject {
         return serialize(inventoryObject.asList());
     }
 
-    @SuppressWarnings("unused")
-    public boolean isResetWarning() {
-        return resetWarning;
-    }
-
-    @SuppressWarnings("unused")
-    public void setResetWarning(boolean resetWarning) {
-        this.resetWarning = resetWarning;
-    }
-
     public InventorySortType getInventorySortType() {
         return inventorySortType;
-    }
-
-    public boolean isHiddenLegacy() {
-        return hiddenLegacy;
     }
 
     public boolean isNewPlayerNotice() {
@@ -601,10 +509,6 @@ public class Player implements ManagedMongoObject {
 
     public long getReputation() {
         return this.reputation;
-    }
-
-    public Long getLevel() {
-        return this.level;
     }
 
     @BsonIgnore

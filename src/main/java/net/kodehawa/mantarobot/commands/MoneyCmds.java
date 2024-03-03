@@ -40,7 +40,7 @@ import net.kodehawa.mantarobot.core.command.slash.SlashContext;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.CustomFinderUtil;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -518,7 +518,7 @@ public class MoneyCmds {
         var balance = player.getCurrentMoney();
         var extra = "";
 
-        if (balance < 300 && player.getExperience() < 3400 && !player.isNewPlayerNotice()) {
+        if (balance < 300 && !player.isNewPlayerNotice()) {
             extra += languageContext.get("commands.balance.new_player");
             player.newPlayerNotice(true);
             player.updateAllChanged();

@@ -15,32 +15,28 @@
  *
  */
 
-package net.kodehawa.mantarobot.commands.currency.item;
+package net.kodehawa.mantarobot.db.rel;
 
-import org.bson.codecs.pojo.annotations.BsonCreator;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.codecs.pojo.annotations.BsonProperty;
+import net.kodehawa.mantarobot.commands.currency.item.ItemType;
+import net.kodehawa.mantarobot.db.rel.help.Transactional;
 
-import java.util.UUID;
-
-@SuppressWarnings("unused")
-public class PotionEffect {
-    private String uuid;
-    private int potion; //item id
+public class PotionEffect extends Transactional {
+    private NewUser appliedTo;
     private long until;
     private ItemType.PotionType type;
-    private long timesUsed;
-    private long amountEquipped = 1;
+    private int timesUsed;
+    private int amountEquipped;
 
-    @BsonCreator
-    public PotionEffect(@BsonProperty("potion") int potionId, @BsonProperty("until") long until, @BsonProperty("type") ItemType.PotionType type) {
-        uuid = UUID.randomUUID().toString();
-        this.potion = potionId;
+    public PotionEffect() {}
+
+    public PotionEffect(NewUser appliedTo, long until, ItemType.PotionType type, int timesUsed, int amountEquipped) {
+        this.appliedTo = appliedTo;
         this.until = until;
         this.type = type;
+        this.timesUsed = timesUsed;
+        this.amountEquipped = amountEquipped;
     }
 
-    @BsonIgnore
     public boolean use() {
         long newAmount = amountEquipped - 1;
         if (newAmount < 1) {
@@ -52,9 +48,8 @@ public class PotionEffect {
         }
     }
 
-    @BsonIgnore
     public void equip(int amount) {
-        long newAmount = amountEquipped + amount;
+        int newAmount = amountEquipped + amount;
         if (newAmount > 15) {
             setAmountEquipped(15);
         } else {
@@ -62,25 +57,16 @@ public class PotionEffect {
         }
     }
 
-    @BsonIgnore
     public void equip() {
         equip(1);
     }
 
-    public String getUuid() {
-        return this.uuid;
+    public NewUser getAppliedTo() {
+        return appliedTo;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public int getPotion() {
-        return this.potion;
-    }
-
-    public void setPotion(int potion) {
-        this.potion = potion;
+    public void setAppliedTo(NewUser appliedTo) {
+        this.appliedTo = appliedTo;
     }
 
     public long getUntil() {
@@ -103,7 +89,7 @@ public class PotionEffect {
         return this.timesUsed;
     }
 
-    public void setTimesUsed(long timesUsed) {
+    public void setTimesUsed(int timesUsed) {
         this.timesUsed = timesUsed;
     }
 
@@ -111,7 +97,7 @@ public class PotionEffect {
         return this.amountEquipped;
     }
 
-    public void setAmountEquipped(long amountEquipped) {
+    public void setAmountEquipped(int amountEquipped) {
         this.amountEquipped = amountEquipped;
     }
 }

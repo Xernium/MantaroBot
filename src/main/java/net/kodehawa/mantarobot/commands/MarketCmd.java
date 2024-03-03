@@ -669,7 +669,7 @@ public class MarketCmd {
                 }
 
                 if (itemToBuy instanceof Attribute attribute && !(itemToBuy instanceof Wrench) &&
-                        attribute.getTier() == 1 && random.nextFloat() <= 0.20 && player.getLevel() <= 5) {
+                        attribute.getTier() == 1 && random.nextFloat() <= 0.20) {
                     warn += "\n" + EmoteReference.WRENCH.toHeaderString() + languageContext.get("commands.market.buy.success_breakable_upgrade") + "\n";
                 }
 

@@ -29,6 +29,7 @@ import net.kodehawa.mantarobot.utils.cache.ImageCache;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
+import org.jdbi.v3.core.Handle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -101,7 +102,7 @@ public class ImageActionCmd extends TextCommand {
     }
 
     @Override
-    protected void process(TextContext ctx) {
+    protected void process(TextContext ctx, Handle trn) {
         if (!RatelimitUtils.ratelimit(rateLimiter, ctx, null)) {
             return;
         }

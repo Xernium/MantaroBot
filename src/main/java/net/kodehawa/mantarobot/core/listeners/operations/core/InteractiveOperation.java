@@ -18,8 +18,9 @@
 package net.kodehawa.mantarobot.core.listeners.operations.core;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.kodehawa.mantarobot.db.rel.help.DataAccess;
 
 @FunctionalInterface
 public interface InteractiveOperation extends Operation {
-    int run(MessageReceivedEvent event);
+    int run(MessageReceivedEvent event, DataAccess dao);
 }

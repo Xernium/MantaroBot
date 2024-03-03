@@ -19,12 +19,12 @@ package net.kodehawa.mantarobot.commands.currency.profile;
 
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.ProfileCmd;
-import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
+import net.kodehawa.mantarobot.db.entities.done.PlayerEquipment;
 import net.kodehawa.mantarobot.commands.currency.item.special.Potion;
 import net.kodehawa.mantarobot.core.command.helpers.IContext;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.db.entities.done.MongoUser;
+import net.kodehawa.mantarobot.db.entities.done.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
 import java.util.function.Function;
@@ -84,13 +84,6 @@ public enum StatsComponent {
     EQUIPMENT(EmoteReference.PICK, lang -> lang.get("commands.profile.stats.equipment"), holder -> {
         var equippedItems = holder.getDbUser().getEquippedItems();
         return ProfileCmd.parsePlayerEquipment(equippedItems, holder.getI18nContext());
-    }),
-
-    EXPERIENCE(EmoteReference.ZAP, lang -> lang.get("commands.profile.stats.experience"), holder -> {
-        var experienceNext = (long) (holder.getPlayer().getLevel() * Math.log10(holder.getPlayer().getLevel()) * 1000) +
-                (50 * holder.getPlayer().getLevel() / 2);
-
-        return "%,d/%,d XP".formatted(holder.getPlayer().getExperience(), experienceNext);
     }),
 
     AUTO_EQUIP(EmoteReference.SATELLITE, lang -> lang.get("commands.profile.stats.autoequip"), holder -> String.valueOf(holder.getDbUser().isAutoEquip())),

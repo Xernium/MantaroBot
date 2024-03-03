@@ -15,7 +15,7 @@
  */
 
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
+import net.kodehawa.mantarobot.db.entities.done.MongoGuild;
 import net.kodehawa.mantarobot.utils.LanguageKeyNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
