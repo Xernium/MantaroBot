@@ -79,8 +79,6 @@ Make sure to set the `MIGRATOR_MONGO_URI`, `MIGRATOR_RETHINK_HOST`, `MIGRATOR_RE
 
 ## Tools Mantaro uses
 *   [JDA by DV8FromTheWorld and MinnDevelopment](https://github.com/DV8FromTheWorld/JDA)
-*   [Lavaplayer by sedmelluq](https://github.com/sedmelluq/lavaplayer)
-*   [Lavalink by Frederikam](https://github.com/Frederikam/Lavalink)
 *   [MongoDB by MongoDB Inc.](http://mongodb.com)
 *   [Redis by the redis team](https://redis.io)
 *   [imageboard-api by Kodehawa](https://github.com/Kodehawa/imageboard-api)

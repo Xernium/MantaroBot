@@ -92,7 +92,6 @@ public enum EmoteReference {
     TROPHY(":trophy:", "\uD83C\uDFC6"),
     WRENCH(":wrench:", "\ud83d\udd27"),
     WHITE_CIRCLE(":white_circle:", "\u25CB"),
-    MUSICAL_NOTE(":musical_note", "\uD83C\uDFB5"),
     DROPLET(":droplet:", "\uD83D\uDCA7"),
     DEV(":desktop:", "\uD83D\uDDA5"),
     ROCK(":rock:", "\uD83E\uDEA8"),

@@ -26,6 +26,3 @@ updates:
     - 4.2.1_254
     - 4.2.1_255
     - 4.2.1_261
-  - dependency-name: com.sedmelluq:lavaplayer
-    versions:
-    - 1.3.76

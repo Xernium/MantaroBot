@@ -474,7 +474,6 @@ public class OwnerCmd {
                     import net.kodehawa.mantarobot.commands.currency.*;
                     import net.kodehawa.mantarobot.commands.currency.item.*;
                     import net.kodehawa.mantarobot.commands.currency.item.special.*;
-                    import net.kodehawa.mantarobot.commands.music.*;
                     import net.kodehawa.mantarobot.commands.custom.*;
                     import net.kodehawa.mantarobot.utils.*;
                     import net.kodehawa.mantarobot.utils.eval.*;

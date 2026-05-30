@@ -140,7 +140,6 @@ public class AsyncInfoMonitor {
                                 .put("guild_count", bot.getShardManager().getGuildCache().size())
                                 .put("user_count", bot.getShardManager().getUserCache().size())
                                 .put("shard_slice", bot.getShardSlice())
-                                .put("queue_size", bot.getAudioManager().getTotalQueueSize())
                                 .put("commands_ran", CommandListener.getCommandTotal())
                                 .toString()
                 );

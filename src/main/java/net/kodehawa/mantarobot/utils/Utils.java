@@ -628,7 +628,7 @@ public class Utils {
     }
 
     public enum HushType {
-        ANIME, CHARACTER, MUSIC
+        ANIME, CHARACTER
     }
 
     public static boolean isAccountOldEnough(User user, int time, TemporalUnit unit) {

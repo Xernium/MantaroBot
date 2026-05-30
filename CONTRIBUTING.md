@@ -35,7 +35,7 @@ Where action can be:
 And module can be:
 * Any command (mine, fish, profile, etc)
 * A internal part of Mantaro (cc, evalsystem, finderutil, core, command, option)
-* A external part included on Mantaro's code (lavalink-client)
+* A external part included on Mantaro's code
 * Dependencies (deps), CI stuff (ci) and Docker configs (docker)
 * One of the .md files (features, coc, contrib, readme)
 

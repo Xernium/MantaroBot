@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum CommandCategory {
-    MUSIC(CommandPermission.USER, "categories.music", "Audio"),
     ACTION(CommandPermission.USER, "categories.action", "Action"),
     CURRENCY(CommandPermission.USER, "categories.currency", "Currency"),
     GAMES(CommandPermission.USER, "categories.games", "Games"),

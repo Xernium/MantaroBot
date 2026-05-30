@@ -23,11 +23,6 @@ import io.prometheus.client.Histogram;
 
 public class Metrics {
     public static final ThreadPoolCollector THREAD_POOL_COLLECTOR = new ThreadPoolCollector().register();
-    public static final Counter TRACK_EVENTS = Counter.build()
-            .name("track_event")
-            .help("Music Track Events (failed/loaded/searched)")
-            .labelNames("type")
-            .register();
     public static final Counter BIRTHDAY_COUNTER = Counter.build()
             .name("birthdays_logged")
             .help("Logged birthdays")

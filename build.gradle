@@ -22,7 +22,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
-def ver = new Version(major: 8, minor: 2, revision: 0)
+def ver = new Version(major: 8, minor: 2, revision: 1)
 version ver.toString()
 
 application {
@@ -43,9 +43,6 @@ dependencies {
     // Base
     implementation 'net.dv8tion:JDA:5.0.0-beta.19'
     implementation 'club.minnced:discord-webhooks:0.8.4'
-
-    // Music
-    implementation("dev.arbjerg:lavalink-client:2.2.0")
 
     // JSON
     implementation 'com.fasterxml.jackson.core:jackson-core:2.16.1'

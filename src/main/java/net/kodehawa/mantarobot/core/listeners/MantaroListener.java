@@ -470,7 +470,7 @@ public class MantaroListener implements EventListener {
                         .setColor(Color.PINK)
                         .setDescription("""
                                 Welcome to **Mantaro**, a fun, quirky and complete Discord bot! Thanks for adding me to your server, I highly appreciate it <3
-                                We have music, currency (money/economy), games and way more stuff you can check out!
+                                We have currency (money/economy), games and way more stuff you can check out!
                                 Make sure you use the `~>help` command to make yourself comfy and to get started with the bot!
 
                                 If you're interested in supporting Mantaro, check out our Patreon page below, it'll greatly help to improve the bot.
@@ -529,18 +529,11 @@ public class MantaroListener implements EventListener {
             final var jda = event.getJDA();
             final var guild = event.getGuild();
             final var guildBirthdayCache = BirthdayCmd.getGuildBirthdayCache();
-            final var manager = bot.getAudioManager().getMusicManagers().get(guild.getId());
 
             // Clear internal data we don't need anymore.
             guild.getTextChannelCache().stream().forEach(TextChannelGround::delete);
             guildBirthdayCache.invalidate(guild.getIdLong());
             guildBirthdayCache.cleanUp();
-
-            // Clean the internal music data.
-            if (manager != null) {
-                manager.getLavaLink().destroyPlayer().block(Duration.ofMillis(300));
-                bot.getAudioManager().getMusicManagers().remove(guild.getId());
-            }
 
             // Post bot statistics to the main API.
             this.updateStats(jda);

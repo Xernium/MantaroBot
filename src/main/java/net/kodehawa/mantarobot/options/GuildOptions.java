@@ -264,37 +264,6 @@ public class GuildOptions extends OptionHandler {
             ctx.sendLocalized("options.lobby.enable.success", EmoteReference.CORRECT);
         });
 
-        registerOption("djrole:set", "Set a custom DJ role", """
-                Sets a custom DJ role. This role will be used to control music.
-                **Example:** `~>opts djrole set DJ`, `~>opts djrole set "Magic Role"`
-                """, "Sets the DJ role.", (ctx, args) -> {
-            if (args.length == 0) {
-                ctx.sendLocalized("options.djrole_set.no_role", EmoteReference.ERROR);
-                return;
-            }
-
-            Consumer<Role> consumer = (role) -> {
-                var dbGuild = ctx.getDBGuild();
-                dbGuild.djRoleId(role.getId());
-                dbGuild.updateAllChanged();
-                ctx.sendLocalized("options.djrole_set.success", EmoteReference.CORRECT, role.getName(), role.getPosition());
-            };
-
-            Role role = FinderUtils.findRoleSelect(ctx, ctx.getCustomContent(), consumer);
-
-            if (role != null) {
-                consumer.accept(role);
-            }
-        });
-
-        registerOption("djrole:reset", "Resets the DJ role",
-                "Resets the DJ role", "Resets the DJ role.", (ctx, args) -> {
-            var dbGuild = ctx.getDBGuild();
-            dbGuild.djRoleId(null);
-            dbGuild.updateAllChanged();
-            ctx.sendLocalized("options.djrole_reset.success", EmoteReference.CORRECT);
-        });
-
         registerOption("imageboard:disableexplicit", "Disables explicit searches",
             "Disables explicit/questionable searches, regardless of the channel type.",
             "Disables explicit searches.", (ctx, args) -> {
