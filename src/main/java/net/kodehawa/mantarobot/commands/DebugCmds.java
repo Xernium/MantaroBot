@@ -106,9 +106,12 @@ public class DebugCmds {
                     .sum();
 
             var mApiRequests = 0;
-            try {
-                mApiRequests = new JSONObject(APIUtils.getFrom("/mantaroapi/ping")).getInt("requests_served");
-            } catch (IOException | JSONException ignored) { }
+            if (config.needApi) {
+                try {
+                    mApiRequests = new JSONObject(APIUtils.getFrom("/mantaroapi/ping")).getInt("requests_served");
+                } catch (IOException | JSONException ignored) {
+                }
+            }
 
             // Get the master node.
             var node = new JSONObject(nodeData);
