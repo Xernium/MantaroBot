@@ -17,7 +17,6 @@
 
 package net.kodehawa.mantarobot.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.kodehawa.mantarobot.MantaroInfo;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.data.Config;
@@ -27,8 +26,9 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import tools.jackson.databind.ObjectMapper;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.IOException;
 
 public class APIUtils {

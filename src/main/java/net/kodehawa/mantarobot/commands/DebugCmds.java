@@ -18,6 +18,7 @@
 package net.kodehawa.mantarobot.commands;
 
 import com.google.common.eventbus.Subscribe;
+import io.valkey.Jedis;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDAInfo;
 import net.kodehawa.mantarobot.MantaroInfo;
@@ -42,7 +43,6 @@ import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.List;
@@ -92,7 +92,6 @@ public class DebugCmds {
                 for (var cluster : clusters.entrySet()) {
                     var json = new JSONObject(cluster.getValue());
                     totalMemory += json.getLong("used_memory");
-                    queueSize += json.getLong("queue_size");
                     totalThreadCount += json.getLong("thread_count");
                     totalCommandCount += json.getLong("commands_ran");
                 }
@@ -106,9 +105,12 @@ public class DebugCmds {
                     .sum();
 
             var mApiRequests = 0;
-            try {
-                mApiRequests = new JSONObject(APIUtils.getFrom("/mantaroapi/ping")).getInt("requests_served");
-            } catch (IOException | JSONException ignored) { }
+            if (config.needApi) {
+                try {
+                    mApiRequests = new JSONObject(APIUtils.getFrom("/mantaroapi/ping")).getInt("requests_served");
+                } catch (IOException | JSONException ignored) {
+                }
+            }
 
             // Get the master node.
             var node = new JSONObject(nodeData);

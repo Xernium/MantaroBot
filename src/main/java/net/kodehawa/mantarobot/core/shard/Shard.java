@@ -27,7 +27,7 @@ import net.kodehawa.mantarobot.core.MantaroEventManager;
 import net.kodehawa.mantarobot.core.listeners.entities.CachedMessage;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.util.Objects;
@@ -57,25 +57,25 @@ public class Shard {
         return id;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
     public Cache<Long, Optional<CachedMessage>> getMessageCache() {
         return messageCache;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
     public MantaroEventManager getManager() {
         return manager;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
     public EventListener getListener() {
         return listener;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
     public JDA getJDA() {
         return Objects.requireNonNull(jda, "Shard has not been started yet");

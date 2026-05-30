@@ -18,8 +18,8 @@
 package net.kodehawa.mantarobot.utils.eval;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import javax.tools.Diagnostic;
 import java.util.List;
 
@@ -39,7 +39,7 @@ public class CompilationResult {
         return clazz != null;
     }
     
-    @Nonnull
+    
     public Class<?> resultingClass() {
         if(!isSuccessful()) {
             throw new IllegalStateException("Compilation failed");
@@ -53,7 +53,7 @@ public class CompilationResult {
         return output;
     }
     
-    @Nonnull
+    
     @CheckReturnValue
     public List<Diagnostic<?>> diagnostics() {
         return diagnostics;

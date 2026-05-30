@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.utils.SessionController;
 import net.dv8tion.jda.api.utils.SessionControllerAdapter;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -67,9 +67,9 @@ public class PrioritizingSessionController extends SessionControllerAdapter
                         == node.getShardInfo().getShardId();
     }
 
-    @Nonnull
+    
     @Override
-    public ShardedGateway getShardedGateway(@Nonnull JDA api) {
+    public ShardedGateway getShardedGateway( JDA api) {
         throw new UnsupportedOperationException();
     }
 }

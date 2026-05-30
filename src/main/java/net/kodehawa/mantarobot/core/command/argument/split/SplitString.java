@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.core.command.argument.split;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Represents a part of the result of splitting a string.
@@ -39,7 +39,7 @@ public final class SplitString {
      *
      * @return The value of this string.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public String getValue() {
         return value;
@@ -50,7 +50,7 @@ public final class SplitString {
      *
      * @return The whitespace preceding this string.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public String getPreviousWhitespace() {
         return previousWhitespace;
@@ -61,7 +61,7 @@ public final class SplitString {
      *
      * @return The raw value of this string.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public String getRawValue() {
         return previousWhitespace + value;

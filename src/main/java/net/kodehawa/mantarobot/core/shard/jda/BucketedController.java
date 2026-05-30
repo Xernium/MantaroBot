@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.utils.SessionControllerAdapter;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class BucketedController extends SessionControllerAdapter {
     private final SessionController[] shardControllers;
@@ -43,18 +43,18 @@ public class BucketedController extends SessionControllerAdapter {
     }
 
     @Override
-    public void appendSession(@Nonnull SessionConnectNode node) {
+    public void appendSession( SessionConnectNode node) {
         controllerFor(node).appendSession(node);
     }
 
     @Override
-    public void removeSession(@Nonnull SessionConnectNode node) {
+    public void removeSession( SessionConnectNode node) {
         controllerFor(node).removeSession(node);
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    private SessionController controllerFor(@Nonnull SessionConnectNode node) {
+    private SessionController controllerFor( SessionConnectNode node) {
         return shardControllers[node.getShardInfo().getShardId() % shardControllers.length];
     }
 }

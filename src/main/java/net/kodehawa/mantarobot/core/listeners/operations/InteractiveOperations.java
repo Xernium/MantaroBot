@@ -25,7 +25,7 @@ import net.kodehawa.mantarobot.core.listeners.operations.core.InteractiveOperati
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -139,7 +139,7 @@ public class InteractiveOperations {
      */
     public static class InteractiveListener implements EventListener {
         @Override
-        public void onEvent(@Nonnull GenericEvent e) {
+        public void onEvent( GenericEvent e) {
             if (!(e instanceof MessageReceivedEvent event))
                 return;
 

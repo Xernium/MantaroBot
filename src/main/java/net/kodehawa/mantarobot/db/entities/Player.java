@@ -34,7 +34,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -766,7 +766,7 @@ public class Player implements ManagedMongoObject {
     }
 
     @Override
-    @Nonnull
+    
     public String getId() {
         return this.id;
     }
@@ -774,14 +774,14 @@ public class Player implements ManagedMongoObject {
     @SuppressWarnings("unused")
     @BsonIgnore
     @Override
-    @Nonnull
+    
     public String getTableName() {
         return DB_TABLE;
     }
 
     @SuppressWarnings("unused")
     @BsonIgnore
-    @Nonnull
+    
     @Override
     public String getDatabaseId() {
         return getId();

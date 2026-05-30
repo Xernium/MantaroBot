@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.utils.eval;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,13 +33,13 @@ public class ResourceList {
     private ResourceList() {}
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public Stream<String> stream(@Nonnull String pkg, boolean recursive) {
+    public Stream<String> stream( String pkg, boolean recursive) {
         return findPackage(pkg).stream(recursive);
     }
 
-    @Nonnull
+    
     private Stream<String> stream(boolean recursive) {
         if(!recursive) {
             return resources.stream();
@@ -54,19 +54,19 @@ public class ResourceList {
         );
     }
 
-    @Nonnull
+    
     public ResourceList findPackage(String name) {
         if(name.isEmpty()) return this;
         var parts = name.split("\\.");
         return resolveChild(parts, parts.length);
     }
 
-    @Nonnull
+    
     private ResourceList child(String name) {
         return subpackages.computeIfAbsent(name, __ -> new ResourceList());
     }
 
-    @Nonnull
+    
     private ResourceList resolveChild(String[] parts, int limit) {
         ResourceList r = this;
         for(int i = 0; i < limit; i++) {
@@ -75,8 +75,8 @@ public class ResourceList {
         return r;
     }
 
-    @Nonnull
-    public static ResourceList fromJar(@Nonnull JarFile jf) {
+    
+    public static ResourceList fromJar( JarFile jf) {
         var root = new ResourceList();
         try(var stream = jf.versionedStream()) {
             for(var it = stream.iterator(); it.hasNext();) {

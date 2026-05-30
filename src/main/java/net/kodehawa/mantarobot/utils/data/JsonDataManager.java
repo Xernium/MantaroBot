@@ -17,13 +17,13 @@
 
 package net.kodehawa.mantarobot.utils.data;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonReadFeature;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.json.JsonReadFeature;
+import tools.jackson.core.json.JsonFactoryBuilder;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +35,13 @@ import java.nio.file.Paths;
 import java.util.function.Supplier;
 
 public class JsonDataManager<T> implements DataManager<T> {
-    private static final ObjectMapper mapper = new ObjectMapper()
+    private static final ObjectMapper mapper = new ObjectMapper(new JsonFactoryBuilder()
+            .enable(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES) // Custom commands.
+            .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS) // Allow newlines.
+            .build())
+            .rebuild()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // Anime / Character lookup.
-            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true) // Custom commands.
-            .configure(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature(), true); // Allow newlines.
+            .build();
     private static final Logger log = LoggerFactory.getLogger(JsonDataManager.class);
     private final Path configPath;
     private final T data;
@@ -90,11 +93,11 @@ public class JsonDataManager<T> implements DataManager<T> {
         }
     }
 
-    public static <T> String toJson(T object) throws JsonProcessingException {
+    public static <T> String toJson(T object) throws JacksonException {
         return mapper.writeValueAsString(object);
     }
 
-    public static <T> T fromJson(String json, Class<T> clazz) throws JsonProcessingException {
+    public static <T> T fromJson(String json, Class<T> clazz) throws JacksonException {
         return mapper.readValue(json, clazz);
     }
 
@@ -103,11 +106,11 @@ public class JsonDataManager<T> implements DataManager<T> {
     }
 
     @SuppressWarnings("unused")
-    public static <T> T fromJson(String json, TypeReference<T> type) throws JsonProcessingException {
+    public static <T> T fromJson(String json, TypeReference<T> type) throws JacksonException {
         return mapper.readValue(json, type);
     }
 
-    public static <T> T fromJson(String json, JavaType type) throws JsonProcessingException {
+    public static <T> T fromJson(String json, JavaType type) throws JacksonException {
         return mapper.readValue(json, type);
     }
 }

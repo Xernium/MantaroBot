@@ -37,7 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -452,9 +452,9 @@ public class Utils {
      * @return String with appropriate unicode direction modifier characters
      *         around code blocks.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public static String fixInlineCodeblockDirection(@Nonnull String src) {
+    public static String fixInlineCodeblockDirection( String src) {
         // if there's no right to left override, there's nothing to do
         if (!isRtl(src)) {
             return src;

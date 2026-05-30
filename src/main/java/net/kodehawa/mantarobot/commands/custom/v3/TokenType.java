@@ -17,7 +17,7 @@
 
 package net.kodehawa.mantarobot.commands.custom.v3;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 
 public enum TokenType {
@@ -30,7 +30,7 @@ public enum TokenType {
         this.literalValue = literalValue;
     }
 
-    @Nonnull
+    
     public String literalValue() {
         return Objects.requireNonNull(literalValue, "This token type does not have a literal value");
     }

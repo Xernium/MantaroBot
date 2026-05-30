@@ -44,8 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class ManagedDatabase {
     private static final Logger log = LoggerFactory.getLogger(ManagedDatabase.class);
     private final MongoClient mongoClient;
 
-    public ManagedDatabase(@Nonnull MongoClient mongoClient) {
+    public ManagedDatabase( MongoClient mongoClient) {
         this.mongoClient = mongoClient;
     }
 
@@ -77,7 +77,7 @@ public class ManagedDatabase {
 
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull String guildId, @Nonnull String name) {
+    public CustomCommand getCustomCommand( String guildId,  String name) {
         var id = guildId + ":" + name;
         log("Requesting Custom Command {} from MongoDB", id);
 
@@ -87,83 +87,83 @@ public class ManagedDatabase {
 
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull Guild guild, @Nonnull String name) {
+    public CustomCommand getCustomCommand( Guild guild,  String name) {
         return getCustomCommand(guild.getId(), name);
     }
 
     @SuppressWarnings("unused")
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull MongoGuild guild, @Nonnull String name) {
+    public CustomCommand getCustomCommand( MongoGuild guild,  String name) {
         return getCustomCommand(guild.getId(), name);
     }
 
     @SuppressWarnings("unused")
     @Nullable
     @CheckReturnValue
-    public CustomCommand getCustomCommand(@Nonnull MessageReceivedEvent event, @Nonnull String cmd) {
+    public CustomCommand getCustomCommand( MessageReceivedEvent event,  String cmd) {
         return getCustomCommand(event.getGuild(), cmd);
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public List<CustomCommand> getCustomCommands() {
         log("Requesting all Custom Commands from MongoDB");
         return Lists.newArrayList(dbMantaro().getCollection(CustomCommand.DB_TABLE, CustomCommand.class).find());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull String guildId) {
+    public List<CustomCommand> getCustomCommands( String guildId) {
         log("Requesting all Custom Commands from MongoDB on guild {}", guildId);
         var collection = dbMantaro().getCollection(CustomCommand.DB_TABLE, CustomCommand.class);
         return Lists.newArrayList(collection.find(Filters.eq("guildId", guildId)));
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull Guild guild) {
+    public List<CustomCommand> getCustomCommands( Guild guild) {
         return getCustomCommands(guild.getId());
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public List<CustomCommand> getCustomCommands(@Nonnull MongoGuild guild) {
+    public List<CustomCommand> getCustomCommands( MongoGuild guild) {
         return getCustomCommands(guild.getId());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoGuild getGuild(@Nonnull String guildId) {
+    public MongoGuild getGuild( String guildId) {
         log("Requesting Guild {} from MongoDB", guildId);
         var collection = dbMantaro().getCollection(MongoGuild.DB_TABLE, MongoGuild.class);
         var guild = collection.find().filter(Filters.eq(guildId)).first();
         return guild == null ? MongoGuild.of(guildId) : guild;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoGuild getGuild(@Nonnull Guild guild) {
+    public MongoGuild getGuild( Guild guild) {
         return getGuild(guild.getId());
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoGuild getGuild(@Nonnull Member member) {
+    public MongoGuild getGuild( Member member) {
         return getGuild(member.getGuild());
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoGuild getGuild(@Nonnull MessageReceivedEvent event) {
+    public MongoGuild getGuild( MessageReceivedEvent event) {
         return getGuild(event.getGuild());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
     public MantaroObject getMantaroData() {
         log("Requesting MantaroObject from MongoDB");
@@ -182,9 +182,9 @@ public class ManagedDatabase {
         return obj;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public Player getPlayer(@Nonnull String userId) {
+    public Player getPlayer( String userId) {
         log("Requesting Player {} from MongoDB", userId);
         var collection = dbMantaro().getCollection(Player.DB_TABLE, Player.class);
         var player = collection.find().filter(Filters.eq(userId)).first();
@@ -192,21 +192,21 @@ public class ManagedDatabase {
         return player == null ? Player.of(userId) : player;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public Player getPlayer(@Nonnull User user) {
+    public Player getPlayer( User user) {
         return getPlayer(user.getId());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public Player getPlayer(@Nonnull Member member) {
+    public Player getPlayer( Member member) {
         return getPlayer(member.getUser());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull String userId) {
+    public PlayerStats getPlayerStats( String userId) {
         log("Requesting PlayerStats {} from MongoDB", userId);
         var collection = dbMantaro().getCollection(PlayerStats.DB_TABLE, PlayerStats.class);
         var stats = collection.find().filter(Filters.eq(userId)).first();
@@ -214,15 +214,15 @@ public class ManagedDatabase {
         return stats == null ? PlayerStats.of(userId) : stats;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull User user) {
+    public PlayerStats getPlayerStats( User user) {
         return getPlayerStats(user.getId());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public PlayerStats getPlayerStats(@Nonnull Member member) {
+    public PlayerStats getPlayerStats( Member member) {
         return getPlayerStats(member.getUser());
     }
 
@@ -237,16 +237,16 @@ public class ManagedDatabase {
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public List<Marriage> getMarriages() {
         log("Requesting all Marriages from MongoDB");
         return Lists.newArrayList(dbMantaro().getCollection(Marriage.DB_TABLE, Marriage.class).find());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoUser getUser(@Nonnull String userId) {
+    public MongoUser getUser( String userId) {
         log("Requesting User {} from MongoDB", userId);
         var collection = dbMantaro().getCollection(MongoUser.DB_TABLE, MongoUser.class);
         var user = collection.find().filter(Filters.eq(userId)).first();
@@ -254,19 +254,19 @@ public class ManagedDatabase {
         return user == null ? MongoUser.of(userId) : user;
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoUser getUser(@Nonnull User user) {
+    public MongoUser getUser( User user) {
         return getUser(user.getId());
     }
 
-    @Nonnull
+    
     @CheckReturnValue
-    public MongoUser getUser(@Nonnull Member member) {
+    public MongoUser getUser( Member member) {
         return getUser(member.getUser());
     }
 
-    public <T extends ManagedMongoObject> void saveMongo(@Nonnull T object, Class<T> clazz) {
+    public <T extends ManagedMongoObject> void saveMongo( T object, Class<T> clazz) {
         log("Saving {} {}:{} to MongoDB (replacing whole)", object.getClass().getSimpleName(), object.getTableName(), object.getDatabaseId());
 
         var collection = dbMantaro().getCollection(object.getTableName(), clazz);
@@ -277,7 +277,7 @@ public class ManagedDatabase {
         }
     }
 
-    public <T extends ManagedMongoObject> void deleteMongo(@Nonnull T object, Class<T> clazz) {
+    public <T extends ManagedMongoObject> void deleteMongo( T object, Class<T> clazz) {
         log("Deleting {} {}:{} from MongoDB (whole)", object.getClass().getSimpleName(), object.getTableName(), object.getDatabaseId());
 
         MongoCollection<T> collection = dbMantaro().getCollection(object.getTableName(), clazz);

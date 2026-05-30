@@ -17,7 +17,7 @@
 
 package net.kodehawa.mantarobot.commands.game;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.kodehawa.mantarobot.commands.game.core.AnimeGameData;
@@ -94,7 +94,7 @@ public class Character extends ImageGame {
 
             lobby.setGameLoaded(true);
             return true;
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             ex.printStackTrace();
             lobby.getContext().edit("commands.game.character.load_error", EmoteReference.WARNING, characterName);
 

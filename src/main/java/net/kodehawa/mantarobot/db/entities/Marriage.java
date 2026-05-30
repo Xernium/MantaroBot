@@ -26,7 +26,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -263,13 +263,13 @@ public class Marriage implements ManagedMongoObject {
     }
 
     @Override
-    @Nonnull
+    
     public String getId() {
         return this.id;
     }
 
     @BsonIgnore
-    @Nonnull
+    
     @Override
     public String getTableName() {
         return DB_TABLE;

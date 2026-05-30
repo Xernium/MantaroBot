@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.core.command.argument;
 import net.kodehawa.mantarobot.core.command.text.TextContext;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Optional;
 import java.util.function.Function;
@@ -55,9 +55,9 @@ public interface Parser<T> {
      * </ul>
      * Alternatives such as {@link Arguments#marked() marked()} or {@link Arguments#range(int, int) range(int, int)} should be used instead.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    Optional<T> parse(@Nonnull TextContext context, @Nonnull Arguments arguments);
+    Optional<T> parse( TextContext context,  Arguments arguments);
 
     /**
      * Helper method for {@link #parse(TextContext, Arguments)}
@@ -68,9 +68,9 @@ public interface Parser<T> {
      *
      * @see #parse(TextContext, Arguments)
      */
-    @Nonnull
+    
     @CheckReturnValue
-    default Optional<T> parse(@Nonnull TextContext context) {
+    default Optional<T> parse( TextContext context) {
         return parse(context, context.arguments());
     }
 
@@ -81,9 +81,9 @@ public interface Parser<T> {
      *
      * @return A new parser, which applies the given filter.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    default Parser<T> filter(@Nonnull Predicate<? super T> predicate) {
+    default Parser<T> filter( Predicate<? super T> predicate) {
         return (c, args) -> parse(c, args).filter(predicate);
     }
 
@@ -96,9 +96,9 @@ public interface Parser<T> {
      *
      * @param <U> Type returned by the returned parser.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    default <U> Parser<U> map(@Nonnull Function<? super T, ? extends U> mapper) {
+    default <U> Parser<U> map( Function<? super T, ? extends U> mapper) {
         return (c, args) -> parse(c, args).map(mapper);
     }
 
@@ -111,9 +111,9 @@ public interface Parser<T> {
      *
      * @param <U> Type returned by the returned parser.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    default <U> Parser<U> flatMap(@Nonnull Function<? super T, Optional<U>> mapper) {
+    default <U> Parser<U> flatMap( Function<? super T, Optional<U>> mapper) {
         return (c, args) -> parse(c, args).flatMap(mapper);
     }
 
@@ -124,10 +124,10 @@ public interface Parser<T> {
      *
      * @return A new parser, which is guaranteed not to return any provided value.
      */
-    @Nonnull
+    
     @CheckReturnValue
     @SuppressWarnings("unchecked")
-    default Parser<T> noneOf(@Nonnull T... values) {
+    default Parser<T> noneOf( T... values) {
         return filter(v -> !Helper.contains(values, v));
     }
 
@@ -138,10 +138,10 @@ public interface Parser<T> {
      *
      * @return A new parser, which is guaranteed to return an object equal to one of the provided values.
      */
-    @Nonnull
+    
     @CheckReturnValue
     @SuppressWarnings("unchecked")
-    default Parser<T> oneOf(@Nonnull T... values) {
+    default Parser<T> oneOf( T... values) {
         return filter(v -> Helper.contains(values, v));
     }
 
@@ -156,10 +156,10 @@ public interface Parser<T> {
      *
      * @return A parser that attempts to apply the provided parsers.
      */
-    @Nonnull
+    
     @CheckReturnValue
     @SafeVarargs
-    static <T> Parser<T> firstOf(@Nonnull Parser<? extends T>... parsers) {
+    static <T> Parser<T> firstOf( Parser<? extends T>... parsers) {
         return (c, args) -> {
             var block = args.marked();
             for (var parser : parsers) {

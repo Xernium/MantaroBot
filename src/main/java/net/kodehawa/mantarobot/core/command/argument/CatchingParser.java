@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.core.command.argument;
 
 import net.kodehawa.mantarobot.core.command.text.TextContext;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -33,19 +33,19 @@ public class CatchingParser<T> implements Parser<T> {
     private final ThrowingParser<T> parseFunction;
     private final Function<Exception, Optional<T>> errorHandler;
 
-    public CatchingParser(@Nonnull ThrowingParser<T> parseFunction, @Nonnull Function<Exception, Optional<T>> errorHandler) {
+    public CatchingParser( ThrowingParser<T> parseFunction,  Function<Exception, Optional<T>> errorHandler) {
         this.parseFunction = parseFunction;
         this.errorHandler = errorHandler;
     }
 
-    public CatchingParser(@Nonnull ThrowingParser<T> parseFunction) {
+    public CatchingParser( ThrowingParser<T> parseFunction) {
         this(parseFunction, __->Optional.empty());
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @Override
-    public Optional<T> parse(@Nonnull TextContext context, @Nonnull Arguments arguments) {
+    public Optional<T> parse( TextContext context,  Arguments arguments) {
         try {
             return Optional.of(parseFunction.parse(arguments.next().getValue()));
         } catch(Exception e) {

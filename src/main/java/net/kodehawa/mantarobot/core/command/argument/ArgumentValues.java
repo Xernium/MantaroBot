@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.core.command.argument;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Iterator;
 
 /**
@@ -28,7 +28,7 @@ import java.util.Iterator;
 public class ArgumentValues implements Iterator<String> {
     private final Arguments arguments;
 
-    public ArgumentValues(@Nonnull Arguments arguments) {
+    public ArgumentValues( Arguments arguments) {
         this.arguments = arguments;
     }
 
@@ -88,7 +88,7 @@ public class ArgumentValues implements Iterator<String> {
      * @apiNote When possible, prefer using {@link #range(int, int) relative ranges} instead.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public String[] absoluteRange(int from, int to) {
         String[] array = new String[to - from];
@@ -107,7 +107,7 @@ public class ArgumentValues implements Iterator<String> {
      * @return A range of the underlying array.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public String[] range(int from, int to) {
         String[] array = new String[to - from];
@@ -126,7 +126,7 @@ public class ArgumentValues implements Iterator<String> {
      *
      * @throws IllegalArgumentException If the given index is smaller than zero or outside the bounds of the underlying array.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public String get(@Nonnegative int i) {
         return arguments.get(i).getValue();
@@ -143,7 +143,7 @@ public class ArgumentValues implements Iterator<String> {
      *          in an inconsistent state.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public String previous() {
         return arguments.previous().getValue();
@@ -183,7 +183,7 @@ public class ArgumentValues implements Iterator<String> {
      * @see #hasNext()
      */
     @Override
-    @Nonnull
+    
     @CheckReturnValue
     public String next() {
         return arguments.next().getValue();
@@ -206,7 +206,7 @@ public class ArgumentValues implements Iterator<String> {
      * @return A copy of this object.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public ArgumentValues snapshot() {
         return arguments.snapshot().values();

@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.core.command.argument;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,7 +40,7 @@ public class Parsers {
      *
      * @return A parser that matches everything.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<String> string() {
         return new BasicParser<>(Function.identity());
@@ -51,7 +51,7 @@ public class Parsers {
      *
      * @return Returns a parser that matches booleans.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Boolean> bool() {
         return new BasicParser<>(BooleanUtils::toBoolean);
@@ -63,7 +63,7 @@ public class Parsers {
      *
      * @return A parser that strictly matches integers.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Integer> strictInt() {
         return new CatchingParser<>(Integer::valueOf);
@@ -77,7 +77,7 @@ public class Parsers {
      *
      * @deprecated Use {@link #strictInt()} or {@link #lenientInt()} instead.
      */
-    @Nonnull
+    
     @CheckReturnValue
     @Deprecated
     public static Parser<Integer> parseInt() {
@@ -96,7 +96,7 @@ public class Parsers {
      *
      * @return A parser that leniently matches integers.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Integer> lenientInt() {
         return new IntegerTypeParser<>((s, m) -> Integer.parseInt(s) * m);
@@ -108,7 +108,7 @@ public class Parsers {
      * @return A parser that matches floats.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Float> parseFloat() {
         return new CatchingParser<>(Float::valueOf);
@@ -120,7 +120,7 @@ public class Parsers {
      *
      * @return A parser that strictly matches longs.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Long> strictLong() {
         return new CatchingParser<>(Long::valueOf);
@@ -134,7 +134,7 @@ public class Parsers {
      *
      * @deprecated Use {@link #strictLong()} or {@link #lenientLong()} instead.
      */
-    @Nonnull
+    
     @CheckReturnValue
     @Deprecated
     public static Parser<Long> parseLong() {
@@ -153,7 +153,7 @@ public class Parsers {
      *
      * @return A parser that leniently matches longs.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Long> lenientLong() {
         return new IntegerTypeParser<>((s, m) -> Long.parseLong(s) * m);
@@ -165,7 +165,7 @@ public class Parsers {
      * @return A parser that matches doubles.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Double> parseDouble() {
         return new CatchingParser<>(Double::valueOf);
@@ -180,7 +180,7 @@ public class Parsers {
      * @return A parser that matches integer ranges, inclusive on both ends.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Integer> range(int from, int to) {
         int smaller = Math.min(from, to);
@@ -197,7 +197,7 @@ public class Parsers {
      * @return A parser that matches integer ranges, inclusive on both ends.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Integer> rangeStrict(int from, int to) {
         int smaller = Math.min(from, to);
@@ -214,7 +214,7 @@ public class Parsers {
      * @return A parser that matches long ranges, inclusive on both ends.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Long> range(long from, long to) {
         long smaller = Math.min(from, to);
@@ -231,7 +231,7 @@ public class Parsers {
      * @return A parser that matches long ranges, inclusive on both ends.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<Long> rangeStrict(long from, long to) {
         long smaller = Math.min(from, to);
@@ -247,9 +247,9 @@ public class Parsers {
      * @return A parser that matches based on regular expressions.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public static Parser<String> matching(@Nonnull String regex) {
+    public static Parser<String> matching( String regex) {
         return matching(Pattern.compile(regex));
     }
 
@@ -262,9 +262,9 @@ public class Parsers {
      * @return A parser that matches based on regular expressions.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public static Parser<String> matching(@Nonnull String regex, int flags) {
+    public static Parser<String> matching( String regex, int flags) {
         return matching(Pattern.compile(regex, flags));
     }
 
@@ -275,9 +275,9 @@ public class Parsers {
      *
      * @return A parser that matches based on regular expressions.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public static Parser<String> matching(@Nonnull Pattern pattern) {
+    public static Parser<String> matching( Pattern pattern) {
         return string().filter(s->pattern.matcher(s).matches());
     }
 
@@ -290,9 +290,9 @@ public class Parsers {
      * @return A parser that matches enum values.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public static <T extends Enum<T>> Parser<T> toEnum(@Nonnull Class<T> enumClass) {
+    public static <T extends Enum<T>> Parser<T> toEnum( Class<T> enumClass) {
         return toEnum(enumClass, false);
     }
 
@@ -305,9 +305,9 @@ public class Parsers {
      *
      * @return A parser that matches enum values.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public static <T extends Enum<T>> Parser<T> toEnum(@Nonnull Class<T> enumClass, boolean ignoreCase) {
+    public static <T extends Enum<T>> Parser<T> toEnum( Class<T> enumClass, boolean ignoreCase) {
         T[] constants = enumClass.getEnumConstants();
         return (__, arguments) -> {
             String name = arguments.next().getValue();
@@ -331,7 +331,7 @@ public class Parsers {
      * @return A parser that yields all the remaining content as-is.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<String> remainingContent() {
         return (__, arguments) -> {
@@ -350,7 +350,7 @@ public class Parsers {
      * @return A parser that yields all remaining arguments as a string.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<String> remainingArguments() {
         return remainingArguments(" ");
@@ -363,9 +363,9 @@ public class Parsers {
      *
      * @return A parser that yields all remaining arguments as a string.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public static Parser<String> remainingArguments(@Nonnull String delimiter) {
+    public static Parser<String> remainingArguments( String delimiter) {
         return (c, arguments) -> {
             if (!arguments.hasNext()) return Optional.empty();
             StringJoiner sj = new StringJoiner(delimiter);
@@ -381,7 +381,7 @@ public class Parsers {
      *
      * @return A parser that matches an URL.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<URL> url() {
         return new CatchingParser<>(URL::new);
@@ -394,7 +394,7 @@ public class Parsers {
      *
      * @return A parser that matches an URL with one of the given protocols.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<URL> url(Collection<String> allowedProtocols) {
         return url().filter(u->allowedProtocols.contains(u.getProtocol()));
@@ -408,7 +408,7 @@ public class Parsers {
      * @return A parser that matches an URL with one of the given protocols.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<URL> url(String... allowedProtocols) {
         return url(Arrays.asList(allowedProtocols));
@@ -420,7 +420,7 @@ public class Parsers {
      * @return A parser that matches an HTTP URL.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<URL> httpUrl() {
         return url(Arrays.asList("http", "https"));
@@ -440,7 +440,7 @@ public class Parsers {
      *
      * @return A parser that matches a string delimited by a given character.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public static Parser<String> delimitedBy(char delimiter, boolean allowEscaping) {
         return (__, arguments) -> {
@@ -465,9 +465,9 @@ public class Parsers {
      * @return Parser that never fails, always returning a valid option.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
-    public static <T> Parser<Optional<T>> option(@Nonnull Parser<T> parser) {
+    public static <T> Parser<Optional<T>> option( Parser<T> parser) {
         return (c, args) -> Optional.of(parser.parse(c, args));
     }
 }

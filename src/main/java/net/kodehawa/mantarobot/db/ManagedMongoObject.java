@@ -3,19 +3,19 @@ package net.kodehawa.mantarobot.db;
 import net.kodehawa.mantarobot.data.MantaroData;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("unused")
 public interface ManagedMongoObject {
-    @Nonnull
+    
     String getId();
 
     @BsonIgnore
-    @Nonnull
+    
     String getTableName();
 
     @BsonIgnore
-    @Nonnull
+    
     default String getDatabaseId() {
         return getId();
     }

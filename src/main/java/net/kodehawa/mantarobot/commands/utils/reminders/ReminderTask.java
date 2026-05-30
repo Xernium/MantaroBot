@@ -17,6 +17,7 @@
 
 package net.kodehawa.mantarobot.commands.utils.reminders;
 
+import io.valkey.Jedis;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -24,7 +25,6 @@ import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;

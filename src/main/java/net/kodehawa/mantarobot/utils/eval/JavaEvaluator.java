@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.utils.eval;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import javax.tools.Diagnostic;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
@@ -32,11 +32,11 @@ import java.util.List;
 public class JavaEvaluator implements Closeable {
     private final MavenDependencies dependencies;
     
-    public JavaEvaluator(@Nonnull MavenDependencies dependencies) {
+    public JavaEvaluator( MavenDependencies dependencies) {
         this.dependencies = dependencies;
     }
     
-    @Nonnull
+    
     @CheckReturnValue
     public CompilationResult compile(String name, String source) {
         var writer = new StringWriter();

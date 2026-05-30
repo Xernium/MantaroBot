@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.core.command.argument.split;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -38,7 +38,7 @@ public class StringSplitter {
      *
      * @param pattern Pattern used to split strings.
      */
-    public StringSplitter(@Nonnull Pattern pattern) {
+    public StringSplitter( Pattern pattern) {
         this.pattern = Objects.requireNonNull(pattern, "Pattern may not be null");
     }
 
@@ -48,7 +48,7 @@ public class StringSplitter {
      * @param regex Pattern used to split strings.
      * @param flags Regex flags to compile with.
      */
-    public StringSplitter(@Nonnull String regex, int flags) {
+    public StringSplitter( String regex, int flags) {
         this(Pattern.compile(regex, flags));
     }
 
@@ -57,7 +57,7 @@ public class StringSplitter {
      *
      * @param regex Pattern used to split strings.
      */
-    public StringSplitter(@Nonnull String regex) {
+    public StringSplitter( String regex) {
         this(Pattern.compile(regex));
     }
 
@@ -76,9 +76,9 @@ public class StringSplitter {
      *
      * @return The result of the split operation.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public SplitString[] split(@Nonnull String string) {
+    public SplitString[] split( String string) {
         String[] values = pattern.split(string);
         int remove = values.length > 0 && values[0].isEmpty() ? 1 : 0; //1 if first string is empty
         int effectiveLength = values.length - remove;
@@ -102,9 +102,9 @@ public class StringSplitter {
      *
      * @see Pattern#split(CharSequence)
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public String[] rawSplit(@Nonnull String string) {
+    public String[] rawSplit( String string) {
         return pattern.split(string);
     }
 
@@ -118,9 +118,9 @@ public class StringSplitter {
      *
      * @see Pattern#split(CharSequence, int)
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public String[] rawSplit(@Nonnull String string, @Nonnegative int limit) {
+    public String[] rawSplit( String string, @Nonnegative int limit) {
         return pattern.split(string, limit);
     }
 }

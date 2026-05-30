@@ -31,7 +31,7 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -359,14 +359,14 @@ public class MongoUser implements ManagedMongoObject {
     }
 
     @Override
-    @Nonnull
+    
     public String getId() {
         return this.id;
     }
 
     @BsonIgnore
     @Override
-    @Nonnull
+    
     public String getTableName() {
         return DB_TABLE;
     }

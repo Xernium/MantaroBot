@@ -17,11 +17,11 @@
 
 package net.kodehawa.mantarobot.commands.utils.polls;
 
+import io.valkey.Jedis;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 
 import java.util.List;
 

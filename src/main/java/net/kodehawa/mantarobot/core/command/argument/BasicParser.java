@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.core.command.argument;
 
 import net.kodehawa.mantarobot.core.command.text.TextContext;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -31,14 +31,14 @@ import java.util.function.Function;
 public class BasicParser<T> implements Parser<T> {
     private final Function<String, T> parseFunction;
 
-    public BasicParser(@Nonnull Function<String, T> parseFunction) {
+    public BasicParser( Function<String, T> parseFunction) {
         this.parseFunction = parseFunction;
     }
 
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @Override
-    public Optional<T> parse(@Nonnull TextContext context, @Nonnull Arguments arguments) {
+    public Optional<T> parse( TextContext context,  Arguments arguments) {
         return Optional.of(parseFunction.apply(arguments.next().getValue()));
     }
 }

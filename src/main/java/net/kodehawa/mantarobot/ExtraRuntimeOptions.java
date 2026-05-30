@@ -17,8 +17,8 @@
 
 package net.kodehawa.mantarobot;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.OptionalInt;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -49,8 +49,7 @@ public class ExtraRuntimeOptions {
         }
     }
 
-    @Nullable
-    private static String getValue(@Nonnull String name) {
+    private static @Nullable String getValue( String name) {
         return System.getProperty(name, System.getenv(name.replace("-", "_").replace(".", "_").toUpperCase()));
     }
 }

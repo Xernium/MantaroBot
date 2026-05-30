@@ -26,7 +26,7 @@ import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -59,7 +59,7 @@ public class MantaroObject implements ManagedMongoObject {
 
     @SuppressWarnings("unused")
     @Override
-    @Nonnull
+    
     public String getId() {
         return id;
     }
@@ -67,7 +67,7 @@ public class MantaroObject implements ManagedMongoObject {
     @SuppressWarnings("unused")
     @BsonIgnore
     @Override
-    @Nonnull
+    
     public String getTableName() {
         return DB_TABLE;
     }

@@ -24,7 +24,7 @@ import net.kodehawa.mantarobot.core.listeners.operations.core.ModalOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -83,7 +83,7 @@ public class ModalOperations {
 
     public static class ModalListener implements EventListener {
         @Override
-        public void onEvent(@Nonnull GenericEvent e) {
+        public void onEvent( GenericEvent e) {
             if (e instanceof ModalInteractionEvent evt) {
                 var guild = evt.getGuild();
                 var member = evt.getMember();

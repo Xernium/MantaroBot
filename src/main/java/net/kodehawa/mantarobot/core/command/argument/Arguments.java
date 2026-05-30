@@ -21,7 +21,7 @@ import net.kodehawa.mantarobot.core.command.argument.split.SplitString;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -33,7 +33,7 @@ public class Arguments implements Iterator<SplitString> {
     private final ArgumentValues strings;
     private int offset;
 
-    public Arguments(@Nonnull SplitString[] array, @Nonnegative int offset) {
+    public Arguments( SplitString[] array, @Nonnegative int offset) {
         this.array = array;
         this.offset = offset;
         this.strings = new ArgumentValues(this);
@@ -55,7 +55,7 @@ public class Arguments implements Iterator<SplitString> {
      *
      * @return A marker for a given offset, with support for back (and front) jumps.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public MarkedBlock marked() {
         return new MarkedBlock(this);
@@ -96,7 +96,7 @@ public class Arguments implements Iterator<SplitString> {
      *
      * @apiNote When possible, prefer using {@link #range(int, int) relative ranges} instead.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public SplitString[] absoluteRange(int from, int to) {
         return Arrays.copyOfRange(array, from, to);
@@ -111,7 +111,7 @@ public class Arguments implements Iterator<SplitString> {
      * @return A range of the underlying array.
      */
     @SuppressWarnings("unused")
-    @Nonnull
+    
     @CheckReturnValue
     public SplitString[] range(int from, int to) {
         return absoluteRange(offset + from, offset + to);
@@ -126,7 +126,7 @@ public class Arguments implements Iterator<SplitString> {
      *
      * @throws IllegalArgumentException If the given index is smaller than zero or outside the bounds of the underlying array.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public SplitString get(@Nonnegative int i) {
         //noinspection ConstantConditions
@@ -149,7 +149,7 @@ public class Arguments implements Iterator<SplitString> {
      * @apiNote Parsers should avoid stepping back more times than they stepped forward, as that may result
      *          in an inconsistent state.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public SplitString previous() {
         if (offset == 0) {
@@ -191,7 +191,7 @@ public class Arguments implements Iterator<SplitString> {
      * @see #hasNext()
      */
     @Override
-    @Nonnull
+    
     @CheckReturnValue
     public SplitString next() {
         if (offset == array.length) {
@@ -216,7 +216,7 @@ public class Arguments implements Iterator<SplitString> {
      *
      * @return A view to the arguments' values.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public ArgumentValues values() {
         return strings;
@@ -227,7 +227,7 @@ public class Arguments implements Iterator<SplitString> {
      *
      * @return A copy of this object.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public Arguments snapshot() {
         return new Arguments(array, offset);

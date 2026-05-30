@@ -22,6 +22,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.connection.ConnectionPoolSettings;
+import io.valkey.JedisPool;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
 import net.kodehawa.mantarobot.db.codecs.MapCodecProvider;
 import net.kodehawa.mantarobot.utils.ShutdownCodes;
@@ -32,7 +33,6 @@ import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisPool;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

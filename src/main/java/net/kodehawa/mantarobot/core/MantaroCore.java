@@ -68,7 +68,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -590,7 +590,7 @@ public class MantaroCore {
         }
 
         @Override
-        public void onEvent(@Nonnull GenericEvent event) {
+        public void onEvent( GenericEvent event) {
             if (event instanceof ReadyEvent) {
                 var sm = event.getJDA().getShardManager();
                 if (sm == null) { // We have a big problem if this happens.

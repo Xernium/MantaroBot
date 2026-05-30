@@ -21,12 +21,17 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import net.dv8tion.jda.api.interactions.IntegrationType;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.kodehawa.mantarobot.core.command.slash.ContextCommand;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
 import net.kodehawa.mantarobot.core.command.text.TextCommand;
 import net.kodehawa.mantarobot.core.command.text.TextContext;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,10 +68,10 @@ public class CommandManager {
         return Collections.unmodifiableMap(contextMessageCommand);
     }
 
-    public <T extends TextCommand> T register(@Nonnull Class<T> clazz) {
+    public <T extends TextCommand> T register( Class<T> clazz) {
         return register(instantiate(clazz));
     }
-    public <T extends TextCommand> T register(@Nonnull T command) {
+    public <T extends TextCommand> T register( T command) {
         if (commands.putIfAbsent(command.getName(), command) != null) {
             throw new IllegalArgumentException("Duplicate command " + command.getName());
         }
@@ -80,43 +85,43 @@ public class CommandManager {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public <T extends SlashCommand> T registerSlash(@Nonnull Class<T> clazz) {
+    public <T extends SlashCommand> T registerSlash( Class<T> clazz) {
         return registerSlash(instantiate(clazz));
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    public <T extends ContextCommand<User>> T registerContextUser(@Nonnull Class<T> clazz) {
+    public <T extends ContextCommand<User>> T registerContextUser( Class<T> clazz) {
         return registerContextUser(instantiate(clazz));
     }
 
     @SuppressWarnings("unused")
-    public <T extends ContextCommand<Message>> T registerContextMessage(@Nonnull Class<T> clazz) {
+    public <T extends ContextCommand<Message>> T registerContextMessage( Class<T> clazz) {
         return registerContextMessage(instantiate(clazz));
     }
 
-    private <T extends ContextCommand<User>> T registerContextUser(@Nonnull T command) {
+    private <T extends ContextCommand<User>> T registerContextUser( T command) {
         if (contextUserCommand.putIfAbsent(command.getName(), command) != null) {
             throw new IllegalArgumentException("Duplicate context command (user)" + command.getName());
         }
 
-        CommandData commandData = Commands.user(command.getName()).setGuildOnly(true);
+        CommandData commandData = Commands.user(command.getName()).setContexts(InteractionContextType.GUILD);
         contextUserCommand.put(command.getName(), command);
         contextUserCommandList.add(commandData);
         return command;
     }
 
-    private <T extends ContextCommand<Message>> T registerContextMessage(@Nonnull T command) {
+    private <T extends ContextCommand<Message>> T registerContextMessage( T command) {
         if (contextMessageCommand.putIfAbsent(command.getName(), command) != null) {
             throw new IllegalArgumentException("Duplicate context command (message)" + command.getName());
         }
 
-        CommandData commandData = Commands.user(command.getName()).setGuildOnly(true);
+        CommandData commandData = Commands.message(command.getName()).setContexts(InteractionContextType.GUILD);
         contextMessageCommand.put(command.getName(), command);
         contextMessageCommandList.add(commandData);
         return command;
     }
 
-    private <T extends SlashCommand> T registerSlash(@Nonnull T command) {
+    private <T extends SlashCommand> T registerSlash( T command) {
         if (slashCommands.putIfAbsent(command.getName(), command) != null) {
             throw new IllegalArgumentException("Duplicate command " + command.getName());
         }
@@ -125,16 +130,16 @@ public class CommandManager {
         CommandData commandData;
         // So you can't have root commands if you have subcommands, why?
         if (command.getSubCommands().isEmpty()) {
-            commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
-                    .setNSFW(command.isNsfw())
-                    .setGuildOnly(true)
-                    .addOptions(command.getOptions());
+                commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
+                        .setNSFW(command.isNsfw())
+                        .setContexts(InteractionContextType.GUILD)
+                        .addOptions(command.getOptions());
 
         } else {
-            commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
-                    .setNSFW(command.isNsfw())
-                    .setGuildOnly(true)
-                    .addSubcommands(command.getSubCommandsRaw());
+                commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
+                        .setNSFW(command.isNsfw())
+                        .setContexts(InteractionContextType.GUILD)
+                        .addSubcommands(command.getSubCommandsRaw());
         }
 
         slashCommands.put(command.getName(), command);
@@ -142,7 +147,7 @@ public class CommandManager {
         return command;
     }
 
-    public boolean execute(@Nonnull TextContext ctx) {
+    public boolean execute( TextContext ctx) {
         var args = ctx.arguments();
         if (args.hasNext()) {
             var name = args.next().getValue().toLowerCase();

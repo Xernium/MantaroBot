@@ -26,7 +26,7 @@ import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,7 +110,7 @@ public class CustomCommand implements ManagedMongoObject {
 
     @SuppressWarnings("unused")
     @BsonIgnore
-    @Nonnull
+    
     @Override
     public String getTableName() {
         return DB_TABLE;

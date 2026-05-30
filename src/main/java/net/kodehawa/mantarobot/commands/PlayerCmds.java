@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
@@ -290,12 +290,12 @@ public class PlayerCmds {
                 }
 
                 var button = event.getButton();
-                if (button.getId() == null) {
+                if (button.getCustomId() == null) {
                     return Operation.IGNORED;
                 }
 
                 InteractionHook hook = event.getHook();
-                if (button.getId().equalsIgnoreCase("yes")) {
+                if (button.getCustomId().equalsIgnoreCase("yes")) {
                     var dbUserFinal = ctx.getDBUser(author);
                     var playerFinal = ctx.getPlayer(author);
                     var equipmentFinal = dbUserFinal.getEquippedItems();
@@ -342,7 +342,7 @@ public class PlayerCmds {
                     hook.editOriginal(lang.get("commands.profile.unequip.success").formatted(EmoteReference.CORRECT, type.name().toLowerCase()) + part)
                             .setComponents()
                             .queue();
-                } else if (button.getId().equalsIgnoreCase("no")) {
+                } else if (button.getCustomId().equalsIgnoreCase("no")) {
                     hook.editOriginal(lang.get("commands.profile.unequip.cancelled").formatted(EmoteReference.WARNING))
                             .setComponents()
                             .queue();

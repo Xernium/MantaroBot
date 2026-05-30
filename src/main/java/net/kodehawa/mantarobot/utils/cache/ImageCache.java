@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.utils.cache;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import net.kodehawa.mantarobot.commands.action.WeebAPIRequester;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
@@ -53,7 +53,7 @@ public class ImageCache {
     }
 
     @JsonIgnore
-    public static WeebAPIRequester.WeebAPIObject getImage(String type) throws NoSuchElementException, JsonProcessingException {
+    public static WeebAPIRequester.WeebAPIObject getImage(String type) throws NoSuchElementException, JacksonException {
         // Having this on the method call itself caused this to fail prematurely.
         WeebAPIRequester.WeebAPIObject result = null;
         try {

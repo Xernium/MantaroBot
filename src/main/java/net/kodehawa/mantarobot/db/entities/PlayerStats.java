@@ -24,7 +24,7 @@ import net.kodehawa.mantarobot.db.ManagedMongoObject;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,12 +75,12 @@ public class PlayerStats implements ManagedMongoObject {
     }
 
     @Override
-    @Nonnull
+    
     public String getId() {
         return this.id;
     }
 
-    @Nonnull
+    
     @Override
     @BsonIgnore
     public String getTableName() {
@@ -88,7 +88,7 @@ public class PlayerStats implements ManagedMongoObject {
     }
 
     @BsonIgnore
-    @Nonnull
+    
     @Override
     public String getDatabaseId() {
         return getId();

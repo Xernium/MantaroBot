@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.commands.currency.Waifu;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
@@ -253,7 +253,7 @@ public class WaifuCmd {
                         return Operation.IGNORED;
                     }
 
-                    final var button = e.getButton().getId();
+                    final var button = e.getButton().getCustomId();
                     if (button == null) {
                         return Operation.IGNORED;
                     }
@@ -435,11 +435,11 @@ public class WaifuCmd {
                     }
 
                     var button = ie.getButton();
-                    if (button.getId() == null) {
+                    if (button.getCustomId() == null) {
                         return Operation.IGNORED;
                     }
 
-                    if (button.getId().equals("yes")) {
+                    if (button.getCustomId().equals("yes")) {
                         final var p = ctx.getPlayer();
                         final var dbUser = ctx.getDBUser();
                         if (p.getCurrentMoney() < valuePayment) {
@@ -459,7 +459,7 @@ public class WaifuCmd {
 
                         ctx.edit("commands.waifu.unclaim.success", EmoteReference.CORRECT, name, valuePayment);
                         return Operation.COMPLETED;
-                    } else if (button.getId().equals("no")) {
+                    } else if (button.getCustomId().equals("no")) {
                         ctx.edit("commands.waifu.unclaim.scrapped", EmoteReference.CORRECT);
                         return Operation.COMPLETED;
                     }

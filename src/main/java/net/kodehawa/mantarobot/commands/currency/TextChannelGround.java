@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.commands.currency;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import tools.jackson.core.JacksonException;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.kodehawa.mantarobot.commands.currency.item.Item;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
@@ -57,7 +57,7 @@ public class TextChannelGround {
             } else {
                 return JsonDataManager.fromJson(json, Ground.class);
             }
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             e.printStackTrace();
             return new Ground(new HashMap<>(), 0, id);
         }
@@ -198,7 +198,7 @@ public class TextChannelGround {
             final var identifier =  "textchannelground:" + channel;
             try (var jedis = MantaroData.getDefaultJedisPool().getResource()) {
                 jedis.set(identifier, JsonDataManager.toJson(this));
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 e.printStackTrace();
             }
         }

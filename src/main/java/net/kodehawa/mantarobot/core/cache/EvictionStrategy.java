@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.core.cache;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface EvictionStrategy {
     long NO_REMOVAL_NEEDED = 0;
@@ -35,7 +35,7 @@ public interface EvictionStrategy {
     @CheckReturnValue
     long cache(long id);
     
-    @Nonnull
+    
     @CheckReturnValue
     static EvictionStrategy leastRecentlyUsed(@Nonnegative int size) {
         if (size < 1)

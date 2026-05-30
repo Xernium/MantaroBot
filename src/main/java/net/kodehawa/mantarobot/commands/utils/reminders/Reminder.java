@@ -17,10 +17,10 @@
 
 package net.kodehawa.mantarobot.commands.utils.reminders;
 
+import io.valkey.JedisPool;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.db.ManagedDatabase;
 import org.json.JSONObject;
-import redis.clients.jedis.JedisPool;
 
 import java.util.UUID;
 

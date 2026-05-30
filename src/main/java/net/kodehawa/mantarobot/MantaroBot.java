@@ -51,6 +51,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -64,7 +65,7 @@ import static net.kodehawa.mantarobot.utils.ShutdownCodes.FATAL_FAILURE;
 @SuppressWarnings("SameReturnValue")
 public class MantaroBot {
     private static final Logger log = LoggerFactory.getLogger(MantaroBot.class);
-    private static MantaroBot instance;
+    private static MantaroBot instance = null;
 
     // Just in case
     static {
@@ -177,7 +178,7 @@ public class MantaroBot {
     }
 
     public static MantaroBot getInstance() {
-        return MantaroBot.instance;
+        return Objects.requireNonNull(MantaroBot.instance, "Startup failed");
     }
 
     public ShardManager getShardManager() {

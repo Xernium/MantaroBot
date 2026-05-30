@@ -25,7 +25,7 @@ import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -48,8 +48,8 @@ import net.kodehawa.mantarobot.utils.commands.UtilsContext;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RateLimitContext;
 
 import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -69,14 +69,14 @@ public class TextContext implements IContext {
     private I18nContext i18n;
     private String customContent; // opts moment
 
-    private TextContext(@Nonnull MessageReceivedEvent event, @Nonnull I18nContext i18n, @Nonnull Arguments args, boolean isMentionPrefix) {
+    private TextContext( MessageReceivedEvent event,  I18nContext i18n,  Arguments args, boolean isMentionPrefix) {
         this.event = event;
         this.i18n = i18n;
         this.args = args;
         this.isMentionPrefix = isMentionPrefix;
     }
 
-    public TextContext(@Nonnull MessageReceivedEvent event, @Nonnull I18nContext i18n, @Nonnull String contentAfterPrefix, boolean isMentionPrefix) {
+    public TextContext( MessageReceivedEvent event,  I18nContext i18n,  String contentAfterPrefix, boolean isMentionPrefix) {
         this(event, i18n, new Arguments(SPLITTER.split(contentAfterPrefix), 0), isMentionPrefix);
     }
 
@@ -105,9 +105,9 @@ public class TextContext implements IContext {
      * @throws ArgumentParseError If there are no more arguments to read or the parser
      *                            returned nothing.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public <T> T argument(@Nonnull Parser<T> parser) {
+    public <T> T argument( Parser<T> parser) {
         return argument(parser, null);
     }
 
@@ -126,9 +126,9 @@ public class TextContext implements IContext {
      * @throws ArgumentParseError If there are no more arguments to read or the parser
      *                            returned nothing.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public <T> T argument(@Nonnull Parser<T> parser, @Nullable String failureMessage) {
+    public <T> T argument( Parser<T> parser, @Nullable String failureMessage) {
         return argument(parser, "Missing argument", failureMessage);
     }
 
@@ -147,9 +147,9 @@ public class TextContext implements IContext {
      * @throws ArgumentParseError If there are no more arguments to read or the parser
      *                            returned nothing.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public <T> T argument(@Nonnull Parser<T> parser, @Nullable String missingMessage, @Nullable String failureMessage) {
+    public <T> T argument( Parser<T> parser, @Nullable String missingMessage, @Nullable String failureMessage) {
         int offset = args.getOffset();
         Optional<T> optional;
         if (!args.hasNext()) {
@@ -175,9 +175,9 @@ public class TextContext implements IContext {
      *
      * @return An optional parsed argument.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public <T> Optional<T> tryArgument(@Nonnull Parser<T> parser) {
+    public <T> Optional<T> tryArgument( Parser<T> parser) {
         if (!args.hasNext()) return Optional.empty();
         MarkedBlock block = args.marked();
         Optional<T> optional = parser.parse(this);
@@ -205,9 +205,9 @@ public class TextContext implements IContext {
      *
      * @return A possibly empty list of arguments returned by the parser.
      */
-    @Nonnull
+    
     @CheckReturnValue
-    public <T> List<T> takeMany(@Nonnull Parser<T> parser) {
+    public <T> List<T> takeMany( Parser<T> parser) {
         List<T> list = new ArrayList<>();
         for(Optional<T> parsed = tryArgument(parser); parsed.isPresent(); parsed = tryArgument(parser)) {
             list.add(parsed.get());
@@ -230,7 +230,7 @@ public class TextContext implements IContext {
      * </p>
      * @return A possibly-empty String value
      */
-    @Nonnull
+    
     @CheckReturnValue
     public <T> String takeAllString() {
         var arg = tryArgument(Parsers.remainingArguments());
@@ -247,7 +247,7 @@ public class TextContext implements IContext {
      * @return True if the current argument matched the parser.
      */
     @CheckReturnValue
-    public boolean matches(@Nonnull Parser<?> parser) {
+    public boolean matches( Parser<?> parser) {
         return tryArgument(parser).isPresent();
     }
 
@@ -270,7 +270,7 @@ public class TextContext implements IContext {
      *
      * @return Possibly empty list of arguments matching.
      */
-    @Nonnull
+    
     @CheckReturnValue
     public <T> List<T> takeUntil(Parser<T> valueParser, Parser<?> delimiter) {
         List<T> list = new ArrayList<>();
