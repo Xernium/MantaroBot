@@ -32,7 +32,7 @@ import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisPool;
+import io.valkey.JedisPool;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

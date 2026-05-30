@@ -17,7 +17,6 @@
 
 package net.kodehawa.mantarobot.commands.action;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.kodehawa.mantarobot.MantaroInfo;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.Utils;
@@ -27,6 +26,7 @@ import okhttp3.Request;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.core.JacksonException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +48,7 @@ public class WeebAPIRequester {
             .readTimeout(2500, TimeUnit.MILLISECONDS)
             .build();
 
-    public WeebAPIObject getRandomImageByType(String type, boolean nsfw, String filetype) throws JsonProcessingException {
+    public WeebAPIObject getRandomImageByType(String type, boolean nsfw, String filetype) throws JacksonException {
         HashMap<String, Object> queryParams = new HashMap<>();
         queryParams.put("type", type);
 

@@ -82,10 +82,10 @@ public class ImageCmds {
     private static final ImageBoard<FurryImage> e621 = DefaultImageBoards.E621;
     private static final ImageBoard<SafeFurryImage> e926 = DefaultImageBoards.E926;
     private static final ImageBoard<KonachanImage> konachan = DefaultImageBoards.KONACHAN;
-    private static final ImageBoard<Rule34Image> rule34 = DefaultImageBoards.RULE34;
+    //private static final ImageBoard<Rule34Image> rule34 = DefaultImageBoards.RULE34; // TODO: Create token system for Imageboards
     private static final ImageBoard<SafebooruImage> safebooru = DefaultImageBoards.SAFEBOORU;
     private static final ImageBoard<YandereImage> yandere = DefaultImageBoards.YANDERE;
-    private static final ImageBoard<GelbooruImage> gelbooru = DefaultImageBoards.GELBOORU;
+    //private static final ImageBoard<GelbooruImage> gelbooru = DefaultImageBoards.GELBOORU; // TODO: Create token system for Imageboards
     private static final WeebAPIRequester weebAPIRequester = new WeebAPIRequester();
     private static final Random random = new Random();
 
@@ -94,12 +94,12 @@ public class ImageCmds {
         cr.registerSlash(Image.class);
         cr.registerSlash(Konachan.class);
         cr.registerSlash(Danbooru.class);
-        cr.registerSlash(Gelbooru.class);
+        //cr.registerSlash(Gelbooru.class);
         cr.registerSlash(Safebooru.class);
         cr.registerSlash(Yandere.class);
         cr.registerSlash(E621.class);
         cr.registerSlash(E926.class);
-        cr.registerSlash(Rule34.class);
+        //cr.registerSlash(Rule34.class);
     }
 
     @Name("image")
@@ -359,6 +359,7 @@ public class ImageCmds {
         }
     }
 
+    /*
     @Name("gelbooru")
     @Defer
     @NSFW
@@ -408,7 +409,7 @@ public class ImageCmds {
                     ctx.getOptionAsString("excludetags", "")
             );
         }
-    }
+    }*/
 
     @Name("safebooru")
     @Defer
@@ -442,6 +443,7 @@ public class ImageCmds {
         }
     }
 
+    /*
     @Name("rule34")
     @Defer
     @NSFW
@@ -470,7 +472,7 @@ public class ImageCmds {
             sendImage(ctx, rule34, true, "rule34", "explicit", ctx.getOptionAsString("tags", ""),
                     ctx.getOptionAsString("excludetags", ""));
         }
-    }
+    }*/
 
     @Name("danbooru")
     @Defer

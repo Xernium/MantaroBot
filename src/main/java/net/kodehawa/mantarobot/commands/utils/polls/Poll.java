@@ -36,7 +36,7 @@ import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisPool;
+import io.valkey.JedisPool;
 
 import java.awt.Color;
 import java.beans.ConstructorProperties;

@@ -17,11 +17,11 @@
 
 package net.kodehawa.mantarobot.commands.anime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.kodehawa.mantarobot.MantaroInfo;
 import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import okhttp3.Request;
 import org.json.JSONObject;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URLEncoder;

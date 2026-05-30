@@ -18,6 +18,7 @@
 package net.kodehawa.mantarobot.commands;
 
 import com.google.common.eventbus.Subscribe;
+import io.valkey.Jedis;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDAInfo;
 import net.kodehawa.mantarobot.MantaroInfo;
@@ -42,7 +43,6 @@ import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
-import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.util.List;

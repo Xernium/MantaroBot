@@ -17,12 +17,11 @@
 
 package net.kodehawa.mantarobot.commands;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.commands.anime.AnimeData;
 import net.kodehawa.mantarobot.commands.anime.CharacterData;
 import net.kodehawa.mantarobot.commands.anime.KitsuRetriever;
@@ -45,6 +44,7 @@ import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import org.apache.commons.text.StringEscapeUtils;
+import tools.jackson.core.JacksonException;
 
 import java.awt.Color;
 import java.net.SocketTimeoutException;
@@ -113,7 +113,7 @@ public class AnimeCmds {
                                 .setFooter(languageContext.get("commands.anime.information_footer"), ctx.getAuthor().getAvatarUrl())
                                 .build(),
                         (anime, hook) -> animeData(ctx, languageContext, anime));
-            } catch (JsonProcessingException jex) {
+            } catch (JacksonException jex) {
                 jex.printStackTrace();
                 ctx.reply("commands.anime.no_results", EmoteReference.ERROR);
             } catch (NullPointerException npe) {
@@ -181,7 +181,7 @@ public class AnimeCmds {
                                 .setFooter(languageContext.get("commands.anime.information_footer"), ctx.getAuthor().getAvatarUrl())
                                 .build(),
                         (character, hook)  -> characterData(ctx, languageContext, character));
-            } catch (JsonProcessingException jex) {
+            } catch (JacksonException jex) {
                 jex.printStackTrace();
                 ctx.reply("commands.anime.no_results", EmoteReference.ERROR);
             } catch (NullPointerException npe) {

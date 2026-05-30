@@ -23,8 +23,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.core.command.helpers.IContext;
 import net.kodehawa.mantarobot.core.command.slash.SlashContext;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
@@ -119,11 +119,11 @@ public class DiscordUtils {
                 }
 
                 var button = e.getButton();
-                if (button.getId() == null) {
+                if (button.getCustomId() == null) {
                     return Operation.IGNORED;
                 }
 
-                if (button.getId().equals("cancel")) {
+                if (button.getCustomId().equals("cancel")) {
                     e.getHook().editOriginal(ctx.getLanguageContext().get("commands.profile.unequip.cancelled").formatted(EmoteReference.OK))
                             .setEmbeds()
                             .setComponents()
@@ -133,7 +133,7 @@ public class DiscordUtils {
                 }
 
                 try {
-                    valueConsumer.accept(Integer.parseInt(button.getId()), e.getHook());
+                    valueConsumer.accept(Integer.parseInt(button.getCustomId()), e.getHook());
                     return Operation.COMPLETED;
                 } catch (Exception ignored) { }
 
@@ -213,20 +213,20 @@ public class DiscordUtils {
                     return Operation.IGNORED;
 
                 var button = e.getButton();
-                if (button.getId() == null)
+                if (button.getCustomId() == null)
                     return Operation.IGNORED;
 
                 var hook = e.getHook();
-                switch (button.getId()) {
+                switch (button.getCustomId()) {
                     case "button_first" -> {
                         index.set(0);
                         hook.editOriginalEmbeds(embeds.get(0)).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                     }
                     case "button_last" -> {
                         index.set(embeds.size() - 1);
                         hook.editOriginalEmbeds(embeds.get(embeds.size() - 1)).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                     }
 
                     case "button_right" -> {
@@ -235,9 +235,9 @@ public class DiscordUtils {
                         }
 
                         if (index.get() == 0) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginalEmbeds(embeds.get(index.decrementAndGet())).queue();
@@ -249,9 +249,9 @@ public class DiscordUtils {
                         }
 
                         if (index.get() == embeds.size() - 1) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginalEmbeds(embeds.get(index.incrementAndGet())).queue();
@@ -266,7 +266,7 @@ public class DiscordUtils {
 
             @Override
             public void onExpire() {
-                message.editMessageComponents(ActionRow.of(DEFAULT_COMPONENTS_DISABLED)).queue();
+                message.editMessageComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_DISABLED))).queue();
             }
         }, DEFAULT_COMPONENTS_FIRST);
     }
@@ -297,19 +297,19 @@ public class DiscordUtils {
 
                 var hook = e.getHook();
                 var button = e.getButton();
-                if (button.getId() == null)
+                if (button.getCustomId() == null)
                     return Operation.IGNORED;
 
-                switch (button.getId()) {
+                switch (button.getCustomId()) {
                     case "button_first" -> {
                         index.set(0);
                         hook.editOriginal(String.format("%s%n**Page: %d**", parts.get(index.get()), 1)).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                     }
                     case "button_last" -> {
                         index.set(parts.size() - 1);
                         hook.editOriginal(String.format("%s%n**Page: %d**", parts.get(parts.size() - 1), parts.size())).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                     }
                     case "button_right" -> {
                         if (index.get() == 0) {
@@ -317,9 +317,9 @@ public class DiscordUtils {
                         }
 
                         if (index.get() == 0) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginal(String.format("%s%n**Page: %d**", parts.get(index.decrementAndGet()), index.get() + 1)).queue();
@@ -331,9 +331,9 @@ public class DiscordUtils {
                         }
 
                         if (index.get() == parts.size() - 1) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginal(String.format("%s%n**Page: %d**", parts.get(index.incrementAndGet()), index.get() + 1)).queue();
@@ -349,7 +349,7 @@ public class DiscordUtils {
 
             @Override
             public void onExpire() {
-                m.editMessageComponents(ActionRow.of(DEFAULT_COMPONENTS_DISABLED)).queue();
+                m.editMessageComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_DISABLED))).queue();
             }
         }, DEFAULT_COMPONENTS_FIRST);
     }
@@ -393,11 +393,11 @@ public class DiscordUtils {
                 }
 
                 var button = e.getButton();
-                if (button.getId() == null)
+                if (button.getCustomId() == null)
                     return Operation.IGNORED;
 
                 var hook = e.getHook();
-                switch (button.getId()) {
+                switch (button.getCustomId()) {
                     case "button_first" -> {
                         index.set(0);
                         var toSend = addAllFields(base, parts.get(index.get()));
@@ -406,7 +406,7 @@ public class DiscordUtils {
                         );
 
                         hook.editOriginalEmbeds(toSend.build()).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                     }
                     case "button_last" -> {
                         index.set(parts.size() - 1);
@@ -416,7 +416,7 @@ public class DiscordUtils {
                         );
 
                         hook.editOriginalEmbeds(toSend.build()).queue();
-                        hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                        hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                     }
 
                     case "button_right" -> {
@@ -430,9 +430,9 @@ public class DiscordUtils {
                         );
 
                         if (index.get() == 0) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_FIRST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_FIRST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginalEmbeds(toSend.build()).queue();
@@ -449,9 +449,9 @@ public class DiscordUtils {
                         );
 
                         if (index.get() == parts.size() - 1) {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_LAST)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_LAST))).queue();
                         } else {
-                            hook.editOriginalComponents(ActionRow.of(DEFAULT_COMPONENTS_ALL)).queue();
+                            hook.editOriginalComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_ALL))).queue();
                         }
 
                         hook.editOriginalEmbeds(toSend1.build()).queue();
@@ -466,7 +466,7 @@ public class DiscordUtils {
 
             @Override
             public void onExpire() {
-                message.editMessageComponents(ActionRow.of(DEFAULT_COMPONENTS_DISABLED)).queue();
+                message.editMessageComponents(ActionRow.of(List.of(DEFAULT_COMPONENTS_DISABLED))).queue();
             }
         }, DEFAULT_COMPONENTS_FIRST);
     }

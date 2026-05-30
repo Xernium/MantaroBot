@@ -20,14 +20,15 @@ package net.kodehawa.mantarobot.commands;
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.components.label.Label;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
+import net.dv8tion.jda.api.modals.Modal;
 import net.kodehawa.mantarobot.commands.currency.TextChannelGround;
 import net.kodehawa.mantarobot.commands.custom.CustomCommandHandler;
 import net.kodehawa.mantarobot.commands.custom.v3.Parser;
@@ -367,19 +368,22 @@ public class CustomCmds {
                 }
 
                 var lang = ctx.getLanguageContext();
-                var subject = TextInput.create("content", lang.get("commands.custom.add.content_slash"), TextInputStyle.PARAGRAPH)
+                var subject = TextInput.create("content", TextInputStyle.PARAGRAPH)
                         .setPlaceholder(lang.get("commands.custom.add.content_placeholder"))
                         .setRequiredRange(5, 3900)
                         .build();
 
-                var nameInput = TextInput.create("name", lang.get("commands.custom.add.name_slash"), TextInputStyle.SHORT)
+                var nameInput = TextInput.create("name", TextInputStyle.SHORT)
                         .setPlaceholder(lang.get("commands.custom.add.custom_name_placeholder"))
                         .setRequiredRange(2, 49)
                         .build();
 
                 var nsfw = ctx.getOptionAsBoolean("nsfw");
                 var id = "%s/%s".formatted(ctx.getAuthor().getId(), ctx.getChannel().getId());
-                var modal = Modal.create(id, lang.get("commands.custom.add.header_slash")).addComponents(ActionRow.of(nameInput), ActionRow.of(subject)).build();
+                var modal = Modal.create(id, lang.get("commands.custom.add.header_slash")).addComponents(
+                        Label.of(lang.get("commands.custom.add.name_slash"), nameInput),
+                        Label.of(lang.get("commands.custom.add.content_slash"), subject)
+                ).build();
                 ctx.replyModal(modal);
 
                 ModalOperations.create(id, 300, new ModalOperation() {
@@ -576,7 +580,7 @@ public class CustomCmds {
                 var id = "%s/%s".formatted(ctx.getAuthor().getId(), ctx.getChannel().getId());
                 var content = cc.getValues().get(where - 1);
 
-                var subject = TextInput.create("content", lang.get("commands.custom.edit.content_slash"), TextInputStyle.PARAGRAPH)
+                var subject = TextInput.create("content", TextInputStyle.PARAGRAPH)
                         .setPlaceholder(lang.get("commands.custom.edit.content_slash_placeholder"))
                         .setRequiredRange(5, 3900);
 
@@ -585,8 +589,9 @@ public class CustomCmds {
                 }
 
                 var modal = Modal.create(id, lang.get("commands.custom.edit.header_slash"))
-                        .addComponents(ActionRow.of(subject.build()))
-                        .build();
+                        .addComponents(
+                                Label.of(lang.get("commands.custom.edit.content_slash"),subject.build())
+                        ).build();
 
                 ctx.replyModal(modal);
 
@@ -1048,7 +1053,7 @@ public class CustomCmds {
                 return Operation.IGNORED;
             }
 
-            final var button = e.getButton().getId();
+            final var button = e.getButton().getCustomId();
             if (button == null) {
                 return Operation.IGNORED;
             }

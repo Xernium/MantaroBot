@@ -19,6 +19,7 @@ package net.kodehawa.mantarobot.core.command;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.kodehawa.mantarobot.core.command.slash.ContextCommand;
@@ -99,7 +100,7 @@ public class CommandManager {
             throw new IllegalArgumentException("Duplicate context command (user)" + command.getName());
         }
 
-        CommandData commandData = Commands.user(command.getName()).setGuildOnly(true);
+        CommandData commandData = Commands.user(command.getName()).setContexts(InteractionContextType.GUILD);
         contextUserCommand.put(command.getName(), command);
         contextUserCommandList.add(commandData);
         return command;
@@ -110,7 +111,7 @@ public class CommandManager {
             throw new IllegalArgumentException("Duplicate context command (message)" + command.getName());
         }
 
-        CommandData commandData = Commands.user(command.getName()).setGuildOnly(true);
+        CommandData commandData = Commands.user(command.getName()).setContexts(InteractionContextType.GUILD);
         contextMessageCommand.put(command.getName(), command);
         contextMessageCommandList.add(commandData);
         return command;
@@ -127,13 +128,13 @@ public class CommandManager {
         if (command.getSubCommands().isEmpty()) {
             commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
                     .setNSFW(command.isNsfw())
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(command.getOptions());
 
         } else {
             commandData = Commands.slash(command.getName(), "[%s] %s".formatted(command.getCategory().readableName(), command.getDescription()))
                     .setNSFW(command.isNsfw())
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addSubcommands(command.getSubCommandsRaw());
         }
 

@@ -56,12 +56,12 @@ public abstract class Game<T> {
         }
 
         var button = event.getButton();
-        if (button.getId() == null) {
+        if (button.getCustomId() == null) {
             return Operation.IGNORED;
         }
 
         var languageContext = lobby.getLanguageContext();
-        if (button.getId().equals("end-game")) {
+        if (button.getCustomId().equals("end-game")) {
             event.getHook().editOriginal("").setComponents().queue();
             event.getHook().sendMessage(
                     languageContext.get("commands.game.lobby.ended_game").formatted(EmoteReference.CORRECT, expectedAnswerRaw)
@@ -71,7 +71,7 @@ public abstract class Game<T> {
             return Operation.COMPLETED;
         }
 
-        if (button.getId().equals(expectedAnswer)) {
+        if (button.getCustomId().equals(expectedAnswer)) {
             var player = managedDatabase.getPlayer(event.getUser());
             var gains = 70 + extra;
             player.addMoney(gains);

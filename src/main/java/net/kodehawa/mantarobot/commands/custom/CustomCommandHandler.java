@@ -19,8 +19,8 @@ package net.kodehawa.mantarobot.commands.custom;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.kodehawa.mantarobot.commands.MiscCmds;
 import net.kodehawa.mantarobot.commands.custom.legacy.ConditionalCustoms;

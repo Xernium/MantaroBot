@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.commands;
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
@@ -164,7 +164,7 @@ public class MarryCmd {
                         return Operation.IGNORED;
                     }
 
-                    String buttonId = e.getButton().getId();
+                    String buttonId = e.getButton().getCustomId();
                     var hook = e.getHook();
                     if (buttonId == null) {
                         return Operation.IGNORED;
@@ -431,7 +431,7 @@ public class MarryCmd {
                         return Operation.IGNORED;
                     }
 
-                    var button = e.getButton().getId();
+                    var button = e.getButton().getCustomId();
                     var hook = e.getHook();
                     if (button == null) {
                         return Operation.IGNORED;
@@ -524,7 +524,7 @@ public class MarryCmd {
                         return Operation.IGNORED;
                     }
 
-                    var button = e.getButton().getId();
+                    var button = e.getButton().getCustomId();
                     var hook = e.getHook();
                     if (button == null) {
                         return Operation.IGNORED;
@@ -616,7 +616,7 @@ public class MarryCmd {
                         return Operation.IGNORED;
                     }
 
-                    var button = e.getButton().getId();
+                    var button = e.getButton().getCustomId();
                     var hook = e.getHook();
                     if (button == null) {
                         return Operation.IGNORED;
@@ -683,7 +683,7 @@ public class MarryCmd {
                     return Operation.IGNORED;
                 }
 
-                String buttonId = e.getButton().getId();
+                String buttonId = e.getButton().getCustomId();
                 if (buttonId == null) {
                     return Operation.IGNORED;
                 }

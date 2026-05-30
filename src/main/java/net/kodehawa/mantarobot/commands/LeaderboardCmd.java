@@ -17,15 +17,15 @@
 
 package net.kodehawa.mantarobot.commands;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Sorts;
+import io.valkey.Jedis;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.utils.leaderboards.CachedLeaderboardMember;
 import net.kodehawa.mantarobot.core.CommandRegistry;
@@ -49,7 +49,7 @@ import net.kodehawa.mantarobot.utils.data.JsonDataManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bson.conversions.Bson;
-import redis.clients.jedis.Jedis;
+import tools.jackson.core.JacksonException;
 
 import java.util.List;
 import java.util.Objects;
@@ -328,7 +328,7 @@ public class LeaderboardCmd {
             } else {
                 return JsonDataManager.fromJson(json, CachedLeaderboardMember.class);
             }
-        } catch (JsonProcessingException e) { // This would be odd, really.
+        } catch (JacksonException e) { // This would be odd, really.
             e.printStackTrace();
             return null;
         }

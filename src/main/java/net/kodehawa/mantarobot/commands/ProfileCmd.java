@@ -19,6 +19,9 @@ package net.kodehawa.mantarobot.commands;
 
 import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
@@ -26,10 +29,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.modals.Modal;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
@@ -348,7 +349,7 @@ public class ProfileCmd {
 
                 var lang = ctx.getLanguageContext();
                 var description = ctx.getPlayer().getDescription();
-                var subjectBuilder = TextInput.create("description", lang.get("commands.profile.description.header"), TextInputStyle.PARAGRAPH)
+                var subjectBuilder = TextInput.create("description", TextInputStyle.PARAGRAPH)
                         .setPlaceholder(lang.get("commands.profile.description.content_placeholder"))
                         .setRequiredRange(5, MAX_LENGTH);
 
@@ -359,7 +360,7 @@ public class ProfileCmd {
                 var subject = subjectBuilder.build();
                 var id = "%s/%s".formatted(ctx.getAuthor().getId(), ctx.getChannel().getId());
                 var modal = Modal.create(id, lang.get("commands.profile.description.header"))
-                        .addComponents(ActionRow.of(subject))
+                        .addComponents(Label.of(lang.get("commands.custom.edit.content_slash"), subject))
                         .build();
                 ctx.replyModal(modal);
 

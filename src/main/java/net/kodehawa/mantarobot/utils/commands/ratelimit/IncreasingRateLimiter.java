@@ -17,13 +17,13 @@
 
 package net.kodehawa.mantarobot.utils.commands.ratelimit;
 
+import io.valkey.Jedis;
+import io.valkey.JedisPool;
+import io.valkey.exceptions.JedisNoScriptException;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
 import org.apache.commons.io.IOUtils;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.exceptions.JedisNoScriptException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

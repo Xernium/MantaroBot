@@ -19,8 +19,8 @@ package net.kodehawa.mantarobot.commands.image;
 
 import com.google.common.collect.ImmutableMap;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.lib.imageboards.DefaultImageBoards;
 import net.kodehawa.lib.imageboards.ImageBoard;
 import net.kodehawa.lib.imageboards.entities.BoardImage;
@@ -54,7 +54,7 @@ public class ImageboardUtils {
 
     private static final Map<ImageBoard<?>, Boolean> imageboardUsesRating = ImmutableMap.of(
             DefaultImageBoards.SAFEBOORU, false,
-            DefaultImageBoards.RULE34, false,
+            //DefaultImageBoards.RULE34, false, // TODO: Create token system for R34
             DefaultImageBoards.E621, false
     );
 

@@ -21,7 +21,7 @@ import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.kodehawa.mantarobot.commands.currency.item.Item;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
@@ -520,12 +520,12 @@ public class PetCmds {
                     }
 
                     var button = event.getButton();
-                    if (button.getId() == null) {
+                    if (button.getCustomId() == null) {
                         return Operation.IGNORED;
                     }
 
                     var hook = event.getHook();
-                    if (button.getId().equals("yes-button")) {
+                    if (button.getCustomId().equals("yes-button")) {
                         final var playerFinal = ctx.getPlayer();
                         final var marriageConfirmed = ctx.getDBUser().getMarriage();
                         var petFinal = getCurrentPet(ctx, playerFinal, marriageConfirmed, "commands.pet.remove.no_pet");
@@ -580,7 +580,7 @@ public class PetCmds {
                         return Operation.COMPLETED;
                     }
 
-                    if (button.getId().equals("no-button")) {
+                    if (button.getCustomId().equals("no-button")) {
                         var marriageConfirmed = ctx.getDBUser().getMarriage();
                         var playerFinal = ctx.getPlayer();
                         playerFinal.locked(false);
@@ -709,13 +709,13 @@ public class PetCmds {
                     }
 
                     var button = event.getButton();
-                    if (button.getId() == null) {
+                    if (button.getCustomId() == null) {
                         return Operation.IGNORED;
                     }
 
                     var lang = ctx.getLanguageContext();
                     var hook = event.getHook();
-                    if (button.getId().equals("yes-button")) {
+                    if (button.getCustomId().equals("yes-button")) {
                         var playerConfirmed = ctx.getPlayer();
                         var dbUserConfirmed = ctx.getDBUser();
                         var marriageConfirmed = dbUserConfirmed.getMarriage();
@@ -802,7 +802,7 @@ public class PetCmds {
                         return Operation.COMPLETED;
                     }
 
-                    if (button.getId().equals("no-button")) {
+                    if (button.getCustomId().equals("no-button")) {
                         var playerConfirmed = ctx.getPlayer();
                         var marriageConfirmed = ctx.getDBUser().getMarriage();
                         // Original player is fine, we checked it originally with this.
