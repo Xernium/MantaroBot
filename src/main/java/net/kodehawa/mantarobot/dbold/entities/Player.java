@@ -15,7 +15,7 @@
  *
  */
 
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.dbold.entities;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -29,7 +29,7 @@ import net.kodehawa.mantarobot.commands.currency.profile.ProfileComponent;
 import net.kodehawa.mantarobot.commands.currency.profile.inventory.InventorySortType;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static net.kodehawa.mantarobot.db.entities.Inventory.serialize;
+import static net.kodehawa.mantarobot.dbold.entities.Inventory.serialize;
 
 public class Player implements ManagedMongoObject {
     @BsonIgnore

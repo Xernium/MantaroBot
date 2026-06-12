@@ -31,14 +31,14 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.Marriage;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
@@ -72,7 +72,7 @@ public class MarryCmd {
     @Category(CommandCategory.CURRENCY)
     public static class Marry extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("user")
         @Defer
@@ -87,7 +87,7 @@ public class MarryCmd {
         )
         public static class MarryUser extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var proposingUser = ctx.getAuthor();
                 var proposedToUser = ctx.getOptionAsUser("user");
                 if (proposedToUser == null) {
@@ -272,7 +272,7 @@ public class MarryCmd {
         @Description("Shows the status of your marriage.")
         public static class Status extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var author = ctx.getAuthor();
                 final var dbUser = ctx.getDBUser();
                 final var currentMarriage = dbUser.getMarriage();
@@ -373,7 +373,7 @@ public class MarryCmd {
         )
         public static class CreateLetter extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var author = ctx.getAuthor();
                 final var player = ctx.getPlayer();
                 final var dbUser = ctx.getDBUser();
@@ -490,7 +490,7 @@ public class MarryCmd {
         )
         public static class House extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -582,7 +582,7 @@ public class MarryCmd {
         )
         public static class Car extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -669,7 +669,7 @@ public class MarryCmd {
     @Category(CommandCategory.CURRENCY)
     public static class Divorce extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             //We, indeed, have no marriage here.
             if (ctx.getDBUser().getMarriage() == null) {
                 ctx.reply("commands.divorce.not_married", EmoteReference.ERROR);

@@ -30,7 +30,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -70,7 +70,7 @@ public class MessageCmds {
     )
     public static class Prune extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var user = ctx.getOptionAsUser("user");
             var amount = ctx.getOptionAsLong("amount", 1);
             var botOnly = ctx.getOptionAsBoolean("botonly");
@@ -101,7 +101,7 @@ public class MessageCmds {
         }
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> {
                 if (!ctx.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
                     ctx.reply("commands.prune.no_permissions_user", EmoteReference.ERROR);
@@ -118,7 +118,7 @@ public class MessageCmds {
         }
     }
 
-    private static void getMessageHistory(SlashContext ctx, List<Message> messageHistory, int limit, Predicate<Message> predicate) {
+    private static void getMessageHistory(SlashContextMongo ctx, List<Message> messageHistory, int limit, Predicate<Message> predicate) {
         var stream = messageHistory.stream().filter(predicate);
         if (limit != -1) {
             stream = stream.limit(limit);
@@ -138,7 +138,7 @@ public class MessageCmds {
         prune(ctx, messageHistory);
     }
 
-    private static void prune(SlashContext ctx, List<Message> messageHistory) {
+    private static void prune(SlashContextMongo ctx, List<Message> messageHistory) {
         messageHistory = messageHistory.stream()
                 .filter(message -> message.getType().canDelete())
                 .filter(message -> !message.getTimeCreated().isBefore(OffsetDateTime.now().minusWeeks(2)))

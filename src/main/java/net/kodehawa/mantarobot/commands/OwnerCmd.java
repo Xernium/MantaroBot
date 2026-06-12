@@ -24,8 +24,8 @@ import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Help;
@@ -38,9 +38,9 @@ import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
+import net.kodehawa.mantarobot.dbold.entities.MantaroObject;
+import net.kodehawa.mantarobot.dbold.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.PremiumKey;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -81,9 +81,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class RestoreStreak extends TextCommand {
+    public static class RestoreStreak extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var id = ctx.argument(Parsers.strictLong()
                     .map(String::valueOf), "Invalid id");
             var amount = ctx.argument(Parsers.strictLong(), "Invalid amount");
@@ -107,9 +107,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class DataRequest extends TextCommand {
+    public static class DataRequest extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var db = MantaroData.db();
             var id = ctx.argument(Parsers.strictLong()
                     .map(String::valueOf), "Invalid id");
@@ -145,9 +145,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class GiveItem extends TextCommand {
+    public static class GiveItem extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var itemString = ctx.argument(Parsers.delimitedBy('"', false), "Invalid item");
             int amount = ctx.argument(Parsers.strictInt(), "Invalid item amount");
 
@@ -175,9 +175,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class TransferPlayer extends TextCommand {
+    public static class TransferPlayer extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var transferred = ctx.argument(Parsers.strictLong().map(String::valueOf),
                     "Invalid user (transferring from)"
             );
@@ -244,9 +244,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class AddBadge extends TextCommand {
+    public static class AddBadge extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var toAdd = ctx.argument(Parsers.string(),
                     "Wrong or no badge specified."
             );
@@ -278,9 +278,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class RemoveBadge extends TextCommand {
+    public static class RemoveBadge extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var toRemove = ctx.argument(Parsers.string(),
                     "Wrong or no badge specified."
             );
@@ -314,9 +314,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class RefreshPledges extends TextCommand {
+    public static class RefreshPledges extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             try {
                 APIUtils.getFrom("/mantaroapi/bot/patreon/refresh");
                 ctx.send("Refreshed Patreon pledges successfully.");
@@ -329,9 +329,9 @@ public class OwnerCmd {
 
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class AddOwnerPremium extends TextCommand {
+    public static class AddOwnerPremium extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var guild = ctx.argument(Parsers.strictLong()
                             .map(String::valueOf), "Invalid guild"
             );
@@ -367,21 +367,21 @@ public class OwnerCmd {
                     @Help.Parameter(name = "target", description = "ID of the entity to be (un)blacklisted")
             }
     )
-    public static class Blacklist extends TextCommand {
+    public static class Blacklist extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             ctx.send(EmoteReference.ERROR + "Invalid type. (Valid: guild, user)");
         }
 
         @SuppressWarnings("unused")
-        private abstract static class BlacklistCommand<T> extends TextCommand {
+        private abstract static class BlacklistCommandMongo<T> extends MongoTextCommand {
             private final String type;
             private final Function<MantaroObject, List<String>> dbGetter;
             private final BiFunction<ShardManager, String, T> entityGetter;
             private final Function<T, String> formatter;
 
-            private BlacklistCommand(String type, Function<MantaroObject, List<String>> dbGetter,
-                                     BiFunction<ShardManager, String, T> entityGetter, Function<T, String> formatter) {
+            private BlacklistCommandMongo(String type, Function<MantaroObject, List<String>> dbGetter,
+                                          BiFunction<ShardManager, String, T> entityGetter, Function<T, String> formatter) {
                 this.type = type;
                 this.dbGetter = dbGetter;
                 this.entityGetter = entityGetter;
@@ -389,7 +389,7 @@ public class OwnerCmd {
             }
 
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var action = ctx.argument(Parsers.string());
                 var target = ctx.argument(Parsers.string());
                 var obj = MantaroData.db().getMantaroData();
@@ -431,7 +431,7 @@ public class OwnerCmd {
         }
 
         @SuppressWarnings("unused")
-        public static class Guild extends BlacklistCommand<net.dv8tion.jda.api.entities.Guild> {
+        public static class Guild extends BlacklistCommandMongo<net.dv8tion.jda.api.entities.Guild> {
             public Guild() {
                 super("Guild",
                         MantaroObject::getBlackListedGuilds,
@@ -442,7 +442,7 @@ public class OwnerCmd {
         }
 
         @SuppressWarnings("unused")
-        public static class User extends BlacklistCommand<net.dv8tion.jda.api.entities.User> {
+        public static class User extends BlacklistCommandMongo<net.dv8tion.jda.api.entities.User> {
             public User() {
                 super("User",
                         MantaroObject::getBlackListedUsers,
@@ -456,7 +456,7 @@ public class OwnerCmd {
     @Name("eval")
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class Eval extends TextCommand {
+    public static class Eval extends MongoTextCommand {
         MavenDependencies deps = new MavenDependencies(Path.of("eval_deps"))
                 .addRepository("https://jcenter.bintray.com");
         JavaEvaluator evaluator = new JavaEvaluator(deps);
@@ -519,7 +519,7 @@ public class OwnerCmd {
             }
 
             try {
-                return result.resultingClass().getMethod("run", TextContext.class, MavenDependencies.class)
+                return result.resultingClass().getMethod("run", TextContextMongo.class, MavenDependencies.class)
                         .invoke(null, ctx, deps);
             } catch(InvocationTargetException e) {
                 return e.getCause();
@@ -529,7 +529,7 @@ public class OwnerCmd {
         };
 
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var content = ctx.argument(Parsers.remainingContent(), "Give me something to eval.", "Failed to parse eval string.").trim();
             // eval.eval, yes
             var result = eval.eval(ctx, content);
@@ -560,9 +560,9 @@ public class OwnerCmd {
     @Name("link")
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class Link extends TextCommand {
+    public static class Link extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var config = ctx.getConfig();
             if (!config.isPremiumBot()) {
                 ctx.send("This command can only be ran in MP, as it'll link a guild to an MP holder.");
@@ -612,9 +612,9 @@ public class OwnerCmd {
     @Name("invalidatekey")
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class InvalidateKey extends TextCommand {
+    public static class InvalidateKey extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var keyString = ctx.argument(Parsers.string(), "Give me a key to invalidate.", "Couldn't parse key.");
             var key = MantaroData.db().getPremiumKey(keyString);
             if (key == null) {
@@ -634,9 +634,9 @@ public class OwnerCmd {
     @Name("createkey")
     @Permission(CommandPermission.OWNER)
     @Category(CommandCategory.OWNER)
-    public static class CreateKey extends TextCommand {
+    public static class CreateKey extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var scope = ctx.argument(Parsers.toEnum(PremiumKey.Type.class), "Missing scope (Valid ones are: `user` or `guild`)", "Invalid scope (Valid ones are: `user` or `guild`)");
             var owner = ctx.argument(Parsers.strictLong(), "Missing owner id.", "Failed to parse owner.");
             var linked = ctx.argument(Parsers.bool(), "Missing linked.", "Failed to parse linked.");
@@ -654,6 +654,6 @@ public class OwnerCmd {
     }
 
     private interface Evaluator {
-        Object eval(TextContext ctx, String code);
+        Object eval(TextContextMongo ctx, String code);
     }
 }

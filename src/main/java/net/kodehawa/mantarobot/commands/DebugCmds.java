@@ -29,7 +29,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.processor.CommandProcessor;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.command.CommandListener;
 import net.kodehawa.mantarobot.core.listeners.events.PreLoadEvent;
 import net.kodehawa.mantarobot.core.command.meta.Module;
@@ -45,7 +45,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.kodehawa.mantarobot.commands.info.AsyncInfoMonitor.*;
@@ -64,7 +63,7 @@ public class DebugCmds {
     @Help(description = "Gets the bot technical information. Nothing all that interesting, but shows cute stats.")
     public static class Stats extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var config = ctx.getConfig();
             var bot = ctx.getBot();
             var guilds = 0L;
@@ -174,7 +173,7 @@ public class DebugCmds {
                 .build();
 
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             I18nContext languageContext = ctx.getLanguageContext();
             if (!RatelimitUtils.ratelimit(rateLimiter, ctx, false))
                 return;

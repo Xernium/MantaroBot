@@ -145,3 +145,4 @@ public class SlashContext extends BaseInteractionContext<SlashCommandInteraction
         return option.getAsBoolean();
     }
 }
+

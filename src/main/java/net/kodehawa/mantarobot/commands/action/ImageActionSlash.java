@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -115,7 +115,7 @@ public class ImageActionSlash extends SlashCommand {
     }
 
     @Override
-    public void process(SlashContext ctx) {
+    public void process(SlashContextMongo ctx) {
         if (!RatelimitUtils.ratelimit(rateLimiter, ctx, null)) {
             return;
         }
@@ -241,11 +241,11 @@ public class ImageActionSlash extends SlashCommand {
         }
     }
 
-    private boolean isMentioningBot(SlashContext ctx, Member user) {
+    private boolean isMentioningBot(SlashContextMongo ctx, Member user) {
         return user.getIdLong() == ctx.getSelfUser().getIdLong();
     }
 
-    private boolean isLonely(SlashContext ctx, Member user) {
+    private boolean isLonely(SlashContextMongo ctx, Member user) {
         return user.getIdLong() == ctx.getAuthor().getIdLong();
     }
 }

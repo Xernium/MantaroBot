@@ -28,7 +28,7 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.utils.Utils;
@@ -67,7 +67,7 @@ public class MuteCmds {
     // This does the same as the built-in /timeout, though?
     public static class Mute extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var dbGuild = ctx.getDBGuild();
             var reason = ctx.getOptionAsString("reason", "");
             var placeholderReason = "Not specified.";
@@ -171,7 +171,7 @@ public class MuteCmds {
     })
     public static class UnMute extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var dbGuild = ctx.getDBGuild();
             var reason = ctx.getOptionAsString("reason", "");
             var user = ctx.getOptionAsUser("user");

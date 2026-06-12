@@ -15,10 +15,10 @@
  *
  */
 
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.dbold.entities;
 
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import net.kodehawa.mantarobot.utils.Utils;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonId;

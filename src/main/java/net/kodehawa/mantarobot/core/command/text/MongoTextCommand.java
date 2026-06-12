@@ -28,14 +28,14 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 // common superclass for either commands or options
-public abstract class TextCommand extends AnnotatedCommand<TextContext> {
-    private final Map<String, TextCommand> children = new HashMap<>();
+public abstract class MongoTextCommand extends AnnotatedCommand<TextContextMongo> {
+    private final Map<String, MongoTextCommand> children = new HashMap<>();
     private final Map<String, String> childrenAliases = new HashMap<>();
     private final List<String> aliases;
 
-    private TextCommand parent;
+    private MongoTextCommand parent;
 
-    public TextCommand() {
+    public MongoTextCommand() {
         super();
         var clazz = getClass();
         this.aliases = Arrays.stream(clazz.getAnnotationsByType(Alias.class))
@@ -58,7 +58,7 @@ public abstract class TextCommand extends AnnotatedCommand<TextContext> {
     }
 
     @Override
-    public final void execute(TextContext ctx) {
+    public final void execute(TextContextMongo ctx) {
         if (!getPredicate().test(ctx)) {
             return;
         }
@@ -79,11 +79,11 @@ public abstract class TextCommand extends AnnotatedCommand<TextContext> {
         process(ctx);
     }
 
-    public Predicate<TextContext> getPredicate() {
+    public Predicate<TextContextMongo> getPredicate() {
         return context -> true;
     }
 
-    public void registerParent(TextCommand parent) {
+    public void registerParent(MongoTextCommand parent) {
         this.parent = parent;
         parent.children.put(name, this);
         aliases.forEach(a -> parent.childrenAliases.put(a, name));

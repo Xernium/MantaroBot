@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.commands.game.core.lobby;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.kodehawa.mantarobot.commands.game.core.Game;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.exporters.Metrics;
@@ -47,13 +47,13 @@ public class GameLobby extends Lobby {
     }
 
     public boolean gameLoaded = false;
-    SlashContext context;
+    SlashContextMongo context;
     LinkedList<Game<?>> gamesToPlay;
     Guild guild;
     List<String> players;
     I18nContext languageContext;
 
-    public GameLobby(SlashContext ctx, I18nContext languageContext, List<String> players, LinkedList<Game<?>> games) {
+    public GameLobby(SlashContextMongo ctx, I18nContext languageContext, List<String> players, LinkedList<Game<?>> games) {
         super(ctx.getGuild().getId(), ctx.getChannel().getId());
         this.guild = ctx.getGuild();
         this.context = ctx;
@@ -116,7 +116,7 @@ public class GameLobby extends Lobby {
         });
     }
 
-    public SlashContext getContext() {
+    public SlashContextMongo getContext() {
         return this.context;
     }
 

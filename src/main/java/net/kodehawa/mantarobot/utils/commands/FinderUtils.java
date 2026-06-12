@@ -24,7 +24,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,7 @@ public class FinderUtils {
     public static final Pattern CHANNEL_MENTION = Pattern.compile("<#(\\d{17,21})>");
     public static final Pattern ROLE_MENTION = Pattern.compile("<@&(\\d{17,21})>"); // $1 -> ID
 
-    private static List<Role> findRole0(IContext ctx, String content) {
+    private static List<Role> findRole0(IContextMongo ctx, String content) {
         List<Role> found = findRole0(content, ctx.getGuild());
         if (found.isEmpty() && !content.isEmpty()) {
             ctx.sendLocalized("general.find_roles_failure", EmoteReference.ERROR);
@@ -49,7 +49,7 @@ public class FinderUtils {
         return found;
     }
 
-    public static Role findRole(IContext ctx, String content) {
+    public static Role findRole(IContextMongo ctx, String content) {
         List<Role> found = findRole0(ctx, content);
         // Ah yes, null return null.
         if (found == null) {
@@ -80,7 +80,7 @@ public class FinderUtils {
         return roles.get(0);
     }
 
-    public static Role findRoleSelect(IContext ctx,
+    public static Role findRoleSelect(IContextMongo ctx,
                                       String content, Consumer<Role> consumer) {
         List<Role> found = findRole0(ctx, content);
         if (found == null) {
@@ -105,7 +105,7 @@ public class FinderUtils {
         return null;
     }
 
-    private static List<StandardGuildMessageChannel> findChannel0(IContext ctx, String content) {
+    private static List<StandardGuildMessageChannel> findChannel0(IContextMongo ctx, String content) {
         List<StandardGuildMessageChannel> found = findStandardChannels0(content, ctx.getGuild());
         if (found.isEmpty() && !content.isEmpty()) {
             ctx.sendLocalized("general.find_channels_failure", EmoteReference.ERROR);
@@ -115,7 +115,7 @@ public class FinderUtils {
         return found;
     }
 
-    public static StandardGuildMessageChannel findChannel(IContext ctx, String content) {
+    public static StandardGuildMessageChannel findChannel(IContextMongo ctx, String content) {
         List<StandardGuildMessageChannel> found = findChannel0(ctx, content);
         if (found == null) {
             return null;
@@ -139,8 +139,8 @@ public class FinderUtils {
         return null;
     }
 
-    public static StandardGuildMessageChannel findChannelSelect(IContext ctx,
-                                                String content, Consumer<StandardGuildMessageChannel> consumer) {
+    public static StandardGuildMessageChannel findChannelSelect(IContextMongo ctx,
+                                                                String content, Consumer<StandardGuildMessageChannel> consumer) {
         List<StandardGuildMessageChannel> found = findChannel0(ctx, content);
         // This feels a little weird, but found can return null here.
         if (found == null) {
@@ -156,7 +156,7 @@ public class FinderUtils {
         return null;
     }
 
-    public static VoiceChannel findVoiceChannelSelect(IContext ctx, String content, Consumer<VoiceChannel> consumer) {
+    public static VoiceChannel findVoiceChannelSelect(IContextMongo ctx, String content, Consumer<VoiceChannel> consumer) {
         List<VoiceChannel> found = findVoiceChannels0(content, ctx.getGuild());
         if (found.isEmpty() && !content.isEmpty()) {
             ctx.sendLocalized("general.find_voice_channels_failure", EmoteReference.ERROR);
@@ -172,7 +172,7 @@ public class FinderUtils {
         return null;
     }
 
-    private static <T extends GuildChannel> void selectList(IContext ctx, List<T> found, Consumer<T> consumer) {
+    private static <T extends GuildChannel> void selectList(IContextMongo ctx, List<T> found, Consumer<T> consumer) {
         DiscordUtils.selectListButton(ctx, found.stream().limit(5).collect(Collectors.toList()),
                 channel -> "%s%s (ID: %s)".formatted(
                         EmoteReference.BLUE_SMALL_MARKER,
@@ -358,7 +358,7 @@ public class FinderUtils {
         return genericVoiceChannelSearch(query, guild.getVoiceChannelCache());
     }
 
-    private static EmbedBuilder baseEmbed(IContext ctx, String name) {
+    private static EmbedBuilder baseEmbed(IContextMongo ctx, String name) {
         return new EmbedBuilder()
                 .setAuthor(name, null, ctx.getAuthor().getEffectiveAvatarUrl())
                 .setColor(ctx.getMember().getColor())

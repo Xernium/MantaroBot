@@ -19,8 +19,8 @@ package net.kodehawa.mantarobot.commands.action;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class ImageCmd extends TextCommand {
+public class ImageCmd extends MongoTextCommand {
     private final String toSend;
     private final WeebAPIRequester weebapi = new WeebAPIRequester();
     private final Random rand = new Random();
@@ -78,7 +78,7 @@ public class ImageCmd extends TextCommand {
     }
 
     @Override
-    protected void process(TextContext ctx) {
+    protected void process(TextContextMongo ctx) {
         final var builder = new EmbedBuilder();
         String random;
         try {

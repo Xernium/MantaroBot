@@ -17,17 +17,14 @@
 
 package net.kodehawa.mantarobot.core.command.compat;
 
-import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
-import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
-import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.*;
 
 import java.util.List;
 
-public interface Command {
+public interface Command<T extends IContextBase> {
     CommandCategory category();
     CommandPermission permission();
-    void run(IContext context, String commandName, String content);
+    void run(T context, String commandName, String content);
     HelpContent help();
     List<String> getAliases();
     default boolean isOwnerCommand() {

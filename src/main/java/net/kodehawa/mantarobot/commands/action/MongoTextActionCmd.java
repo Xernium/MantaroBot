@@ -17,20 +17,20 @@
 
 package net.kodehawa.mantarobot.commands.action;
 
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 
 import java.util.List;
 import java.util.Random;
 
-public class TextActionCmd extends TextCommand {
+public class MongoTextActionCmd extends MongoTextCommand {
     private final String format;
     private final List<String> strings;
     private final Random rand = new Random();
 
-    public TextActionCmd(String desc, String format, List<String> strings) {
+    public MongoTextActionCmd(String desc, String format, List<String> strings) {
         super.setCategory(CommandCategory.ACTION);
         super.setHelp(
                 new HelpContent.Builder()
@@ -43,7 +43,7 @@ public class TextActionCmd extends TextCommand {
     }
 
     @Override
-    protected void process(TextContext ctx) {
+    protected void process(TextContextMongo ctx) {
         ctx.send(String.format(format, strings.get(rand.nextInt(strings.size()))));
     }
 }

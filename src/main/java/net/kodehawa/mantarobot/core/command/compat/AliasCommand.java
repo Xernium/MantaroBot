@@ -17,20 +17,17 @@
 
 package net.kodehawa.mantarobot.core.command.compat;
 
-import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
-import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
-import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.*;
 
 import java.util.List;
 
-public class AliasCommand implements Command {
-    private final Command command;
+public class AliasCommand<T extends IContextBase> implements Command<T> {
+    private final Command<T> command;
     private final String commandName;
     private final String originalName;
     private final List<String> aliases;
 
-    public AliasCommand(String commandName, String originalName, Command command) {
+    public AliasCommand(String commandName, String originalName, Command<T> command) {
         this.commandName = commandName;
         this.command = command;
         this.originalName = originalName;
@@ -57,7 +54,7 @@ public class AliasCommand implements Command {
     }
 
     @Override
-    public void run(IContext context, String ignored, String content) {
+    public void run(T context, String ignored, String content) {
         command.run(context, commandName, content);
     }
 
@@ -71,7 +68,7 @@ public class AliasCommand implements Command {
         return aliases;
     }
 
-    public Command getCommand() {
+    public Command<T> getCommand() {
         return this.command;
     }
 

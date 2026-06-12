@@ -36,3 +36,4 @@ public class InteractionContext<T> extends BaseInteractionContext<GenericContext
         return event.getGuildChannel();
     }
 }
+

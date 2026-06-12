@@ -33,10 +33,10 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.ContextCommand;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
-import net.kodehawa.mantarobot.core.command.slash.InteractionContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
+import net.kodehawa.mantarobot.core.command.slash.InteractionContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.I18n;
@@ -73,14 +73,14 @@ public class InfoCmds {
     @Help(description = "Shows useful bot information.")
     public static class Information extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("support")
         @Description("Shows a link to the support server")
         @Help(description = "Shows a link to the support server")
         public static class Support extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 ctx.replyEphemeral("commands.support.info", EmoteReference.POPPER);
             }
         }
@@ -90,7 +90,7 @@ public class InfoCmds {
         @Help(description = "Shows the donation methods in case you want to support Mantaro.")
         public static class Donate extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 ctx.replyEphemeral("commands.donate.beg", EmoteReference.HEART,
                         ctx.getLanguageContext().get("commands.donate.methods")
                                 .formatted("https://patreon.com/mantaro", "https://paypal.me/kodemantaro")
@@ -110,7 +110,7 @@ public class InfoCmds {
         )
         public static class Language extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 ctx.replyEphemeral("commands.lang.info", EmoteReference.ZAP,
                         String.join(", ", I18n.LANGUAGES).replace(".json", "")
                 );
@@ -121,7 +121,7 @@ public class InfoCmds {
         @Help(description = "Shows the message the bot sends when it's added to a server.")
         public static class Welcome extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var embedBuilder = new EmbedBuilder()
                         .setThumbnail(ctx.getJDA().getSelfUser().getEffectiveAvatarUrl())
                         .setColor(Color.PINK)
@@ -153,7 +153,7 @@ public class InfoCmds {
         @Help(description = "Gives you a bot OAuth invite link and some other important links.")
         public static class Invite extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var languageContext = ctx.getLanguageContext();
 
                 ctx.replyEphemeral(new EmbedBuilder()
@@ -189,7 +189,7 @@ public class InfoCmds {
         @Help(description = "Returns information about shards.")
         public static class ShardInfo extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 StringBuilder builder = new StringBuilder();
                 Map<String, String> stats;
 
@@ -238,7 +238,7 @@ public class InfoCmds {
         @Help(description = "Returns in what shard I am.")
         public static class Shard extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 long nodeAmount;
                 try(Jedis jedis = MantaroData.getDefaultJedisPool().getResource()) {
                     nodeAmount = jedis.hlen("node-stats-" + ctx.getConfig().getClientId());
@@ -268,7 +268,7 @@ public class InfoCmds {
     })
     public static class Avatar extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var member = ctx.getOptionAsMember("user", ctx.getMember());
             var languageContext = ctx.getLanguageContext();
 
@@ -290,7 +290,7 @@ public class InfoCmds {
     @Help(description = "The hub for (user/role/server) info related commands.")
     public static class Info extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("user")
         @Description("See information about specific users.")
@@ -302,7 +302,7 @@ public class InfoCmds {
         })
         public static class UserInfo extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getOptionAsUser("user", ctx.getAuthor());
                 userInfo(ctx, user);
             }
@@ -313,7 +313,7 @@ public class InfoCmds {
         @Help(description = "See your server's current stats.")
         public static class ServerInfo extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var guild = ctx.getGuild();
                 var roles = guild.getRoles().stream()
                         .filter(role -> !guild.getPublicRole().equals(role))
@@ -365,7 +365,7 @@ public class InfoCmds {
         })
         public static class RoleInfo extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var role = ctx.getOptionAsRole("role");
                 var lang = ctx.getLanguageContext();
                 var str = """
@@ -407,13 +407,13 @@ public class InfoCmds {
     @Name("User information")
     public static class UserInfo extends ContextCommand<User> {
         @Override
-        protected void process(InteractionContext<User> ctx) {
+        protected void process(InteractionContextMongo<User> ctx) {
             var user = ctx.getTarget();
             userInfo(ctx, user);
         }
     }
 
-    private static void userInfo(IContext ctx, User user) {
+    private static void userInfo(IContextMongo ctx, User user) {
         var member = ctx.getGuild().getMember(user);
         if (member == null) {
             ctx.sendLocalized("general.slash_member_lookup_failure", EmoteReference.ERROR);

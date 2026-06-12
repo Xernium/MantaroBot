@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.commands.action;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -73,7 +73,7 @@ public class ImageCmdSlash extends SlashCommand {
     }
 
     @Override
-    protected void process(SlashContext ctx) {
+    protected void process(SlashContextMongo ctx) {
         final var builder = new EmbedBuilder();
         String random;
         try {

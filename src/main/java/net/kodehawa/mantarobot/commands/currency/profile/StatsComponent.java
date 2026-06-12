@@ -21,10 +21,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.ProfileCmd;
 import net.kodehawa.mantarobot.commands.currency.item.PlayerEquipment;
 import net.kodehawa.mantarobot.commands.currency.item.special.Potion;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
 import java.util.function.Function;
@@ -176,7 +176,7 @@ public enum StatsComponent {
         return content.apply(holder);
     }
 
-    public String getName(IContext ctx) {
+    public String getName(IContextMongo ctx) {
         return name.apply(ctx.getLanguageContext());
     }
 
@@ -188,10 +188,10 @@ public enum StatsComponent {
         private final Player player;
         private final MongoUser dbUser;
         private final I18nContext i18nContext;
-        private final IContext context;
+        private final IContextMongo context;
         private final User user;
 
-        public Holder(IContext context, I18nContext i18nContext, Player player, MongoUser dbUser, User member) {
+        public Holder(IContextMongo context, I18nContext i18nContext, Player player, MongoUser dbUser, User member) {
             this.player = player;
             this.dbUser = dbUser;
             this.i18nContext = i18nContext;
@@ -211,7 +211,7 @@ public enum StatsComponent {
             return i18nContext;
         }
 
-        public IContext getContext() {
+        public IContextMongo getContext() {
             return context;
         }
 

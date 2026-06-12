@@ -25,9 +25,7 @@ import net.kodehawa.lib.imageboards.DefaultImageBoards;
 import net.kodehawa.lib.imageboards.ImageBoard;
 import net.kodehawa.lib.imageboards.entities.impl.DanbooruImage;
 import net.kodehawa.lib.imageboards.entities.impl.FurryImage;
-import net.kodehawa.lib.imageboards.entities.impl.GelbooruImage;
 import net.kodehawa.lib.imageboards.entities.impl.KonachanImage;
-import net.kodehawa.lib.imageboards.entities.impl.Rule34Image;
 import net.kodehawa.lib.imageboards.entities.impl.SafeFurryImage;
 import net.kodehawa.lib.imageboards.entities.impl.SafebooruImage;
 import net.kodehawa.lib.imageboards.entities.impl.YandereImage;
@@ -42,7 +40,7 @@ import net.kodehawa.mantarobot.core.command.meta.NSFW;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.utils.cache.URLCache;
@@ -107,14 +105,14 @@ public class ImageCmds {
     @Category(CommandCategory.IMAGE)
     public static class Image extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
         @Name("cat")
         @Defer
         @Description("Sends a random cat image. Really cute stuff.")
         @Help(description = "Sends a random cat image. Really cute stuff, you know?")
         public static class Cat extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 try {
                     var result = weebAPIRequester.getRandomImageByType("animal_cat", false, null);
                     var url = result.url();
@@ -138,7 +136,7 @@ public class ImageCmds {
         @Help(description = "Sends a random dog image. Really cute stuff, you know?")
         public static class Dog extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 try {
                     var result = weebAPIRequester.getRandomImageByType("animal_dog", false, null);
                     var url = result.url();
@@ -170,7 +168,7 @@ public class ImageCmds {
         })
         public static class Catgirl extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 try {
                     var result = weebAPIRequester.getRandomImageByType("neko", false, null);
                     if (result == null) {
@@ -217,7 +215,7 @@ public class ImageCmds {
     })
     public static class E621 extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.isChannelNSFW()) {
                 ctx.reply("commands.imageboard.e621_nsfw_notice", EmoteReference.ERROR);
                 return;
@@ -253,7 +251,7 @@ public class ImageCmds {
     })
     public static class E926 extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             sendImage(ctx, e926, false, "e926", "safe", ctx.getOptionAsString("tags", ""),
                     ctx.getOptionAsString("excludetags", ""));
         }
@@ -294,7 +292,7 @@ public class ImageCmds {
     })
     public static class Konachan extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.isChannelNSFW()) {
                 ctx.reply("commands.imageboard.konachan_nsfw_notice", EmoteReference.ERROR);
                 return;
@@ -345,7 +343,7 @@ public class ImageCmds {
     })
     public static class Yandere extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.isChannelNSFW()) {
                 ctx.reply("commands.imageboard.yandere_nsfw_notice", EmoteReference.ERROR);
                 return;
@@ -432,7 +430,7 @@ public class ImageCmds {
     })
     public static class Safebooru extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.isChannelNSFW()) {
                 ctx.reply("commands.imageboard.konachan_nsfw_notice", EmoteReference.ERROR);
                 return;
@@ -510,7 +508,7 @@ public class ImageCmds {
     })
     public static class Danbooru extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.isChannelNSFW()) {
                 ctx.reply("commands.imageboard.konachan_nsfw_notice", EmoteReference.ERROR);
                 return;
@@ -524,7 +522,7 @@ public class ImageCmds {
         }
     }
 
-    private static void sendImage(SlashContext ctx, ImageBoard<?> image,
+    private static void sendImage(SlashContextMongo ctx, ImageBoard<?> image,
                                   boolean nsfwOnly, String name, String rating, String tags, String excludeTags) {
         if (tags.isEmpty() && excludeTags.isEmpty()) {
             getImage(image, ImageRequestType.RANDOM, nsfwOnly, name, rating, tags, excludeTags, ctx);

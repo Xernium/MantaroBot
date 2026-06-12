@@ -35,23 +35,23 @@ import net.kodehawa.mantarobot.commands.currency.pets.HousePetType;
 import net.kodehawa.mantarobot.commands.currency.pets.PetChoice;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Defer;
 import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.Marriage;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.RandomCollection;
 import net.kodehawa.mantarobot.utils.commands.campaign.Campaign;
@@ -111,9 +111,9 @@ public class CurrencyActionCmds {
         cr.registerSlash(Chop.class);
 
         // Text
-        cr.register(MineText.class);
-        cr.register(FishText.class);
-        cr.register(ChopText.class);
+        cr.register(MineMongoText.class);
+        cr.register(FishMongoText.class);
+        cr.register(ChopMongoText.class);
     }
 
     @Name("mine")
@@ -126,7 +126,7 @@ public class CurrencyActionCmds {
             """)
     public static class Mine extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -145,7 +145,7 @@ public class CurrencyActionCmds {
             """)
     public static class Fish extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -164,7 +164,7 @@ public class CurrencyActionCmds {
             """)
     public static class Chop extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -180,9 +180,9 @@ public class CurrencyActionCmds {
             `/mine` - Mines. You can gain minerals or mineral fragments by mining.
             This can used later on to cast rods or picks for better chances.
             """)
-    public static class MineText extends TextCommand {
+    public static class MineMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -198,9 +198,9 @@ public class CurrencyActionCmds {
             `/fish` - Starts fishing.
             This can used later on to cast rods or picks for better chances.
             """)
-    public static class FishText extends TextCommand {
+    public static class FishMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -216,9 +216,9 @@ public class CurrencyActionCmds {
             `/chop` - Starts chopping trees.
             You can gain credits and items by chopping, which can be used later on for casting, specially tools.
             """)
-    public static class ChopText extends TextCommand {
+    public static class ChopMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var player = ctx.getPlayer();
             final var dbUser = ctx.getDBUser();
             final var marriage = ctx.getMarriage(dbUser);
@@ -227,7 +227,7 @@ public class CurrencyActionCmds {
         }
     }
 
-    private static void mine(IContext ctx, Player player, MongoUser dbUser, Marriage marriage) {
+    private static void mine(IContextMongo ctx, Player player, MongoUser dbUser, Marriage marriage) {
         final var languageContext = ctx.getLanguageContext();
         final var equipped = dbUser.getEquippedItems().of(PlayerEquipment.EquipmentType.PICK);
 
@@ -456,7 +456,7 @@ public class CurrencyActionCmds {
         ctx.sendStripped(message);
     }
 
-    private static void fish(IContext ctx, Player player, MongoUser dbUser, Marriage marriage) {
+    private static void fish(IContextMongo ctx, Player player, MongoUser dbUser, Marriage marriage) {
         final var languageContext = ctx.getLanguageContext();
         FishRod item;
         var equipped = dbUser.getEquippedItems().of(PlayerEquipment.EquipmentType.ROD);
@@ -691,7 +691,7 @@ public class CurrencyActionCmds {
         }
     }
 
-    private static void chop(IContext ctx, Player player, MongoUser dbUser, Marriage marriage) {
+    private static void chop(IContextMongo ctx, Player player, MongoUser dbUser, Marriage marriage) {
         final var languageContext = ctx.getLanguageContext();
         var extraMessage = "\n";
         var equipped = dbUser.getEquippedItems().of(PlayerEquipment.EquipmentType.AXE);

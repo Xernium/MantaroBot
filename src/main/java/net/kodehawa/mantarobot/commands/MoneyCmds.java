@@ -25,8 +25,8 @@ import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.item.ItemStack;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Defer;
@@ -34,13 +34,13 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.CustomFinderUtil;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -86,9 +86,9 @@ public class MoneyCmds {
         cr.registerSlash(Loot.class);
         cr.registerSlash(Balance.class);
 
-        cr.register(DailyText.class);
-        cr.register(LootText.class);
-        cr.register(BalanceText.class);
+        cr.register(DailyMongoText.class);
+        cr.register(LootMongoText.class);
+        cr.register(BalanceMongoText.class);
     }
 
     @Name("daily")
@@ -112,7 +112,7 @@ public class MoneyCmds {
     )
     public static class Daily extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             daily(ctx, ctx.getOptionAsUser("user"), ctx.getOptionAsBoolean("check"));
         }
     }
@@ -127,7 +127,7 @@ public class MoneyCmds {
     )
     public static class Loot extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             loot(ctx);
         }
     }
@@ -145,7 +145,7 @@ public class MoneyCmds {
     )
     public static class Balance extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             balance(ctx, ctx.getOptionAsUser("user"));
         }
     }
@@ -165,9 +165,9 @@ public class MoneyCmds {
                 @Help.Parameter(name = "-check", description = "Check the time left for you to be able to claim it.", optional = true)
             }
     )
-    public static class DailyText extends TextCommand {
+    public static class DailyMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             final var mentionedUsers = ctx.getMentionedUsers();
             final boolean targetOther = !mentionedUsers.isEmpty();
             User toGive = null;
@@ -185,9 +185,9 @@ public class MoneyCmds {
     @Name("loot")
     @Category(CommandCategory.CURRENCY)
     @Help(description = "Loot the current chat for items, for usage in Mantaro's currency system. You have a random chance of getting collectible items from here.")
-    public static class LootText extends TextCommand {
+    public static class LootMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             loot(ctx);
         }
     }
@@ -201,9 +201,9 @@ public class MoneyCmds {
             usage = "`~>balance [user]`",
             parameters = { @Help.Parameter(name = "user", description = "The user to check the balance of. This is optional.", optional = true)}
     )
-    public static class BalanceText extends TextCommand {
+    public static class BalanceMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var content = ctx.takeAllString();
             ctx.findMember(content, members -> {
                 var user = ctx.getAuthor();
@@ -223,7 +223,7 @@ public class MoneyCmds {
     }
     // Old command system end
 
-    private static void daily(IContext ctx, User toGive, boolean check) {
+    private static void daily(IContextMongo ctx, User toGive, boolean check) {
         final var languageContext = ctx.getLanguageContext();
         if (check) {
             long rl = dailyRateLimiter.getRemaniningCooldown(ctx.getAuthor());
@@ -413,7 +413,7 @@ public class MoneyCmds {
         var toSend = new StringBuilder();
         if (targetOther) {
             toSend.append(languageContext.get("commands.daily.given_credits")
-                            .formatted(EmoteReference.CORRECT, dailyMoney, ((ctx instanceof SlashContext) ? otherUser.getAsMention() : otherUser.getName()))
+                            .formatted(EmoteReference.CORRECT, dailyMoney, ((ctx instanceof SlashContextMongo) ? otherUser.getAsMention() : otherUser.getName()))
             ).append("\n");
         } else {
             toSend.append(languageContext.get("commands.daily.credits").formatted(EmoteReference.CORRECT, dailyMoney)).append("\n");
@@ -427,7 +427,7 @@ public class MoneyCmds {
         ctx.send(toSend.toString());
     }
 
-    private static void loot(IContext ctx) {
+    private static void loot(IContextMongo ctx) {
         var player = ctx.getPlayer();
         var dbUser = ctx.getDBUser();
         var languageContext = ctx.getLanguageContext();
@@ -519,7 +519,7 @@ public class MoneyCmds {
         player.updateAllChanged();
     }
 
-    private static void balance(IContext ctx, User toCheck) {
+    private static void balance(IContextMongo ctx, User toCheck) {
         var languageContext = ctx.getLanguageContext();
         var user = ctx.getAuthor();
         boolean isExternal = false;

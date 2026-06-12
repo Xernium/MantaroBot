@@ -30,7 +30,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -79,7 +79,7 @@ public class FunCmds {
             })
     public static class CoinFlip extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var times = ctx.getOptionAsInteger("times", 1);
             final int[] heads = {0};
             final int[] tails = {0};
@@ -104,7 +104,7 @@ public class FunCmds {
     })
     public static class RateWaifu extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var user = ctx.getOptionAsUser("user");
             if (user == null) {
                 ctx.reply("general.slash_member_lookup_failure", EmoteReference.ERROR);
@@ -142,7 +142,7 @@ public class FunCmds {
     )
     public static class Roll extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(rollRateLimiter, ctx)) {
                 return;
             }
@@ -216,7 +216,7 @@ public class FunCmds {
     })
     public static class Love extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var user = ctx.getOptionAsUser("user");
             if (user == null) {
                 ctx.reply("general.slash_member_lookup_failure", EmoteReference.ERROR);

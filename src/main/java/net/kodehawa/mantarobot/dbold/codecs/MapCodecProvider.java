@@ -1,4 +1,4 @@
-package net.kodehawa.mantarobot.db.codecs;
+package net.kodehawa.mantarobot.dbold.codecs;
 
 import org.bson.codecs.Codec;
 import org.bson.codecs.pojo.PropertyCodecProvider;

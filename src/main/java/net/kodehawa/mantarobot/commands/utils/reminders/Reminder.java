@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.commands.utils.reminders;
 
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
+import net.kodehawa.mantarobot.dbold.ManagedDatabase;
 import org.json.JSONObject;
 import io.valkey.JedisPool;
 

@@ -17,7 +17,7 @@
 
 package net.kodehawa.mantarobot.options.core;
 
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class Option {
     private final String description;
     private final String optionName;
     private final OptionType type;
-    private BiConsumer<TextContext, String[]> eventConsumer;
+    private BiConsumer<TextContextMongo, String[]> eventConsumer;
 
     public Option(String displayName, String description, OptionType type) {
         this.optionName = displayName;
@@ -79,12 +79,12 @@ public class Option {
         return this;
     }
 
-    public Option setAction(Consumer<TextContext> code) {
+    public Option setAction(Consumer<TextContextMongo> code) {
         eventConsumer = (event, ignored) -> code.accept(event);
         return this;
     }
 
-    public Option setAction(BiConsumer<TextContext, String[]> code) {
+    public Option setAction(BiConsumer<TextContextMongo, String[]> code) {
         eventConsumer = code;
         return this;
     }
@@ -101,7 +101,7 @@ public class Option {
         return this.type;
     }
 
-    public BiConsumer<TextContext, String[]> getEventConsumer() {
+    public BiConsumer<TextContextMongo, String[]> getEventConsumer() {
         return this.eventConsumer;
     }
 }

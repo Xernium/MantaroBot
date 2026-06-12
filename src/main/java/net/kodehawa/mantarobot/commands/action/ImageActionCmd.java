@@ -20,8 +20,8 @@ package net.kodehawa.mantarobot.commands.action;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -37,7 +37,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class ImageActionCmd extends TextCommand {
+public class ImageActionCmd extends MongoTextCommand {
     private final String format;
     private final String lonelyLine;
     private final Random rand = new Random();
@@ -101,7 +101,7 @@ public class ImageActionCmd extends TextCommand {
     }
 
     @Override
-    protected void process(TextContext ctx) {
+    protected void process(TextContextMongo ctx) {
         if (!RatelimitUtils.ratelimit(rateLimiter, ctx, null)) {
             return;
         }
@@ -210,11 +210,11 @@ public class ImageActionCmd extends TextCommand {
         }
     }
 
-    private boolean isMentioningBot(TextContext ctx) {
+    private boolean isMentioningBot(TextContextMongo ctx) {
         return ctx.getMentionedUsers().stream().anyMatch(user -> user.getIdLong() == ctx.getSelfUser().getIdLong());
     }
 
-    private boolean isLonely(TextContext ctx) {
+    private boolean isLonely(TextContextMongo ctx) {
         return ctx.getMentionedUsers().stream().anyMatch(user -> user.getId().equals(ctx.getAuthor().getId()));
     }
 

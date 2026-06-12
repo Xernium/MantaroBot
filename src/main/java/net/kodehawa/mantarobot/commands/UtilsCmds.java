@@ -26,8 +26,8 @@ import net.dv8tion.jda.api.utils.SplitUtil;
 import net.kodehawa.mantarobot.commands.utils.reminders.Reminder;
 import net.kodehawa.mantarobot.commands.utils.reminders.ReminderObject;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Defer;
 import net.kodehawa.mantarobot.core.command.meta.Description;
@@ -36,7 +36,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
@@ -73,7 +73,7 @@ public class UtilsCmds {
     @Help(description = "The hub for reminder related commands. Check subcommand help for more help.")
     public static class RemindMe extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Description("Adds a reminder.")
         @Defer
@@ -88,7 +88,7 @@ public class UtilsCmds {
         })
         public static class Add extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 long time = 0;
                 final var maybeTime = ctx.getOptionAsString("time");
                 final var matchTime = rawTimePattern.matcher(maybeTime).matches();
@@ -150,7 +150,7 @@ public class UtilsCmds {
         @Description("Cancels a reminder.")
         public static class Cancel extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 try {
                     var reminders = ctx.getDBUser().getReminders();
                     if (reminders.isEmpty()) {
@@ -187,7 +187,7 @@ public class UtilsCmds {
         @Description("Lists your reminders")
         public static class ListReminders extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var reminders = ctx.getDBUser().getReminders();
                 var rms = getReminders(reminders).stream()
                         .sorted(Comparator.comparingLong(ReminderObject::getScheduledAtMillis)).toList();
@@ -233,7 +233,7 @@ public class UtilsCmds {
         final Pattern offsetRegex = Pattern.compile("(?:UTC|GMT)[+-][0-9]{1,2}(:[0-9]{1,2})?", Pattern.CASE_INSENSITIVE);
 
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var user = ctx.getOptionAsUser("user");
             var timezone = ctx.getOptionAsString("timezone", "");
             if (offsetRegex.matcher(timezone).matches()) {
@@ -291,99 +291,99 @@ public class UtilsCmds {
 
     @Category(CommandCategory.UTILS)
     @Description("Shows a bunch of things related to Mantaro's wiki.")
-    public static class Wiki extends TextCommand {
+    public static class Wiki extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             ctx.send(EmoteReference.OK + "**For Mantaro's documentation please visit:** https://www.mantaro.site/mantaro-wiki");
         }
 
-        public static class Opts extends TextCommand {
+        public static class Opts extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's documentation on `~>opts` and general bot options please visit:** https://www.mantaro.site/mantaro-wiki/basics/server-configuration");
             }
         }
 
-        public static class Custom extends TextCommand {
+        public static class Custom extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's documentation on custom commands please visit:** https://www.mantaro.site/mantaro-wiki/guides/custom-commands");
             }
         }
 
-        public static class Modifiers extends TextCommand {
+        public static class Modifiers extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's documentation in custom commands modifiers please visit:** https://www.mantaro.site/mantaro-wiki/guides/modifiers");
             }
         }
 
-        public static class Commands extends TextCommand {
+        public static class Commands extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's documentation on commands and usage please visit:** https://www.mantaro.site/mantaro-wiki/commands/permissions and navigate the pages in the section.");
             }
         }
 
-        public static class Faq extends TextCommand {
+        public static class Faq extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's FAQ please visit:** https://www.mantaro.site/mantaro-wiki/basics/FAQ");
             }
         }
 
-        public static class Badges extends TextCommand {
+        public static class Badges extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's badge documentation please visit:** https://www.mantaro.site/mantaro-wiki/currency/badges");
             }
         }
 
-        public static class Tos extends TextCommand {
+        public static class Tos extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's ToS please visit:** https://www.mantaro.site/mantaro-wiki/legal/terms-of-service");
             }
         }
 
-        public static class UserMessage extends TextCommand {
+        public static class UserMessage extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For Mantaro's Welcome and Leave message tutorial please visit:** https://www.mantaro.site/mantaro-wiki/guides/welcome-and-leave-messages");
             }
         }
 
-        public static class Premium extends TextCommand {
+        public static class Premium extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**To see what Mantaro's Premium features offer please visit:** https://www.mantaro.site/mantaro-wiki/basics/premium-perks");
             }
         }
 
-        public static class Currency extends TextCommand {
+        public static class Currency extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For a Currency guide, please visit:** https://www.mantaro.site/mantaro-wiki/currency/101");
             }
         }
 
-        public static class Items extends TextCommand {
+        public static class Items extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For a list of items, please visit:** https://www.mantaro.site/mantaro-wiki/currency/items");
             }
         }
 
-        public static class Overview extends TextCommand {
+        public static class Overview extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For a feature overview, check:** https://mantaro.site/features.html");
             }
         }
 
-        public static class Birthday extends TextCommand {
+        public static class Birthday extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 ctx.send(EmoteReference.OK + "**For a guide on the birthday system, please visit:** https://www.mantaro.site/mantaro-wiki/guides/birthday-announcer");
             }
         }

@@ -32,10 +32,10 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
 import net.kodehawa.mantarobot.utils.StringUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
@@ -77,7 +77,7 @@ public class BirthdayCmd {
     @Category(CommandCategory.UTILS)
     public static class Birthday extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("set")
         @Description("Sets your birthday date. Only useful if the server has enabled this functionality.")
@@ -91,7 +91,7 @@ public class BirthdayCmd {
         )
         public static class Set extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 // Twice. Yep.
                 var parseFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 var displayFormat = DateTimeFormatter.ofPattern("dd-MM");
@@ -148,7 +148,7 @@ public class BirthdayCmd {
         @Help(description = "Allows the server where you send this command to announce your birthday.")
         public static class AllowServer extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbGuild = ctx.getDBGuild();
                 var author = ctx.getAuthor();
                 if (dbGuild.getAllowedBirthdays().contains(author.getId())) {
@@ -174,7 +174,7 @@ public class BirthdayCmd {
         @Help(description = "Denies the server where you send this command from announcing your birthday.")
         public static class RemoveServer extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbGuild = ctx.getDBGuild();
                 var author = ctx.getAuthor();
                 if (!dbGuild.getAllowedBirthdays().contains(author.getId())) {
@@ -199,7 +199,7 @@ public class BirthdayCmd {
         @Help(description = "Removes your set birthday date.")
         public static class Remove extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getDBUser();
                 user.birthday(null);
                 user.updateAllChanged();
@@ -214,7 +214,7 @@ public class BirthdayCmd {
         @Help(description = "Gives all of the birthdays for this server.")
         public static class List extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 BirthdayCacher cacher = MantaroBot.getInstance().getBirthdayCacher();
                 try {
                     if (cacher != null) {
@@ -266,7 +266,7 @@ public class BirthdayCmd {
         @Help(description = "Checks the current birthday date for the specified month. Example: `/birthday month 1`")
         public static class Month extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var cacher = MantaroBot.getInstance().getBirthdayCacher();
                 var calendar = Calendar.getInstance();
                 long month = calendar.get(Calendar.MONTH);
@@ -322,7 +322,7 @@ public class BirthdayCmd {
         }
     }
 
-    private static void sendBirthdayList(SlashContext ctx, List<Member> members, Map<Long, BirthdayCacher.BirthdayData> guildCurrentBirthdays,
+    private static void sendBirthdayList(SlashContextMongo ctx, List<Member> members, Map<Long, BirthdayCacher.BirthdayData> guildCurrentBirthdays,
                                          Calendar calendar, boolean month) {
         StringBuilder builder = new StringBuilder();
         var languageContext = ctx.getLanguageContext();

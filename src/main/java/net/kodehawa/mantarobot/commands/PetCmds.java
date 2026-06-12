@@ -34,14 +34,14 @@ import net.kodehawa.mantarobot.core.CommandRegistry;
 import net.kodehawa.mantarobot.core.command.meta.*;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.Marriage;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.Pair;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -123,17 +123,17 @@ public class PetCmds {
                 """)
     public static class Pet extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> RatelimitUtils.ratelimit(rl, ctx, false);
         }
 
         @Description("Shows an explanation about the pet system.")
         public static class Explanation extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 ctx.sendLocalized("commands.pet.explanation");
             }
         }
@@ -142,7 +142,7 @@ public class PetCmds {
         @Description("Lists the available pet types.")
         public static class PetList extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var pets = Arrays
                         .stream(HousePetType.values())
                         .sorted(Comparator.comparingLong(HousePetType::getCost))
@@ -173,7 +173,7 @@ public class PetCmds {
         }))
         public static class Choice extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var choice = Utils.lookupEnumString(ctx.getOptionAsString("type"), PetChoice.class);
                 if (choice == null) {
                     ctx.reply("commands.pet.choice.invalid_choice", EmoteReference.ERROR);
@@ -199,7 +199,7 @@ public class PetCmds {
         @Description("Shows the level and experience of your current pet.")
         public static class Level extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
                 var pet = getCurrentPet(ctx, ctx.getPlayer(), marriage, "commands.pet.level.no_pet");
@@ -219,7 +219,7 @@ public class PetCmds {
         })
         public static class Status extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var language = ctx.getLanguageContext();
                 var user = ctx.getOptionAsUser("user", ctx.getAuthor());
 
@@ -312,7 +312,7 @@ public class PetCmds {
         @Description("Check thirst, hunger and dust of your current pet.")
         public static class Check extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
                 var player = ctx.getPlayer();
@@ -334,7 +334,7 @@ public class PetCmds {
         @Description("Pets your pet. Cute.")
         public static class PetPet extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var player = ctx.getPlayer();
                 var marriage = dbUser.getMarriage();
@@ -371,7 +371,7 @@ public class PetCmds {
             final SecureRandom random = new SecureRandom();
 
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var player = ctx.getPlayer();
                 var marriage = dbUser.getMarriage();
@@ -433,7 +433,7 @@ public class PetCmds {
             static final int basePrice = 600;
 
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -476,7 +476,7 @@ public class PetCmds {
         @Description("Sells this pet. This will *reset all pet stats*. Just like buying a new tamagotchi.")
         public static class Sell extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
                 var player = ctx.getPlayer();
@@ -623,7 +623,7 @@ public class PetCmds {
         })
         public static class Buy extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -828,7 +828,7 @@ public class PetCmds {
         @Options(@Options.Option(type = OptionType.STRING, name = "name", description = "The new name.", required = true))
         public static class Rename extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -888,7 +888,7 @@ public class PetCmds {
         })
         public static class Feed extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var food = ctx.getOptionAsString("item");
@@ -986,7 +986,7 @@ public class PetCmds {
         })
         public static class Hydrate extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var dbUser = ctx.getDBUser();
                 var marriage = dbUser.getMarriage();
@@ -1069,7 +1069,7 @@ public class PetCmds {
         ))
         public static class Info extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var lookup = HousePetType.lookupFromString(ctx.getOptionAsString("type"));
                 if (lookup == null) {
                     ctx.reply("commands.pet.info.not_found", EmoteReference.ERROR);
@@ -1126,7 +1126,7 @@ public class PetCmds {
         }
     }
 
-    private static HousePet getCurrentPet(SlashContext ctx) {
+    private static HousePet getCurrentPet(SlashContextMongo ctx) {
         final var playerData = ctx.getPlayer();
         final var marriage = ctx.getMarriage(ctx.getDBUser());
 
@@ -1155,7 +1155,7 @@ public class PetCmds {
         }
     }
 
-    private static HousePet getCurrentPet(SlashContext ctx, Player player, Marriage marriage, String missing) {
+    private static HousePet getCurrentPet(SlashContextMongo ctx, Player player, Marriage marriage, String missing) {
         final var petChoice = player.getActivePetChoice(marriage);
         final var languageContext = ctx.getLanguageContext();
 

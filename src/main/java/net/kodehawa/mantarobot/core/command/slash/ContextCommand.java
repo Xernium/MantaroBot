@@ -21,25 +21,25 @@ import net.kodehawa.mantarobot.MantaroBot;
 
 import java.util.function.Predicate;
 
-public abstract class ContextCommand<T> extends DeferrableCommand<InteractionContext<T>> {
-    private Predicate<InteractionContext<T>> predicate = c -> true;
+public abstract class ContextCommand<T> extends DeferrableCommand<InteractionContextMongo<T>> {
+    private Predicate<InteractionContextMongo<T>> predicate = c -> true;
 
     public ContextCommand() {
         super();
     }
 
     @SuppressWarnings("unused")
-    public void setPredicate(Predicate<InteractionContext<T>> predicate) {
+    public void setPredicate(Predicate<InteractionContextMongo<T>> predicate) {
         this.predicate = predicate;
     }
 
     // This is to be overriden.
-    public Predicate<InteractionContext<T>> getPredicate() {
+    public Predicate<InteractionContextMongo<T>> getPredicate() {
         return predicate;
     }
 
     @Override
-    public final void execute(InteractionContext<T> ctx) {
+    public final void execute(InteractionContextMongo<T> ctx) {
         // If this is over 2500ms, we should attempt to defer instead, as discord might be lagging.
         var averageLatencyMax = MantaroBot.getInstance().getCore().getRestPing() * 4;
         if (!getPredicate().test(ctx)) {

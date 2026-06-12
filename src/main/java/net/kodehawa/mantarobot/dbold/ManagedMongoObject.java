@@ -1,4 +1,4 @@
-package net.kodehawa.mantarobot.db;
+package net.kodehawa.mantarobot.dbold;
 
 import net.kodehawa.mantarobot.data.MantaroData;
 import org.bson.codecs.pojo.annotations.BsonIgnore;

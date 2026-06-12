@@ -38,7 +38,7 @@ import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.InteractiveOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
@@ -96,7 +96,7 @@ public class PlayerCmds {
     )
     public static class Reputation extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var rl = repRatelimiter.getRemaniningCooldown(ctx.getAuthor());
             var lang = ctx.getLanguageContext();
 
@@ -187,7 +187,7 @@ public class PlayerCmds {
     )
     public static class Equip extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var content = ctx.getOptionAsString("item");
             var item = ItemHelper.fromAnyNoId(content.replace("\"", ""), ctx.getLanguageContext())
                     .orElse(null);
@@ -263,7 +263,7 @@ public class PlayerCmds {
     )
     public static class Unequip extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var content = ctx.getOptionAsString("item");
             var dbUser = ctx.getDBUser();
             var equipment = dbUser.getEquippedItems();
@@ -358,7 +358,7 @@ public class PlayerCmds {
     @Category(CommandCategory.CURRENCY)
     public static class Badges extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Description("Show your badge list, or someone else's badge list.")
         @Category(CommandCategory.CURRENCY)
@@ -376,7 +376,7 @@ public class PlayerCmds {
         public static class Show extends SlashCommand {
             final Random r = new Random();
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var toLookup = ctx.getOptionAsUser("user", ctx.getAuthor());
                 var member = ctx.getGuild().getMember(toLookup);
                 var player = ctx.getPlayer(toLookup);
@@ -436,7 +436,7 @@ public class PlayerCmds {
         )
         public static class DisplayBadge extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var player = ctx.getPlayer();
                 var badgeString = ctx.getOptionAsString("badge", "");
                 var badge = Badge.lookupFromString(badgeString);
@@ -489,7 +489,7 @@ public class PlayerCmds {
         @Category(CommandCategory.CURRENCY)
         public static class ListBadges extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var badges = Badge.values();
                 var lang = ctx.getLanguageContext();
                 var builder = new EmbedBuilder()
@@ -524,7 +524,7 @@ public class PlayerCmds {
         })
         public static class Info extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var content = ctx.getOptionAsString("badge");
                 var badge = Badge.lookupFromString(content);
                 if (badge == null || badge == Badge.DJ) {

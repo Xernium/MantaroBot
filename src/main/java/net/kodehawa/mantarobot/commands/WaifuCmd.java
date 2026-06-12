@@ -34,13 +34,13 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
@@ -87,7 +87,7 @@ public class WaifuCmd {
     @Description("Several waifu-related commands.")
     public static class WaifuCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             // IMPLEMENTATION NOTES FOR THE WAIFU SYSTEM
             // You get 3 free slots to put "waifus" in.
             // Each extra slot (up to 9) costs exponentially more than the last one (2x more than the costs of the last one)
@@ -109,7 +109,7 @@ public class WaifuCmd {
         }
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> RatelimitUtils.ratelimit(waifuRatelimiter, ctx, false);
         }
 
@@ -123,7 +123,7 @@ public class WaifuCmd {
         })
         public static class ListCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 // Default call will bring out the waifu list.
                 final var dbUser = ctx.getDBUser();
                 final var player = ctx.getPlayer();
@@ -204,7 +204,7 @@ public class WaifuCmd {
         @Options({@Options.Option(type = OptionType.BOOLEAN, name = "remove", description = "Remove claimlock.")})
         public static class ClaimLock extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 if (ctx.getOptionAsBoolean("remove")) {
                     player.claimLocked(false);
@@ -240,7 +240,7 @@ public class WaifuCmd {
         @Description("Opt-out of the waifu stuff. This will disable the waifu system permanently.")
         public static class OptOut extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 if (player.isWaifuout()) {
                     ctx.reply("commands.waifu.optout.notice", EmoteReference.ERROR);
@@ -286,7 +286,7 @@ public class WaifuCmd {
         })
         public static class Claim extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 if (player.isWaifuout()) {
                     ctx.reply("commands.waifu.optout.notice", EmoteReference.ERROR);
@@ -397,7 +397,7 @@ public class WaifuCmd {
         })
         public static class Unclaim extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 if (player.isWaifuout()) {
                     ctx.reply("commands.waifu.optout.notice", EmoteReference.ERROR);
@@ -473,7 +473,7 @@ public class WaifuCmd {
         @Description("Buys a new waifu slot. Maximum slots are 30, costs get increasingly higher.")
         public static class BuySlot extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var baseValue = 3000;
                 final var user = ctx.getDBUser();
                 final var player = ctx.getPlayer();
@@ -520,7 +520,7 @@ public class WaifuCmd {
         })
         public static class Stats extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 final var lang = ctx.getLanguageContext();
 

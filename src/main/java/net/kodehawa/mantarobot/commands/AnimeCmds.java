@@ -33,7 +33,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
@@ -71,7 +71,7 @@ public class AnimeCmds {
     })
     public static class Anime extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             try {
                 var name = ctx.getOptionAsString("name");
                 if (name.isEmpty()) {
@@ -140,7 +140,7 @@ public class AnimeCmds {
     })
     public static class Character extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             try {
                 var name = ctx.getOptionAsString("name");
                 if (name.isEmpty()) {
@@ -195,7 +195,7 @@ public class AnimeCmds {
         }
     }
 
-    private static void animeData(SlashContext ctx, I18nContext lang, AnimeData animeData) {
+    private static void animeData(SlashContextMongo ctx, I18nContext lang, AnimeData animeData) {
         try {
             final var attributes = animeData.getAttributes();
             final var title = attributes.getCanonicalTitle();
@@ -252,7 +252,7 @@ public class AnimeCmds {
         }
     }
 
-    private static void characterData(SlashContext ctx, I18nContext lang, CharacterData character) {
+    private static void characterData(SlashContextMongo ctx, I18nContext lang, CharacterData character) {
         final var attributes = character.getAttributes();
 
         final var japName = attributes.getNames().getJa_jp();

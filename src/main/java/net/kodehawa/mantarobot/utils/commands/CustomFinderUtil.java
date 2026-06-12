@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 import net.dv8tion.jda.internal.utils.concurrent.task.GatewayTask;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.utils.Utils;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class CustomFinderUtil {
      * @param result The result of Guild#retrieveMembersByPrefix
      * @return The member found. Returns null if nothing was found.
      */
-    public static Member findMember(String query, List<Member> result, TextContext ctx) {
+    public static Member findMember(String query, List<Member> result, TextContextMongo ctx) {
         // This is technically a safeguard, shouldn't be needed, but since we handle no results by giving this an empty list, it should be done.
         // If you want to handle it differently, there's findMemberDefault to return a default member.
         var lang = ctx.getLanguageContext();
@@ -165,7 +165,7 @@ public class CustomFinderUtil {
         return found;
     }
 
-    public static Member findMemberDefault(String query, List<Member> result, TextContext ctx, Member member) {
+    public static Member findMemberDefault(String query, List<Member> result, TextContextMongo ctx, Member member) {
         if (query.isEmpty()) {
             return member;
         } else {
@@ -174,7 +174,7 @@ public class CustomFinderUtil {
     }
 
     // This whole thing is hacky as FUCK
-    public static Task<List<Member>> lookupMember(Guild guild, TextContext context, String query) {
+    public static Task<List<Member>> lookupMember(Guild guild, TextContextMongo context, String query) {
         if (query.trim().isEmpty()) {
             // This is next-level hacky, LMAO.
             // Basically we handle giving an empty value to this, and just return an empty list in that case.

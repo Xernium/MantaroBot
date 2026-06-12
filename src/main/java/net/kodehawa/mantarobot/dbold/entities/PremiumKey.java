@@ -15,11 +15,11 @@
  *
  */
 
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.dbold.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Pair;
 import org.bson.codecs.pojo.annotations.BsonId;

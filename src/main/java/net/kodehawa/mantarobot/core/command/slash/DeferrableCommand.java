@@ -1,12 +1,13 @@
 package net.kodehawa.mantarobot.core.command.slash;
 
 import net.kodehawa.mantarobot.core.command.helpers.AnnotatedCommand;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextBase;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Defer;
 import net.kodehawa.mantarobot.core.command.meta.Ephemeral;
 import net.kodehawa.mantarobot.core.command.meta.ModalInteraction;
 
-public abstract class DeferrableCommand<T extends IContext> extends AnnotatedCommand<T> {
+public abstract class DeferrableCommand<T extends IContextBase> extends AnnotatedCommand<T> {
     protected boolean defer;
     protected boolean ephemeral;
     protected final boolean modal;

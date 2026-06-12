@@ -29,7 +29,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.modals.Modal;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.item.ItemHelper;
@@ -47,10 +46,10 @@ import net.kodehawa.mantarobot.core.command.meta.ModalInteraction;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.ContextCommand;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
-import net.kodehawa.mantarobot.core.command.slash.InteractionContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
+import net.kodehawa.mantarobot.core.command.slash.InteractionContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ModalOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.ModalOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
@@ -137,7 +136,7 @@ public class ProfileCmd {
                     """)
     public static class Profile extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Description("Shows your current profile.")
         @Options({@Options.Option(type = OptionType.USER, name = "user", description = "The user to see the profile of.")})
@@ -149,7 +148,7 @@ public class ProfileCmd {
 
         public static class Show extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var userLooked = ctx.getOptionAsUser("user", ctx.getAuthor());
 
                 if (userLooked.isBot()) {
@@ -164,7 +163,7 @@ public class ProfileCmd {
         @Description("Toggles the ability to do action commands to you.")
         public static class ToggleAction extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var dbUser = ctx.getDBUser();
                 final var isDisabled = dbUser.isActionsDisabled();
 
@@ -183,7 +182,7 @@ public class ProfileCmd {
         @Description("Toggles the display of legacy credits.")
         public static class ToggleLegacy extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var player = ctx.getPlayer();
                 var toSet = !player.isHiddenLegacy();
                 player.hiddenLegacy(toSet);
@@ -202,7 +201,7 @@ public class ProfileCmd {
         )
         public static class AutoEquip extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getDBUser();
 
                 if (ctx.getOptionAsBoolean("disable")) {
@@ -223,7 +222,7 @@ public class ProfileCmd {
         @Description("Hide or show the member id/tag from profile/waifu ls.")
         public static class HideTag extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getDBUser();
 
                 user.privateTag(!user.isPrivateTag());
@@ -242,7 +241,7 @@ public class ProfileCmd {
         )
         public static class Timezone extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var timezone = ctx.getOptionAsString("timezone");
                 if (offsetRegex.matcher(timezone).matches()) {
@@ -293,7 +292,7 @@ public class ProfileCmd {
         )
         public static class Language extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbUser = ctx.getDBUser();
                 var content = ctx.getOptionAsString("lang");
                 if (content.equalsIgnoreCase("reset")) {
@@ -327,7 +326,7 @@ public class ProfileCmd {
         )
         public static class DescriptionCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 if (!RatelimitUtils.ratelimit(profileRatelimiter, ctx)) {
                     return;
                 }
@@ -437,7 +436,7 @@ public class ProfileCmd {
         )
         public static class Stats extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var toLookup = ctx.getOptionAsUser("user", ctx.getAuthor());
                 var lang = ctx.getLanguageContext();
                 if (toLookup.isBot()) {
@@ -477,7 +476,7 @@ public class ProfileCmd {
         })
         public static class Widgets extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getDBUser();
                 var lang = ctx.getLanguageContext();
 
@@ -542,7 +541,7 @@ public class ProfileCmd {
     @Name("Show currency profile")
     public static class ProfileContext extends ContextCommand<User> {
         @Override
-        protected void process(InteractionContext<User> ctx) {
+        protected void process(InteractionContextMongo<User> ctx) {
             var userLooked = ctx.getTarget();
             if (userLooked.isBot()) {
                 ctx.reply("commands.profile.bot_notice", EmoteReference.ERROR);
@@ -559,7 +558,7 @@ public class ProfileCmd {
         }
     }
 
-    private static MessageEmbed buildProfile(IContext ctx, User userLooked) {
+    private static MessageEmbed buildProfile(IContextMongo ctx, User userLooked) {
         final var memberLooked = ctx.getGuild().getMember(userLooked);
         final var player = ctx.getPlayer(userLooked);
         final var dbUser = ctx.getDBUser(userLooked);

@@ -13,12 +13,10 @@ import net.dv8tion.jda.api.modals.Modal;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextBase;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.UtilsContext;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RateLimitContext;
@@ -29,8 +27,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 
 @SuppressWarnings("unused")
-public abstract class BaseInteractionContext<T extends GenericCommandInteractionEvent> implements IContext {
-    protected final ManagedDatabase managedDatabase = MantaroData.db();
+public abstract class BaseInteractionContext<T extends GenericCommandInteractionEvent> implements IContextBase {
     protected final Config config = MantaroData.config().get();
     protected final T event;
     protected final I18nContext i18n;
@@ -404,17 +401,8 @@ public abstract class BaseInteractionContext<T extends GenericCommandInteraction
     }
 
     @Override
-    public ManagedDatabase db() {
-        return managedDatabase;
-    }
-
-    @Override
     public Config getConfig() {
         return config;
-    }
-
-    public boolean isUserBlacklisted(String id) {
-        return getMantaroData().getBlackListedUsers().contains(id);
     }
 
     @Override
@@ -425,11 +413,6 @@ public abstract class BaseInteractionContext<T extends GenericCommandInteraction
     @Override
     public ShardManager getShardManager() {
         return getBot().getShardManager();
-    }
-
-    @Override
-    public MantaroObject getMantaroData() {
-        return managedDatabase.getMantaroData();
     }
 
     public JedisPool getJedisPool() {
@@ -444,3 +427,5 @@ public abstract class BaseInteractionContext<T extends GenericCommandInteraction
         this.forceEphemeral = force;
     }
 }
+
+

@@ -31,11 +31,11 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
+import net.kodehawa.mantarobot.dbold.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.PremiumKey;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -62,7 +62,7 @@ public class PremiumCmds {
     )
     public static class Premium extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("activate")
         @Description("Activates a premium key.")
@@ -81,7 +81,7 @@ public class PremiumCmds {
         )
         public static class ActivateKey extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var db = ctx.db();
                 if (ctx.getConfig().isPremiumBot()) {
                     ctx.reply("commands.activatekey.mp", EmoteReference.WARNING);
@@ -163,7 +163,7 @@ public class PremiumCmds {
         )
         public static class UserCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var toCheck = ctx.getOptionAsUser("user", ctx.getAuthor());
                 var dbUser = ctx.db().getUser(toCheck);
                 var isLookup = toCheck.getIdLong() != ctx.getAuthor().getIdLong();
@@ -269,7 +269,7 @@ public class PremiumCmds {
         @Description("Checks the premium status of this server.")
         public static class GuildCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbGuild = ctx.getDBGuild();
                 if (!dbGuild.isPremium()) {
                     ctx.reply("commands.vipstatus.guild.not_premium", EmoteReference.ERROR);

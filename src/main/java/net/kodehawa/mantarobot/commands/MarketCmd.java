@@ -37,8 +37,8 @@ import net.kodehawa.mantarobot.commands.currency.item.special.tools.Pickaxe;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Wrench;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
@@ -48,9 +48,9 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -117,10 +117,10 @@ public class MarketCmd {
         cr.registerSlash(Sell.class);
         cr.registerSlash(Dump.class);
 
-        cr.register(MarketText.class);
-        cr.register(SellText.class);
-        cr.register(BuyText.class);
-        cr.register(DumpText.class);
+        cr.register(MarketMongoText.class);
+        cr.register(SellMongoText.class);
+        cr.register(BuyMongoText.class);
+        cr.register(DumpMongoText.class);
     }
 
     @Name("market")
@@ -129,7 +129,7 @@ public class MarketCmd {
     @Help(description = "The hub for all market commands.")
     public static class Market extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("show")
         @Description("List current items for buying and selling.")
@@ -137,7 +137,7 @@ public class MarketCmd {
         @Help(description = "List current items for buying and selling.")
         public static class Show extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, item -> true);
             }
         }
@@ -148,7 +148,7 @@ public class MarketCmd {
         @Help(description = "List current pet items.")
         public static class Pet extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, item -> item.getItemType() == ItemType.PET || item.getItemType() == ItemType.PET_FOOD);
             }
         }
@@ -159,7 +159,7 @@ public class MarketCmd {
         @Help(description = "List current common items.")
         public static class Common extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, item -> item.getItemType() == ItemType.COMMON || item.getItemType() == ItemType.COLLECTABLE);
             }
         }
@@ -170,7 +170,7 @@ public class MarketCmd {
         @Help(description = "List current tool items.")
         public static class Tool extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, item -> item instanceof FishRod || item instanceof Pickaxe || item instanceof Axe || item instanceof Broken);
             }
         }
@@ -181,7 +181,7 @@ public class MarketCmd {
         @Help(description = "List current potion items.")
         public static class Potions extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, Potion.class::isInstance);
             }
         }
@@ -192,7 +192,7 @@ public class MarketCmd {
         @Help(description = "List current buyable items.")
         public static class Buyable extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, Item::isBuyable);
             }
         }
@@ -203,7 +203,7 @@ public class MarketCmd {
         @Help(description = "List current sellable items.")
         public static class Sellable extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 showMarket(ctx, Item::isSellable);
             }
         }
@@ -223,7 +223,7 @@ public class MarketCmd {
         )
         public static class Price extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var item = ctx.getOptionAsString("item");
                 if (item == null) {
                     ctx.reply("commands.market.price.no_item", EmoteReference.ERROR);
@@ -255,7 +255,7 @@ public class MarketCmd {
     )
     public static class Buy extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             buy(ctx, ctx.getOptionAsString("item"), ctx.getOptionAsInteger("amount", 1), ctx.getOptionAsBoolean("max"));
         }
     }
@@ -281,7 +281,7 @@ public class MarketCmd {
     )
     public static class Sell extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             sell(ctx, ctx.getOptionAsString("item"), ctx.getOptionAsInteger("amount", 1), ctx.getOptionAsBoolean("max"));
         }
     }
@@ -308,7 +308,7 @@ public class MarketCmd {
     )
     public static class Dump extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             dump(ctx, ctx.getOptionAsString("item"), ctx.getOptionAsInteger("amount", 1), ctx.getOptionAsBoolean("max"));
         }
     }
@@ -317,64 +317,64 @@ public class MarketCmd {
     @Alias("shop")
     @Category(CommandCategory.CURRENCY)
     @Description("List current items for buying and selling. You can check more specific markets below.")
-    public static class MarketText extends TextCommand {
+    public static class MarketMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             showMarket(ctx, item -> true);
         }
 
         @Description("List all current pet items.")
-        public static class Pet extends TextCommand {
+        public static class Pet extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, item -> item.getItemType() == ItemType.PET || item.getItemType() == ItemType.PET_FOOD);
             }
         }
 
         @Description("List all common items.")
-        public static class Common extends TextCommand {
+        public static class Common extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, item -> item.getItemType() == ItemType.COMMON || item.getItemType() == ItemType.COLLECTABLE);
             }
         }
 
         @Description("List all tools.")
-        public static class Tools extends TextCommand {
+        public static class Tools extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, item -> item instanceof FishRod || item instanceof Pickaxe || item instanceof Axe || item instanceof Broken);
             }
         }
 
         @Description("List all potions.")
-        public static class Potions extends TextCommand {
+        public static class Potions extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, Potion.class::isInstance);
             }
         }
 
         @Description("List all buyable items.")
-        public static class Buyable extends TextCommand {
+        public static class Buyable extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, Item::isBuyable);
             }
         }
 
         @Description("List all sellable items.")
-        public static class Sellable extends TextCommand {
+        public static class Sellable extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 showMarket(ctx, Item::isSellable);
             }
         }
 
         @Description("Checks the price of any given item.")
-        public static class Price extends TextCommand {
+        public static class Price extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 price(ctx, ctx.argument(Parsers.string(),
                         ctx.getLanguageContext().get("commands.market.price.no_item").formatted(EmoteReference.ERROR),
                         ctx.getLanguageContext().get("commands.market.price.no_item").formatted(EmoteReference.ERROR))
@@ -397,9 +397,9 @@ public class MarketCmd {
                     @Help.Parameter(name = "item", description = "The item name or emoji")
             }
     )
-    public static class SellText extends TextCommand {
+    public static class SellMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var amount = ctx.tryArgument(Parsers.rangeStrict(1, 5000));
             var max = ctx.tryArgument(Parsers.matching("^max$"));
             var isMax = max.isPresent();
@@ -432,9 +432,9 @@ public class MarketCmd {
                     @Help.Parameter(name = "item", description = "The item to buy. Name or emoji.")
             }
     )
-    public static class BuyText extends TextCommand {
+    public static class BuyMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var amount = ctx.tryArgument(Parsers.rangeStrict(1, 5000));
             var max = ctx.tryArgument(Parsers.matching("^max$"));
             var isMax = max.isPresent();
@@ -466,9 +466,9 @@ public class MarketCmd {
                     @Help.Parameter(name = "item", description = "The item to dump. Name or emoji.")
             }
     )
-    public static class DumpText extends TextCommand {
+    public static class DumpMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var amount = ctx.tryArgument(Parsers.rangeStrict(1, 5000));
             var max = ctx.tryArgument(Parsers.matching("^max$"));
             var isMax = max.isPresent();
@@ -487,7 +487,7 @@ public class MarketCmd {
         }
     }
 
-    private static void price(IContext ctx, String itemString) {
+    private static void price(IContextMongo ctx, String itemString) {
         var item = ItemHelper.fromAnyNoId(itemString, ctx.getLanguageContext()).orElse(null);
         if (item == null) {
             ctx.sendLocalized("commands.market.price.non_existent", EmoteReference.ERROR);
@@ -509,7 +509,7 @@ public class MarketCmd {
         );
     }
 
-    private static void dump(IContext ctx, String itemName, int itemNumber, boolean isMax) {
+    private static void dump(IContextMongo ctx, String itemName, int itemNumber, boolean isMax) {
         if (itemNumber < 1) {
             ctx.sendLocalized("commands.market.dump.invalid", EmoteReference.ERROR);
             return;
@@ -552,7 +552,7 @@ public class MarketCmd {
         ctx.sendLocalized("commands.market.dump.success", EmoteReference.CORRECT, itemNumber, item.getEmoji(), item.getName());
     }
 
-    private static void sell(IContext ctx, String item, int amount, boolean isMax) {
+    private static void sell(IContextMongo ctx, String item, int amount, boolean isMax) {
         if (amount < 1) {
             ctx.sendLocalized("commands.market.sell.invalid", EmoteReference.ERROR);
             return;
@@ -609,7 +609,7 @@ public class MarketCmd {
         }
     }
 
-    private static void buy(IContext ctx, String itemName, int itemNumber, boolean isMax) {
+    private static void buy(IContextMongo ctx, String itemName, int itemNumber, boolean isMax) {
         var languageContext = ctx.getLanguageContext();
         var player = ctx.getPlayer();
 
@@ -693,13 +693,13 @@ public class MarketCmd {
         }
     }
 
-    private static void showMarket(IContext ctx, Predicate<? super Item> predicate) {
+    private static void showMarket(IContextMongo ctx, Predicate<? super Item> predicate) {
         if (!RatelimitUtils.ratelimit(marketRatelimiter, ctx, false)) {
             return;
         }
 
         // Slash does not need Embed Links permissions
-        if (!ctx.getGuild().getSelfMember().hasPermission(ctx.getChannel(), Permission.MESSAGE_EMBED_LINKS) && ctx instanceof TextContext) {
+        if (!ctx.getGuild().getSelfMember().hasPermission(ctx.getChannel(), Permission.MESSAGE_EMBED_LINKS) && ctx instanceof TextContextMongo) {
             ctx.sendLocalized("general.missing_embed_permissions");
             return;
         }

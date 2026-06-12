@@ -18,8 +18,8 @@
 package net.kodehawa.mantarobot.core.command.i18n;
 
 import net.kodehawa.mantarobot.data.I18n;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.MongoGuild;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
 
 public class I18nContext {
     private MongoGuild guildData;

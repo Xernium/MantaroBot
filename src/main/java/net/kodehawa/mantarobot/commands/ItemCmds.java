@@ -42,11 +42,11 @@ import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.PlayerStats;
+import net.kodehawa.mantarobot.dbold.entities.PlayerStats;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -116,7 +116,7 @@ public class ItemCmds {
     )
     public static class Cast extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("item")
         @Defer
@@ -143,7 +143,7 @@ public class ItemCmds {
         )
         public static class CastItem extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var itemName = ctx.getOptionAsString("item");
                 var amountSpecified = ctx.getOptionAsInteger("amount", 1);
                 var maxAmount = ItemStack.MAX_STACK_SIZE; // set to stacklimit for now, it will never truly attempt 5000
@@ -336,7 +336,7 @@ public class ItemCmds {
         @Description("Shows a list of castable items.")
         public static class CastList extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var castableItems = ItemHelper.getCastableItems();
 
                 List<MessageEmbed.Field> fields = new LinkedList<>();
@@ -420,7 +420,7 @@ public class ItemCmds {
     @Category(CommandCategory.CURRENCY)
     public static class Repair extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("item")
         @Defer
@@ -437,7 +437,7 @@ public class ItemCmds {
         })
         public static class RepairItem extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var itemName = ctx.getOptionAsString("item");
 
                 //Get the necessary entities.
@@ -555,7 +555,7 @@ public class ItemCmds {
         @Description("List all items that can be repaired.")
         public static class ListItems extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var repairableItems = ItemHelper.getBrokenItems();
 
                 var lang = ctx.getLanguageContext();
@@ -609,7 +609,7 @@ public class ItemCmds {
     @Category(CommandCategory.CURRENCY)
     public static class Salvage extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("item")
         @Defer
@@ -623,7 +623,7 @@ public class ItemCmds {
         )
         public static class SalvageItem extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 final var itemName = ctx.getOptionAsString("item");
 
                 //Get the necessary entities.
@@ -709,7 +709,7 @@ public class ItemCmds {
         @Help(description = "List all salvageable items.")
         public static class ListItems extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var broken = ItemHelper.getSalvageableItems();
 
                 List<MessageEmbed.Field> fields = new LinkedList<>();
@@ -763,7 +763,7 @@ public class ItemCmds {
     @Help(description = "Shows the information of an item.", usage = "`/iteminfo item:<item name>`", parameters = @Help.Parameter(name = "item", description = "The name of the item."))
     public static class ItemInfo extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var itemName = ctx.getOptionAsString("item");
             var itemOptional = ItemHelper.fromAnyNoId(itemName, ctx.getLanguageContext());
             if (itemOptional.isEmpty()) {

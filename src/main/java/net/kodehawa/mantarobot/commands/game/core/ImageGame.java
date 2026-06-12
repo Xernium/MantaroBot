@@ -20,7 +20,7 @@ package net.kodehawa.mantarobot.commands.game.core;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.utils.cache.URLCache;
 
 import java.awt.Color;
@@ -33,7 +33,7 @@ public abstract class ImageGame extends Game<String> {
         cache = new URLCache(cacheSize);
     }
 
-    protected void sendEmbedImage(SlashContext ctx, String url, Consumer<EmbedBuilder> embedConfigurator) {
+    protected void sendEmbedImage(SlashContextMongo ctx, String url, Consumer<EmbedBuilder> embedConfigurator) {
         var eb = new EmbedBuilder();
         embedConfigurator.accept(eb);
 

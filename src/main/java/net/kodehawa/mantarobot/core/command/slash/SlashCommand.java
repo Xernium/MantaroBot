@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public abstract class SlashCommand extends DeferrableCommand<SlashContext> {
+public abstract class SlashCommand extends DeferrableCommand<SlashContextMongo> {
     private final String description;
     private final List<OptionData> types = new ArrayList<>();
     private final Map<String, SlashCommand> subCommands = new HashMap<>();
-    private Predicate<SlashContext> predicate = c -> true;
+    private Predicate<SlashContextMongo> predicate = c -> true;
     private final boolean nsfw;
 
     public SlashCommand() {
@@ -138,17 +138,17 @@ public abstract class SlashCommand extends DeferrableCommand<SlashContext> {
         return types;
     }
 
-    public void setPredicate(Predicate<SlashContext> predicate) {
+    public void setPredicate(Predicate<SlashContextMongo> predicate) {
         this.predicate = predicate;
     }
 
     // This is to be overriden.
-    public Predicate<SlashContext> getPredicate() {
+    public Predicate<SlashContextMongo> getPredicate() {
         return predicate;
     }
 
     @Override
-    public final void execute(SlashContext ctx) {
+    public final void execute(SlashContextMongo ctx) {
         var sub = getSubCommands().get(ctx.getSubCommand());
         // If this is over 2500ms, we should attempt to defer instead, as discord might be lagging.
         var averageLatencyMax = MantaroBot.getInstance().getCore().getRestPing() * 4;

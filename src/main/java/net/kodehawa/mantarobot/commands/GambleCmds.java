@@ -23,8 +23,8 @@ import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.utils.RoundedMetricPrefixFormat;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
 import net.kodehawa.mantarobot.core.command.meta.Category;
@@ -33,14 +33,14 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PlayerStats;
+import net.kodehawa.mantarobot.dbold.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.PlayerStats;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
@@ -101,8 +101,8 @@ public class GambleCmds {
         cr.registerSlash(Gamble.class);
         cr.registerSlash(Slots.class);
 
-        cr.register(GambleText.class);
-        cr.register(SlotsText.class);
+        cr.register(GambleMongoText.class);
+        cr.register(SlotsMongoText.class);
     }
 
     @Name("gamble")
@@ -126,7 +126,7 @@ public class GambleCmds {
     )
     public static class Gamble extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             doGamble(ctx, ctx.getPlayer(), ctx.getOptionAsString("amount"));
         }
     }
@@ -160,7 +160,7 @@ public class GambleCmds {
     )
     public static class Slots extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var player = ctx.getPlayer();
             var stats = ctx.db().getPlayerStats(ctx.getAuthor());
             var moneyAmount = 50L;
@@ -213,9 +213,9 @@ public class GambleCmds {
                     )
             }
     )
-    public static class GambleText extends TextCommand {
+    public static class GambleMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             doGamble(ctx, ctx.getPlayer(), ctx.takeAllString());
         }
     }
@@ -236,9 +236,9 @@ public class GambleCmds {
                 Using tickets increases your chance by 6 to 12%. Maximum amount of tickets allowed is 100.
                 """
     )
-    public static class SlotsText extends TextCommand {
+    public static class SlotsMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var money = 50L;
             var coinSelect = false;
             var coinAmount = 1;
@@ -285,7 +285,7 @@ public class GambleCmds {
         }
     }
 
-    private static void slots(IContext ctx, Player player, PlayerStats stats, long money, long coinAmount, boolean ticket) {
+    private static void slots(IContextMongo ctx, Player player, PlayerStats stats, long money, long coinAmount, boolean ticket) {
         var slotsChance = 25; // 25% raw chance of winning, completely random chance of winning on the other random iteration
         var isWin = false;
         var coinSelect = false;
@@ -415,7 +415,7 @@ public class GambleCmds {
         ctx.send(message.toString());
     }
 
-    private static void doGamble(IContext ctx, Player player, String amount) {
+    private static void doGamble(IContextMongo ctx, Player player, String amount) {
         if (player.getCurrentMoney() <= 0) {
             ctx.sendLocalized("commands.gamble.no_credits", EmoteReference.SAD);
             return;
@@ -500,7 +500,7 @@ public class GambleCmds {
     }
 
 
-    private static void proceedGamble(IContext ctx, Player player, int luck, long i, long gains, long bet) {
+    private static void proceedGamble(IContextMongo ctx, Player player, int luck, long i, long gains, long bet) {
         var stats = MantaroData.db().getPlayerStats(ctx.getMember());
         final SecureRandom random = new SecureRandom();
 

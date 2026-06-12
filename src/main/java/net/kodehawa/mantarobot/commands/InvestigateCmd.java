@@ -28,8 +28,8 @@ import net.dv8tion.jda.api.utils.MiscUtil;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Help;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 
 @Module
 public class InvestigateCmd {
-    public static void investigate(TextContext ctx, Type type, String id, boolean file) {
+    public static void investigate(TextContextMongo ctx, Type type, String id, boolean file) {
         switch (type) {
             case GUILD -> investigateGuild(ctx, MantaroBot.getInstance().getShardManager().getGuildById(id), file);
             case USER -> investigateUser(ctx, MantaroBot.getInstance().getShardManager().getUserById(id), file);
@@ -63,7 +63,7 @@ public class InvestigateCmd {
         }
     }
 
-    private static void investigateGuild(TextContext ctx, Guild guild, boolean file) {
+    private static void investigateGuild(TextContextMongo ctx, Guild guild, boolean file) {
         if (guild == null) {
             ctx.send("Unknown guild");
             return;
@@ -94,7 +94,7 @@ public class InvestigateCmd {
                 });
     }
 
-    private static void investigateUser(TextContext ctx, User user, boolean file) {
+    private static void investigateUser(TextContextMongo ctx, User user, boolean file) {
         if (user == null) {
             ctx.send("Unknown user");
             return;
@@ -107,7 +107,7 @@ public class InvestigateCmd {
         DiscordUtils.selectListButton(ctx, user.getMutualGuilds(), Guild::toString, s -> eb.setDescription(s).build(), g -> investigateGuild(ctx, g, file));
     }
 
-    private static void investigateChannel(TextContext ctx, TextChannel channel, boolean file) {
+    private static void investigateChannel(TextContextMongo ctx, TextChannel channel, boolean file) {
         if (channel == null) {
             ctx.send("Unknown channel");
             return;
@@ -144,9 +144,9 @@ public class InvestigateCmd {
                     @Help.Parameter(name = "file", description = "put file at the end for a file", optional = true)
             }
     )
-    public static class Investigate extends TextCommand {
+    public static class Investigate extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var id = ctx.argument(Parsers.strictLong(), "Missing id.", "Invalid id.");
             var type = ctx.argument(Parsers.toEnum(Type.class), "Missing type (required: guild, user, channel)", "Bad type (required: guild, user, channel)");
             var file = ctx.tryArgument(Parsers.matching("^file$"));
@@ -170,7 +170,7 @@ public class InvestigateCmd {
             return parts.computeIfAbsent(key.getId(), __ -> new ChannelData(key)).messages;
         }
 
-        public void result(Guild target, TextContext ctx) {
+        public void result(Guild target, TextContextMongo ctx) {
             if (file) {
                 var channels = new JSONObject();
                 parts.forEach((channelId, channel) -> channels.put(channelId, channel.toJson()));

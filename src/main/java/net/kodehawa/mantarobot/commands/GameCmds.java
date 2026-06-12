@@ -34,7 +34,7 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -85,14 +85,14 @@ public class GameCmds {
     @Description("Plays a little game. Maybe a big game, who knows, life is full of surprises.")
     public static class GameCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("character")
         @Defer
         @Description("Anime character names.")
         public static class CharacterCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 startGame(new Character(), ctx);
             }
         }
@@ -102,7 +102,7 @@ public class GameCmds {
         @Description("Who's that pokemon?")
         public static class PokemonCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 startGame(new Pokemon(), ctx);
             }
         }
@@ -112,13 +112,13 @@ public class GameCmds {
         @Description("Guess the number.")
         public static class GuessCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 startGame(new GuessTheNumber(), ctx);
             }
         }
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return context -> RatelimitUtils.ratelimit(gameRatelimiter, context, null);
         }
     }
@@ -138,7 +138,7 @@ public class GameCmds {
             """)
     public static class TriviaCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(triviaRatelimiter, ctx)) {
                 return;
             }
@@ -149,11 +149,11 @@ public class GameCmds {
         }
     }
 
-    private static void startGame(Game<?> game, SlashContext ctx) {
+    private static void startGame(Game<?> game, SlashContextMongo ctx) {
         startGames(createLinkedList(game), ctx);
     }
 
-    private static void startGames(LinkedList<Game<?>> games, SlashContext ctx) {
+    private static void startGames(LinkedList<Game<?>> games, SlashContextMongo ctx) {
         if (checkRunning(ctx)) {
             return;
         }
@@ -169,7 +169,7 @@ public class GameCmds {
         lobby.startFirstGame();
     }
 
-    private static boolean checkRunning(SlashContext ctx) {
+    private static boolean checkRunning(SlashContextMongo ctx) {
         if (GameLobby.LOBBYS.containsKey(ctx.getChannel().getIdLong())) {
             var dbGuild = MantaroData.db().getGuild(ctx.getGuild());
             if (dbGuild.getGameTimeoutExpectedAt() != null &&

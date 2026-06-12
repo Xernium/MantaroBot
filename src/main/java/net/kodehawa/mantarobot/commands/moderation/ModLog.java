@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.MantaroBot;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
+import net.kodehawa.mantarobot.dbold.ManagedDatabase;
 import net.kodehawa.mantarobot.utils.Utils;
 
 public class ModLog {

@@ -18,6 +18,7 @@
 package net.kodehawa.mantarobot.core.command.argument;
 
 import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;

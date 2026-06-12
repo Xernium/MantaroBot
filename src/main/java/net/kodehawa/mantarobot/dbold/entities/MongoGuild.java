@@ -1,4 +1,4 @@
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.dbold.entities;
 
 import net.kodehawa.mantarobot.commands.utils.polls.Poll;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
@@ -6,7 +6,7 @@ import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.data.annotations.ConfigName;
 import net.kodehawa.mantarobot.data.annotations.HiddenConfig;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import net.kodehawa.mantarobot.utils.APIUtils;
 import net.kodehawa.mantarobot.utils.Pair;
 import net.kodehawa.mantarobot.utils.patreon.PatreonPledge;

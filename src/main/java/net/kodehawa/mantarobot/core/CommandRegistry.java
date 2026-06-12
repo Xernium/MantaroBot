@@ -26,26 +26,23 @@ import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEven
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.kodehawa.mantarobot.commands.CustomCmds;
 import net.kodehawa.mantarobot.core.command.CommandManager;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.helpers.*;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.ArgumentParseError;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
 import net.kodehawa.mantarobot.core.command.slash.ContextCommand;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
-import net.kodehawa.mantarobot.core.command.slash.InteractionContext;
+import net.kodehawa.mantarobot.core.command.slash.InteractionContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.compat.AliasCommand;
 import net.kodehawa.mantarobot.core.command.compat.Command;
-import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
-import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
-import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.ManagedDatabase;
+import net.kodehawa.mantarobot.dbold.entities.MongoGuild;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RateLimiter;
@@ -106,7 +103,7 @@ public class CommandRegistry {
 
         if (command == null) {
             // We will create a proper I18nContext once the custom command goes through, if it does. We don't need it otherwise.
-            CustomCmds.handle(prefix, cmdName, new TextContext(event,
+            CustomCmds.handle(prefix, cmdName, new TextContextMongo(event,
                     new I18nContext(),
                     event.getMessage().getContentRaw().substring(prefix.length()), isMention), dbGuild, content);
             return;
@@ -219,7 +216,7 @@ public class CommandRegistry {
 
         // Used a command on the new system?
         try {
-            newCommands.execute(new TextContext(event,
+            newCommands.execute(new TextContextMongo(event,
                     new I18nContext(dbGuild, dbUser),
                     event.getMessage().getContentRaw().substring(prefix.length()), isMention)
             );
@@ -296,7 +293,7 @@ public class CommandRegistry {
         }
 
         final var dbUser = managedDatabase.getUser(author);
-        cmd.execute(new InteractionContext<>(event, new I18nContext(dbGuild, dbUser)));
+        cmd.execute(new InteractionContextMongo<>(event, new I18nContext(dbGuild, dbUser)));
         commandLog.debug("Context (user) command: {}, User: {} ({}), Guild: {}" ,
                 cmd.getName(), author.getName(), author.getId(), guild.getId()
         );
@@ -433,7 +430,7 @@ public class CommandRegistry {
         final var dbUser = managedDatabase.getUser(author);
         renewPremiumKey(managedDatabase, author, dbUser, dbGuild);
 
-        cmd.execute(new SlashContext(event, new I18nContext(dbGuild, dbUser)));
+        cmd.execute(new SlashContextMongo(event, new I18nContext(dbGuild, dbUser)));
         commandLog.debug("Slash command: {}, User: {} ({}), Guild: {}, Channel: {}, Options: {}" ,
                 cmd.getName(), author.getName(), author.getId(), guild.getId(), channel.getId(), event.getOptions()
         );
@@ -497,7 +494,7 @@ public class CommandRegistry {
         }
     }
 
-    public void register(Class<? extends TextCommand> clazz) {
+    public void register(Class<? extends MongoTextCommand> clazz) {
         var cmd = newCommands.register(clazz);
         var p = new ProxyCommand(cmd);
         commands.put(cmd.getName(), p);
@@ -597,10 +594,10 @@ public class CommandRegistry {
         return c;
     }
 
-    private static class ProxyCommand implements Command {
-        private final TextCommand c;
+    private static class ProxyCommand<T extends IContextBase> implements Command<T> {
+        private final MongoTextCommand c;
 
-        private ProxyCommand(TextCommand c) {
+        private ProxyCommand(MongoTextCommand c) {
             this.c = c;
         }
 
@@ -615,7 +612,7 @@ public class CommandRegistry {
         }
 
         @Override
-        public void run(IContext context, String commandName, String content) {
+        public void run(T context, String commandName, String content) {
             throw new UnsupportedOperationException();
         }
 

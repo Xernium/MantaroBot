@@ -33,8 +33,8 @@ import net.kodehawa.mantarobot.commands.currency.item.special.Potion;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.currency.profile.inventory.InventorySortType;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
 import net.kodehawa.mantarobot.core.command.meta.Category;
@@ -44,14 +44,14 @@ import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.CustomFinderUtil;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
@@ -98,11 +98,11 @@ public class CurrencyCmds {
         cr.registerSlash(Use.class);
 
         // Text
-        cr.register(InventoryText.class);
+        cr.register(InventoryMongoText.class);
         cr.register(LootCrate.class);
-        cr.register(DailyCrateText.class);
-        cr.register(ToolsText.class);
-        cr.register(UseItemText.class);
+        cr.register(DailyCrateMongoText.class);
+        cr.register(ToolsMongoText.class);
+        cr.register(UseItemMongoText.class);
     }
 
     @Name("inventory")
@@ -111,7 +111,7 @@ public class CurrencyCmds {
     @Category(CommandCategory.CURRENCY)
     public static class InventoryCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("show")
         @Description("Shows your inventory or a user's.")
@@ -125,7 +125,7 @@ public class CurrencyCmds {
                 })
         public static class Show extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getOptionAsUser("user", ctx.getAuthor());
                 final var player = ctx.getPlayer(user);
                 final var dbUser = ctx.getDBUser(user);
@@ -145,7 +145,7 @@ public class CurrencyCmds {
                 })
         public static class Brief extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var user = ctx.getOptionAsUser("user", ctx.getAuthor());
                 final var player = ctx.getPlayer(user);
                 final var dbUser = ctx.getDBUser(user);
@@ -177,7 +177,7 @@ public class CurrencyCmds {
         )
         public static class InventorySort extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var typeString = ctx.getOptionAsString("type");
                 final var type = Utils.lookupEnumString(typeString, InventorySortType.class);
                 if (type == null) { // This should literally never happen, though.
@@ -206,7 +206,7 @@ public class CurrencyCmds {
                 })
         public static class Calculate extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var member = ctx.getOptionAsMember("user", ctx.getMember());
                 var player = ctx.getPlayer(member);
                 calculateInventory(ctx, member, player);
@@ -236,7 +236,7 @@ public class CurrencyCmds {
     )
     public static class OpenCrate extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var content = ctx.getOptionAsString("crate", "");
             var player = ctx.getPlayer();
             openCrate(ctx, content, player);
@@ -251,7 +251,7 @@ public class CurrencyCmds {
     @Help(description = "Opens a daily premium loot crate.", usage = "`/dailycrate` - You need a crate key to open any crate.")
     public static class DailyCrate extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!ctx.getDBUser().isPremium()) {
                 ctx.reply("commands.dailycrate.not_premium", EmoteReference.ERROR);
                 return;
@@ -279,7 +279,7 @@ public class CurrencyCmds {
     @Help(description = "Shows your equipped tools")
     public static class Tools extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(toolsRatelimiter, ctx)) {
                 return;
             }
@@ -295,7 +295,7 @@ public class CurrencyCmds {
     @Category(CommandCategory.CURRENCY)
     public static class Use extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("item")
         @Description("Use a interactive item.")
@@ -320,7 +320,7 @@ public class CurrencyCmds {
         )
         public static class Item extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 useItem(
                         ctx, ctx.getDBUser(), ctx.getPlayer(),
                         ctx.getOptionAsString("item"),
@@ -340,7 +340,7 @@ public class CurrencyCmds {
         @Help(description = "Shows all *interactive* items")
         public static class List extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 useItemList(ctx);
             }
         }
@@ -352,9 +352,9 @@ public class CurrencyCmds {
     @Description("The hub for inventory related commands.")
     @Help(description = "The hub for inventory related commands. See the subcommands for more information.")
     @Category(CommandCategory.CURRENCY)
-    public static class InventoryText extends TextCommand {
+    public static class InventoryMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var lookup = ctx.takeAllString();
             ctx.findMember(lookup, members -> {
                 var member = CustomFinderUtil.findMemberDefault(lookup, members, ctx, ctx.getMember());
@@ -368,9 +368,9 @@ public class CurrencyCmds {
         }
 
         @Description("Calculates the value of your or someone's inventory.")
-        public static class Calculate extends TextCommand {
+        public static class Calculate extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lookup = ctx.takeAllString();
                 ctx.findMember(lookup, members -> {
                     var member = CustomFinderUtil.findMemberDefault(lookup, members, ctx, ctx.getMember());
@@ -386,9 +386,9 @@ public class CurrencyCmds {
         @Alias("mobile")
         @Alias("b")
         @Description("Calculates the value of your or someone's inventory.")
-        public static class Brief extends TextCommand {
+        public static class Brief extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lookup = ctx.takeAllString();
                 ctx.findMember(lookup, members -> {
                     var member = CustomFinderUtil.findMemberDefault(lookup, members, ctx, ctx.getMember());
@@ -410,9 +410,9 @@ public class CurrencyCmds {
             usage = "`~>opencrate <name>` - Opens a loot crate.\nYou need a crate key to open any crate."
     )
     @Category(CommandCategory.CURRENCY)
-    public static class LootCrate extends TextCommand {
+    public static class LootCrate extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             openCrate(ctx, ctx.takeAllString(), ctx.getPlayer());
         }
     }
@@ -426,9 +426,9 @@ public class CurrencyCmds {
             parameters = { @Help.Parameter(name = "-check", description = "Check the time left for you to be able to claim it.", optional = true) }
     )
     @Category(CommandCategory.CURRENCY)
-    public static class DailyCrateText extends TextCommand {
+    public static class DailyCrateMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             if (!ctx.getDBUser().isPremium()) {
                 ctx.sendLocalized("commands.dailycrate.not_premium", EmoteReference.ERROR);
                 return;
@@ -454,9 +454,9 @@ public class CurrencyCmds {
     @Name("tools")
     @Description("Check the durability and status of your tools.")
     @Category(CommandCategory.CURRENCY)
-    public static class ToolsText extends TextCommand {
+    public static class ToolsMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(toolsRatelimiter, ctx)) {
                 return;
             }
@@ -478,9 +478,9 @@ public class CurrencyCmds {
             }
     )
     @Category(CommandCategory.CURRENCY)
-    public static class UseItemText extends TextCommand {
+    public static class UseItemMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var item = ctx.argument(Parsers.delimitedBy('"', false),
                     String.format(ctx.getLanguageContext().get("commands.useitem.no_items_specified"), EmoteReference.ERROR),
                     String.format(ctx.getLanguageContext().get("commands.useitem.no_items_specified"), EmoteReference.ERROR)
@@ -513,15 +513,15 @@ public class CurrencyCmds {
         @Alias("ls")
         @Alias("1s")
         @Alias("Is") // oh well...
-        public static class List extends TextCommand {
+        public static class List extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 useItemList(ctx);
             }
         }
     }
 
-    private static void useItemList(IContext ctx) {
+    private static void useItemList(IContextMongo ctx) {
         var lang = ctx.getLanguageContext();
         var interactiveItems = ItemHelper.getUsableItems();
         List<MessageEmbed.Field> fields = new LinkedList<>();
@@ -543,7 +543,7 @@ public class CurrencyCmds {
         );
     }
 
-    private static void useItem(IContext ctx, MongoUser dbUser, Player player, String itemString, int amount, boolean isMax) {
+    private static void useItem(IContextMongo ctx, MongoUser dbUser, Player player, String itemString, int amount, boolean isMax) {
         var item = ItemHelper.fromAnyNoId(itemString, ctx.getLanguageContext()).orElse(null);
         //Well, shit.
         if (item == null) {
@@ -570,14 +570,14 @@ public class CurrencyCmds {
         applyPotionEffect(ctx, dbUser, item, player, amount, isMax);
     }
 
-    private static void tools(IContext ctx, MongoUser dbUser) {
+    private static void tools(IContextMongo ctx, MongoUser dbUser) {
         var equippedItems = dbUser.getEquippedItems();
         var equipment = ProfileCmd.parsePlayerEquipment(equippedItems, ctx.getLanguageContext());
 
         ctx.send(equipment);
     }
 
-    private static void dailyCrate(IContext ctx, Player player) {
+    private static void dailyCrate(IContextMongo ctx, Player player) {
         if (!ratelimit(dailyCrateRatelimiter, ctx, false)) {
             return;
         }
@@ -608,7 +608,7 @@ public class CurrencyCmds {
         ctx.send(successMessage);
     }
 
-    private static void openCrate(IContext ctx, String content, Player player) {
+    private static void openCrate(IContextMongo ctx, String content, Player player) {
         var item = ItemHelper.fromAnyNoId(content.replace("\"", ""), ctx.getLanguageContext())
                 .orElse(null);
 
@@ -638,7 +638,7 @@ public class CurrencyCmds {
         item.getAction().test(ctx, false);
     }
 
-    private static void calculateInventory(IContext ctx, Member member, Player player) {
+    private static void calculateInventory(IContextMongo ctx, Member member, Player player) {
         if (member.getUser().isBot()) {
             ctx.sendLocalized("commands.inventory.bot_notice", EmoteReference.ERROR);
             return;
@@ -652,7 +652,7 @@ public class CurrencyCmds {
         ctx.sendLocalized("commands.inventory.calculate", EmoteReference.DIAMOND, member.getEffectiveName(), all);
     }
 
-    private static void showInventory(IContext ctx, User user, Player player, MongoUser dbUser, boolean brief) {
+    private static void showInventory(IContextMongo ctx, User user, Player player, MongoUser dbUser, boolean brief) {
         if (user.isBot()) {
             ctx.sendLocalized("commands.inventory.bot_notice", EmoteReference.ERROR);
             return;
@@ -716,7 +716,7 @@ public class CurrencyCmds {
         DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), builder, DiscordUtils.divideFields(7, fields), toShow);
     }
 
-    public static void applyPotionEffect(IContext ctx, MongoUser dbUser, Item item, Player player, int amount, boolean isMax) {
+    public static void applyPotionEffect(IContextMongo ctx, MongoUser dbUser, Item item, Player player, int amount, boolean isMax) {
         if ((item.getItemType() == ItemType.POTION || item.getItemType() == ItemType.BUFF) && item instanceof Potion potion) {
             final var equippedItems = dbUser.getEquippedItems();
             var type = equippedItems.getTypeFor(item);

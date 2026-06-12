@@ -31,12 +31,12 @@ import net.kodehawa.mantarobot.commands.currency.item.special.tools.Pickaxe;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Wrench;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.command.slash.AutocompleteContext;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
 import net.kodehawa.mantarobot.utils.Tuple;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.RandomCollection;
@@ -212,12 +212,12 @@ public class ItemHelper {
                 .indexOf(item);
     }
 
-    static boolean openLootCrate(IContext ctx, ItemType.LootboxType type, int item, EmoteReference typeEmote, int bound) {
+    static boolean openLootCrate(IContextMongo ctx, ItemType.LootboxType type, int item, EmoteReference typeEmote, int bound) {
         Player player = ctx.getPlayer();
         Item crate = fromId(item);
         int amount = 1;
         // cant really make this work without slash without changing the whole openCrate logic :(
-        if (ctx instanceof SlashContext sCtx) {
+        if (ctx instanceof SlashContextMongo sCtx) {
             if (sCtx.getOptionAsBoolean("max")) {
                 amount = Math.max(1, Math.min(5, Math.min(player.getItemAmount(crate), player.getItemAmount(ItemReference.LOOT_CRATE_KEY))));
             } else {
@@ -252,7 +252,7 @@ public class ItemHelper {
         }
     }
 
-    private static void openLootBox(IContext ctx, Player player, int amount, ItemType.LootboxType type, Item crate,
+    private static void openLootBox(IContextMongo ctx, Player player, int amount, ItemType.LootboxType type, Item crate,
                                     EmoteReference typeEmote, int bound) {
         List<Item> toAdd = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
@@ -474,7 +474,7 @@ public class ItemHelper {
         return null;
     }
 
-    public static Tuple<Boolean, Player, MongoUser> handleDurability(IContext ctx, Item item, Player player, MongoUser user) {
+    public static Tuple<Boolean, Player, MongoUser> handleDurability(IContextMongo ctx, Item item, Player player, MongoUser user) {
         var equippedItems = user.getEquippedItems();
         var subtractFrom = 0;
 
@@ -561,7 +561,7 @@ public class ItemHelper {
         }
     }
 
-    public static void handleItemDurability(Item item, IContext ctx, Player player, MongoUser dbUser, String i18n) {
+    public static void handleItemDurability(Item item, IContextMongo ctx, Player player, MongoUser dbUser, String i18n) {
         var breakage = handleDurability(ctx, item, player, dbUser);
         if (!breakage.first()) {
             return;

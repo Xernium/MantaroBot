@@ -15,13 +15,13 @@
  *
  */
 
-package net.kodehawa.mantarobot.db.entities;
+package net.kodehawa.mantarobot.dbold.entities;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.kodehawa.mantarobot.commands.currency.pets.HousePet;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;

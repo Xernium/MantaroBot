@@ -26,8 +26,8 @@ import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.utils.SplitUtil;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
 import net.kodehawa.mantarobot.core.command.helpers.HelpContent;
@@ -40,7 +40,7 @@ import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.processor.CommandProcessor;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.compat.AliasCommand;
 import net.kodehawa.mantarobot.data.MantaroData;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -48,11 +48,7 @@ import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -78,7 +74,7 @@ public class HelpCmd {
     @Subscribe
     public void register(CommandRegistry cr) {
         cr.registerSlash(HelpCommand.class);
-        cr.register(HelpText.class);
+        cr.register(HelpMongoText.class);
     }
 
     @Name("help")
@@ -103,7 +99,7 @@ public class HelpCmd {
     )
     public static class HelpCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(rateLimiter, ctx, false)) {
                 return;
             }
@@ -274,9 +270,9 @@ public class HelpCmd {
                     )
             }
     )
-        public static class HelpText extends TextCommand {
+        public static class HelpMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             if (!RatelimitUtils.ratelimit(rateLimiter, ctx, false)) {
                 return;
             }
@@ -355,7 +351,7 @@ public class HelpCmd {
                 }
 
                 //Known command aliases.
-                var commandAliases = command.getAliases();
+                List<String> commandAliases = command.getAliases();
                 if (!commandAliases.isEmpty()) {
                     String aliases = commandAliases
                             .stream()
@@ -378,7 +374,7 @@ public class HelpCmd {
         }
     }
 
-    private static void buildHelpSlash(SlashContext ctx) {
+    private static void buildHelpSlash(SlashContextMongo ctx) {
         var dbGuild = ctx.getDBGuild();
         var dbUser = ctx.getDBUser();
         var languageContext = ctx.getLanguageContext();
@@ -440,7 +436,7 @@ public class HelpCmd {
         );
     }
 
-    private static void buildHelp(TextContext ctx, CommandCategory category) {
+    private static void buildHelp(TextContextMongo ctx, CommandCategory category) {
         var dbGuild = ctx.getDBGuild();
         var dbUser = ctx.getDBUser();
         var languageContext = ctx.getLanguageContext();

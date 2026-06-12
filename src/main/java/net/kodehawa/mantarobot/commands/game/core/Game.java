@@ -25,7 +25,7 @@ import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.commands.game.core.lobby.GameLobby;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
+import net.kodehawa.mantarobot.dbold.ManagedDatabase;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
 import java.util.List;

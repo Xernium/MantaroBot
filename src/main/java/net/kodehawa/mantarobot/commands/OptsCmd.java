@@ -21,8 +21,8 @@ import com.google.common.eventbus.Subscribe;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.meta.Alias;
 import net.kodehawa.mantarobot.core.command.meta.Description;
@@ -53,9 +53,9 @@ public class OptsCmd {
                     """,
             usage = "Check https://www.mantaro.site/mantaro-wiki/basics/server-configuration for a guide on how to use opts. Welcome to the jungle."
     )
-    public static class Options extends TextCommand {
+    public static class Options extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             var lang = ctx.getLanguageContext();
             var content = ctx.argument(Parsers.remainingContent(),
                     lang.get("options.error_general").formatted(EmoteReference.ERROR),
@@ -103,9 +103,9 @@ public class OptsCmd {
 
         @Alias("ls")
         @Description("Lists all the available options.")
-        public static class List extends TextCommand {
+        public static class List extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var builder = new StringBuilder();
 
                 for (var opt : Option.getAvaliableOptions()) {
@@ -129,9 +129,9 @@ public class OptsCmd {
 
         @Name("help")
         @Description("Shows help for an specific option.")
-        public static class OptsHelp extends TextCommand {
+        public static class OptsHelp extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var args = ctx.takeMany(Parsers.string());
                 var name = new StringBuilder();
                 for (int i = 1; i < args.size(); i++) {

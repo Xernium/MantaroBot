@@ -32,16 +32,16 @@ import net.kodehawa.mantarobot.core.CommandRegistry;
 import net.kodehawa.mantarobot.core.command.meta.Category;
 import net.kodehawa.mantarobot.core.command.meta.Defer;
 import net.kodehawa.mantarobot.core.command.meta.Description;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PlayerStats;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.PlayerStats;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.IncreasingRateLimiter;
 import net.kodehawa.mantarobot.utils.commands.ratelimit.RatelimitUtils;
@@ -81,17 +81,17 @@ public class LeaderboardCmd {
     @Category(CommandCategory.CURRENCY)
     public static class Leaderboard extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> RatelimitUtils.ratelimit(rateLimiter, ctx, null);
         }
 
         @Description("Sends the money leaderboard.")
         public static class Money extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 if (config.premiumBot) {
                     var tableName = "players";
                     var moneyLeaderboard = getLeaderboard(tableName, Player.class, Sorts.descending("oldMoney"));
@@ -125,7 +125,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Gamble extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var gambleLeaderboard = getLeaderboard("playerstats", PlayerStats.class, Sorts.descending("gambleWins"));
                 send(ctx,
                         generateLeaderboardEmbed(ctx,
@@ -141,7 +141,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Slots extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var slotsLeaderboard = getLeaderboard("playerstats", PlayerStats.class, Sorts.descending("slotsWins"));
                 send(ctx,
                         generateLeaderboardEmbed(ctx,
@@ -158,7 +158,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Reputation extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var tableName = "players";
                 var reputationLeaderboard = getLeaderboard(tableName, Player.class, Sorts.descending("reputation"));
                 send(ctx,
@@ -175,7 +175,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Daily extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dailyLeaderboard = getLeaderboard("players", Player.class, Sorts.descending("dailyStreak"));
                 send(ctx,
                         generateLeaderboardEmbed(ctx,
@@ -194,7 +194,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Claim extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var claimLeaderboard = getLeaderboard("users", MongoUser.class, Sorts.descending("timesClaimed"));
                 send(ctx,
                         generateLeaderboardEmbed(ctx,
@@ -213,7 +213,7 @@ public class LeaderboardCmd {
         @Defer
         public static class Games extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var tableName = "players";
                 var gameLeaderboard = getLeaderboard(tableName, Player.class, Sorts.descending("gamesWon"));
                 send(ctx,
@@ -239,7 +239,7 @@ public class LeaderboardCmd {
                 );
     }
 
-    private static <T> EmbedBuilder generateLeaderboardEmbed(IContext ctx, String description, String leaderboardKey,
+    private static <T> EmbedBuilder generateLeaderboardEmbed(IContextMongo ctx, String description, String leaderboardKey,
                                                              AggregateIterable<T> lbObject,
                                                              Function<T, Pair<CachedLeaderboardMember, String>> mapFunction,
                                                              String format) {
@@ -292,7 +292,7 @@ public class LeaderboardCmd {
      * @return A instance of CachedLeaderboardMember.
      * This can either be retrieved from Redis or cached on the spot if the cache didn't exist for it.
      */
-    private static CachedLeaderboardMember getMember(IContext ctx, String id) {
+    private static CachedLeaderboardMember getMember(IContextMongo ctx, String id) {
         try(Jedis jedis = MantaroData.getDefaultJedisPool().getResource()) {
             var savedTo = "cachedlbuser:" + id;
             var missed = "lbmiss:" + id;
@@ -334,7 +334,7 @@ public class LeaderboardCmd {
         }
     }
 
-    private static void send(IContext ctx, MessageEmbed embed) {
+    private static void send(IContextMongo ctx, MessageEmbed embed) {
         ctx.send(
                 embed,
                 ActionRow.of(

@@ -28,8 +28,8 @@ import net.kodehawa.lib.imageboards.entities.Rating;
 import net.kodehawa.mantarobot.commands.currency.TextChannelGround;
 import net.kodehawa.mantarobot.commands.currency.item.ItemReference;
 import net.kodehawa.mantarobot.commands.currency.profile.Badge;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
+import net.kodehawa.mantarobot.dbold.entities.MongoGuild;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
 
@@ -58,7 +58,7 @@ public class ImageboardUtils {
             DefaultImageBoards.E621, false
     );
 
-    public static void getImage(ImageBoard<?> api, ImageRequestType type, boolean nsfwOnly, String imageboard, String rating, String tags, String excludeTags, SlashContext ctx) {
+    public static void getImage(ImageBoard<?> api, ImageRequestType type, boolean nsfwOnly, String imageboard, String rating, String tags, String excludeTags, SlashContextMongo ctx) {
         Rating ratingEnum = Rating.SAFE;
         if (!nsfwOnly) {
             ratingEnum = lookupRating(rating);
@@ -124,7 +124,7 @@ public class ImageboardUtils {
         }
     }
 
-    private static <T extends BoardImage> void sendImage0(SlashContext ctx, List<T> images, String imageboard, Set<String> blacklisted) {
+    private static <T extends BoardImage> void sendImage0(SlashContextMongo ctx, List<T> images, String imageboard, Set<String> blacklisted) {
         var filter = filterImages(images, ctx);
         if (filter == null) {
             return;
@@ -139,7 +139,7 @@ public class ImageboardUtils {
         sendImage(ctx, imageboard, image, ctx.getDBGuild());
     }
 
-    private static <T extends BoardImage> List<T> filterImages(List<T> images, SlashContext ctx) {
+    private static <T extends BoardImage> List<T> filterImages(List<T> images, SlashContextMongo ctx) {
         if (images == null) {
             ctx.reply("commands.imageboard.null_image_notice", EmoteReference.ERROR);
             return null;
@@ -168,7 +168,7 @@ public class ImageboardUtils {
         return filter;
     }
 
-    private static void sendImage(SlashContext ctx, String imageboard, BoardImage image, MongoGuild dbGuild) {
+    private static void sendImage(SlashContextMongo ctx, String imageboard, BoardImage image, MongoGuild dbGuild) {
         final var tags = image.getTags();
         final var blackListedImageTags = dbGuild.getBlackListedImageTags();
 
@@ -202,7 +202,7 @@ public class ImageboardUtils {
         }
     }
 
-    public static boolean nsfwCheck(SlashContext ctx, boolean nsfwImageboard, boolean sendMessage, Rating rating) {
+    public static boolean nsfwCheck(SlashContextMongo ctx, boolean nsfwImageboard, boolean sendMessage, Rating rating) {
         if (ctx.isChannelNSFW()) {
             return true;
         }
@@ -253,7 +253,7 @@ public class ImageboardUtils {
         return tags.stream().anyMatch(excludedTags::contains);
     }
 
-    private static void imageEmbed(SlashContext ctx, String url, String width, String height,
+    private static void imageEmbed(SlashContextMongo ctx, String url, String width, String height,
                                    String tags, Rating rating, String imageboard) {
         var languageContext = ctx.getLanguageContext();
         var finalTags = (tags == null ? "None" : tags);

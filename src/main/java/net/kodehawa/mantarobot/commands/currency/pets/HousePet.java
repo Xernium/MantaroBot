@@ -19,7 +19,7 @@ package net.kodehawa.mantarobot.commands.currency.pets;
 
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedMongoObject;
+import net.kodehawa.mantarobot.dbold.ManagedMongoObject;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 
 import java.security.SecureRandom;

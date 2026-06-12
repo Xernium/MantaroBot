@@ -17,31 +17,23 @@
 
 package net.kodehawa.mantarobot.core.command.text;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.SelfUser;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.kodehawa.mantarobot.MantaroBot;
-import net.kodehawa.mantarobot.core.command.argument.ArgumentParseError;
-import net.kodehawa.mantarobot.core.command.argument.Arguments;
-import net.kodehawa.mantarobot.core.command.argument.MarkedBlock;
-import net.kodehawa.mantarobot.core.command.argument.Parser;
-import net.kodehawa.mantarobot.core.command.argument.Parsers;
+import net.kodehawa.mantarobot.core.command.argument.*;
 import net.kodehawa.mantarobot.core.command.argument.split.StringSplitter;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextBase;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.ManagedDatabase;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
+import net.kodehawa.mantarobot.dbold.ManagedDatabase;
+import net.kodehawa.mantarobot.dbold.entities.MantaroObject;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.CustomFinderUtil;
 import net.kodehawa.mantarobot.utils.commands.UtilsContext;
@@ -50,16 +42,10 @@ import net.kodehawa.mantarobot.utils.commands.ratelimit.RateLimitContext;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
-public class TextContext implements IContext {
-    private final ManagedDatabase managedDatabase = MantaroData.db();
+public class TextContext implements IContextBase {
     private final Config config = MantaroData.config().get();
     private static final StringSplitter SPLITTER = new StringSplitter();
 
@@ -93,8 +79,8 @@ public class TextContext implements IContext {
     }
 
     /**
-     * Attempts to parse an argument with the provided {@link net.kodehawa.mantarobot.core.command.argument.Parser parser}.
-     * <br>If the parser returns {@link java.util.Optional#empty() nothing} or there are
+     * Attempts to parse an argument with the provided {@link Parser parser}.
+     * <br>If the parser returns {@link Optional#empty() nothing} or there are
      * no more arguments to read, an exception is thrown.
      *
      * @param parser Parser to use.
@@ -113,11 +99,11 @@ public class TextContext implements IContext {
 
     /**
      * Attempts to parse an argument with the provided {@link Parser parser}.
-     * <br>If the parser returns {@link java.util.Optional#empty() nothing} or there are
+     * <br>If the parser returns {@link Optional#empty() nothing} or there are
      * no more arguments to read, an exception is thrown.
      *
      * @param parser Parser to use.
-     * @param failureMessage Message to provide to the {@link net.kodehawa.mantarobot.core.command.argument.ArgumentParseError error}
+     * @param failureMessage Message to provide to the {@link ArgumentParseError error}
      *                       thrown on parse failure.
      * @param <T> Type of the object returned by the parser.
      *
@@ -134,11 +120,11 @@ public class TextContext implements IContext {
 
     /**
      * Attempts to parse an argument with the provided {@link Parser parser}.
-     * <br>If the parser returns {@link java.util.Optional#empty() nothing} or there are
+     * <br>If the parser returns {@link Optional#empty() nothing} or there are
      * no more arguments to read, an exception is thrown.
      *
      * @param parser Parser to use.
-     * @param failureMessage Message to provide to the {@link net.kodehawa.mantarobot.core.command.argument.ArgumentParseError error}
+     * @param failureMessage Message to provide to the {@link ArgumentParseError error}
      *                       thrown on parse failure.
      * @param <T> Type of the object returned by the parser.
      *
@@ -192,11 +178,11 @@ public class TextContext implements IContext {
      * <br>Example:
      * Given the arguments <code>[1, 2, "abc"]</code>:
      * <pre><code>
-     * List&lt;Integer&gt; ints = context.many({@link net.kodehawa.mantarobot.core.command.argument.Parsers#strictInt()} Parsers.strictInt()});
+     * List&lt;Integer&gt; ints = context.many({@link Parsers#strictInt()} Parsers.strictInt()});
      * assertEquals(ints.size(), 2);
      * assertEquals(ints.get(0), 1);
      * assertEquals(ints.get(1), 2);
-     * String string = context.argument({@link net.kodehawa.mantarobot.core.command.argument.Parsers#string() Parsers.string()});
+     * String string = context.argument({@link Parsers#string() Parsers.string()});
      * assertEquals(string, "abc");
      * </code></pre>
      *
@@ -256,11 +242,11 @@ public class TextContext implements IContext {
      * <br>Example:
      * Given the arguments <code>[1, 2, -1]</code>:
      * <pre><code>
-     * List&lt;Integer&gt; ints = context.takeUntil({@link net.kodehawa.mantarobot.core.command.argument.Parsers#strictInt() Parsers.strictInt()}, {@link net.kodehawa.mantarobot.core.command.argument.Parsers#strictInt() Parsers.strictInt()}.{@link Parser#filter(java.util.function.Predicate) filter(x-&gt;x &lt; 0)});
+     * List&lt;Integer&gt; ints = context.takeUntil({@link Parsers#strictInt() Parsers.strictInt()}, {@link Parsers#strictInt() Parsers.strictInt()}.{@link Parser#filter(java.util.function.Predicate) filter(x-&gt;x &lt; 0)});
      * assertEquals(ints.size(), 2);
      * assertEquals(ints.get(0), 1);
      * assertEquals(ints.get(1), 2);
-     * Integer last = context.argument({@link net.kodehawa.mantarobot.core.command.argument.Parsers#strictInt() Parsers.strictInt()});
+     * Integer last = context.argument({@link Parsers#strictInt() Parsers.strictInt()});
      * assertEquals(last, -1);
      * </code></pre>
      *
@@ -319,11 +305,6 @@ public class TextContext implements IContext {
 
     public void sendFile(byte[] bytes, String name) {
         getChannel().sendFiles(FileUpload.fromData(bytes, name)).queue();
-    }
-
-    @Override
-    public ManagedDatabase db() {
-        return managedDatabase;
     }
 
     @Override
@@ -435,11 +416,6 @@ public class TextContext implements IContext {
     }
 
     @Override
-    public MantaroObject getMantaroData() {
-        return managedDatabase.getMantaroData();
-    }
-
-    @Override
     public Config getConfig() {
         return config;
     }
@@ -447,16 +423,6 @@ public class TextContext implements IContext {
     @Override
     public User getAuthor() {
         return getMessage().getAuthor();
-    }
-
-    public void findMember(String query, Consumer<List<Member>> success) {
-        CustomFinderUtil.lookupMember(getGuild(), this, query).onSuccess(s -> {
-            try {
-                success.accept(s);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        });
     }
 
     @Override

@@ -28,7 +28,7 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -101,7 +101,7 @@ public class TransferCmds {
     )
     public static class Transfer extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var giveTo = ctx.getOptionAsUser("user");
             if (giveTo == null) {
                 ctx.reply("general.slash_member_lookup_failure", EmoteReference.ERROR);
@@ -212,7 +212,7 @@ public class TransferCmds {
     )
     public static class TransferItems extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             var giveTo = ctx.getOptionAsUser("user");
             if (giveTo == null) {
                 ctx.reply("general.slash_member_lookup_failure", EmoteReference.ERROR);

@@ -25,8 +25,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.buttons.Button;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.ButtonOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
@@ -90,7 +90,7 @@ public class DiscordUtils {
         return Pair.of(builder.toString(), list.size());
     }
 
-    public static Future<Void> selectIntButton(IContext ctx, Message message, int max,
+    public static Future<Void> selectIntButton(IContextMongo ctx, Message message, int max,
                                                BiConsumer<Integer, InteractionHook> valueConsumer,
                                                @SuppressWarnings("unused") Consumer<Void> cancelConsumer
     ) {
@@ -147,19 +147,19 @@ public class DiscordUtils {
         }, buttons);
     }
 
-    public static <T> void selectListButton(IContext ctx, List<T> list,
+    public static <T> void selectListButton(IContextMongo ctx, List<T> list,
                                             Function<T, String> toString, Function<String, MessageEmbed> toEmbed,
                                             Consumer<T> valueConsumer) {
         selectListButton(ctx, list, toString, toEmbed, (t, v) -> valueConsumer.accept(t), o -> {});
     }
 
-    public static <T> void selectListButtonSlash(SlashContext ctx, List<T> list,
+    public static <T> void selectListButtonSlash(SlashContextMongo ctx, List<T> list,
                                                  Function<T, String> toString, Function<String, MessageEmbed> toEmbed,
                                                  BiConsumer<T, InteractionHook> valueConsumer) {
         selectListButtonSlash(ctx, list, toString, toEmbed, valueConsumer, o -> {});
     }
 
-    public static <T> void selectListButtonSlash(SlashContext ctx, List<T> list,
+    public static <T> void selectListButtonSlash(SlashContextMongo ctx, List<T> list,
                                                  Function<T, String> toString, Function<String, MessageEmbed> toEmbed,
                                                  BiConsumer<T, InteractionHook> valueConsumer, Consumer<Void> cancelConsumer) {
         var r = embedList(list, toString);
@@ -179,7 +179,7 @@ public class DiscordUtils {
         selectIntButton(ctx, m, r.getRight(), (i, h) -> valueConsumer.accept(list.get(i - 1), h), cancelConsumer);
     }
 
-    public static <T> void selectListButton(IContext ctx, List<T> list,
+    public static <T> void selectListButton(IContextMongo ctx, List<T> list,
                                             Function<T, String> toString, Function<String, MessageEmbed> toEmbed,
                                             BiConsumer<T, InteractionHook> valueConsumer, Consumer<Void> cancelConsumer) {
         var r = embedList(list, toString);

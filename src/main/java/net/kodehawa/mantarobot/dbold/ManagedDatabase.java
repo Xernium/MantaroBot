@@ -15,7 +15,7 @@
  *
  */
 
-package net.kodehawa.mantarobot.db;
+package net.kodehawa.mantarobot.dbold;
 
 import com.google.common.collect.Lists;
 import com.mongodb.client.MongoClient;
@@ -31,14 +31,14 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.kodehawa.mantarobot.ExtraRuntimeOptions;
-import net.kodehawa.mantarobot.db.entities.CustomCommand;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
-import net.kodehawa.mantarobot.db.entities.MantaroObject;
-import net.kodehawa.mantarobot.db.entities.Marriage;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
-import net.kodehawa.mantarobot.db.entities.Player;
-import net.kodehawa.mantarobot.db.entities.PlayerStats;
-import net.kodehawa.mantarobot.db.entities.PremiumKey;
+import net.kodehawa.mantarobot.dbold.entities.CustomCommand;
+import net.kodehawa.mantarobot.dbold.entities.MongoGuild;
+import net.kodehawa.mantarobot.dbold.entities.MantaroObject;
+import net.kodehawa.mantarobot.dbold.entities.Marriage;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.Player;
+import net.kodehawa.mantarobot.dbold.entities.PlayerStats;
+import net.kodehawa.mantarobot.dbold.entities.PremiumKey;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.slf4j.Logger;
@@ -243,15 +243,6 @@ public class ManagedDatabase {
     public List<Marriage> getMarriages() {
         log("Requesting all Marriages from MongoDB");
         return Lists.newArrayList(dbMantaro().getCollection(Marriage.DB_TABLE, Marriage.class).find());
-    }
-
-    @SuppressWarnings("unused")
-    @Nonnull
-    @CheckReturnValue
-    public List<PremiumKey> getPremiumKeys() {
-        log("Requesting all Premium Keys from MongoDB");
-        var collection = dbMantaro().getCollection(PremiumKey.DB_TABLE, PremiumKey.class);
-        return Lists.newArrayList(collection.find());
     }
 
     //Also tests if the key is valid or not!

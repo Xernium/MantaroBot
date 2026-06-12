@@ -25,7 +25,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.modals.Modal;
@@ -34,8 +33,8 @@ import net.kodehawa.mantarobot.commands.custom.CustomCommandHandler;
 import net.kodehawa.mantarobot.commands.custom.v3.Parser;
 import net.kodehawa.mantarobot.commands.custom.v3.SyntaxException;
 import net.kodehawa.mantarobot.core.CommandRegistry;
-import net.kodehawa.mantarobot.core.command.text.TextCommand;
-import net.kodehawa.mantarobot.core.command.text.TextContext;
+import net.kodehawa.mantarobot.core.command.text.MongoTextCommand;
+import net.kodehawa.mantarobot.core.command.text.TextContextMongo;
 import net.kodehawa.mantarobot.core.command.argument.Parsers;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
@@ -49,16 +48,16 @@ import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
 import net.kodehawa.mantarobot.core.command.processor.CommandProcessor;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.listeners.operations.ButtonOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.ModalOperations;
 import net.kodehawa.mantarobot.core.listeners.operations.core.ModalOperation;
 import net.kodehawa.mantarobot.core.listeners.operations.core.Operation;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.CustomCommand;
-import net.kodehawa.mantarobot.db.entities.MongoGuild;
+import net.kodehawa.mantarobot.dbold.entities.CustomCommand;
+import net.kodehawa.mantarobot.dbold.entities.MongoGuild;
 import net.kodehawa.mantarobot.utils.Utils;
 import net.kodehawa.mantarobot.utils.commands.DiscordUtils;
 import net.kodehawa.mantarobot.utils.commands.EmoteReference;
@@ -101,7 +100,7 @@ public class CustomCmds {
             .build();
     //Just so this is in english.
     private static final I18nContext i18nTemp = new I18nContext();
-    private static final Predicate<IContext> adminPredicate = (ctx) -> {
+    private static final Predicate<IContextMongo> adminPredicate = (ctx) -> {
         if (db().getGuild(ctx.getGuild()).isCustomAdminLockNew() && !CommandPermission.ADMIN.test(ctx.getMember())) {
             ctx.getChannel().sendMessage(i18nTemp.get("commands.custom.admin_only")).queue();
             return false;
@@ -110,7 +109,7 @@ public class CustomCmds {
         return true;
     };
 
-    public static void handle(String prefix, String cmdName, TextContext ctx, MongoGuild guildData, String args) {
+    public static void handle(String prefix, String cmdName, TextContextMongo ctx, MongoGuild guildData, String args) {
         CustomCommand customCommand = getCustomCommand(ctx.getGuild().getId(), cmdName);
         if (customCommand == null) {
             return;
@@ -198,7 +197,7 @@ public class CustomCmds {
     @Subscribe
     public void registry(CommandRegistry cr) {
         cr.registerSlash(Custom.class);
-        cr.register(CustomText.class);
+        cr.register(CustomMongoText.class);
     }
 
     @Description("Add, modify or list custom commands / tags.")
@@ -211,10 +210,10 @@ public class CustomCmds {
             """, usage = "`/custom [sub command]`")
     public static class Custom extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> RatelimitUtils.ratelimit(customRatelimiter, ctx, null);
         }
 
@@ -222,7 +221,7 @@ public class CustomCmds {
         @Description("List all custom commands")
         public static class ListCustom extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 listCustoms(ctx);
             }
         }
@@ -242,7 +241,7 @@ public class CustomCmds {
         )
         public static class View extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 viewCommands(ctx, ctx.getOptionAsString("name"), ctx.getOptionAsInteger("response") - 1);
             }
         }
@@ -260,7 +259,7 @@ public class CustomCmds {
         )
         public static class Raw extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 rawCommand(ctx, ctx.getOptionAsString("name"));
             }
         }
@@ -278,7 +277,7 @@ public class CustomCmds {
         )
         public static class Info extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 infoCommand(ctx, ctx.getOptionAsString("name"));
             }
         }
@@ -298,7 +297,7 @@ public class CustomCmds {
         )
         public static class Rename extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 renameCmd(ctx, ctx.getOptionAsString("name"), ctx.getOptionAsString("new"));
             }
         }
@@ -309,7 +308,7 @@ public class CustomCmds {
         })
         public static class LockCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 lockCmd(ctx, ctx.getOptionAsString("name"));
             }
         }
@@ -320,7 +319,7 @@ public class CustomCmds {
         })
         public static class UnlockCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 unlockCmd(ctx, ctx.getOptionAsString("name"));
             }
         }
@@ -340,7 +339,7 @@ public class CustomCmds {
         )
         public static class DeleteResponse extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 deleteResponseCmd(ctx, ctx.getOptionAsString("name"), ctx.getOptionAsInteger("response"));
             }
         }
@@ -351,7 +350,7 @@ public class CustomCmds {
         })
         public static class Remove extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 removeCmd(ctx, ctx.getOptionAsString("name"));
             }
         }
@@ -362,7 +361,7 @@ public class CustomCmds {
         @Help(description = "Add a custom command. This will open a pop-up. The pop-up will time out in 5 minutes.")
         public static class Add extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 if (!adminPredicate.test(ctx)) {
                     return;
                 }
@@ -550,7 +549,7 @@ public class CustomCmds {
         )
         public static class Edit extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 if (!adminPredicate.test(ctx)) {
                     return;
                 }
@@ -688,7 +687,7 @@ public class CustomCmds {
         @Description("Eval the result of a custom command.")
         public static class Eval extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 ctx.reply("commands.custom.eval.slash_notice", EmoteReference.CORRECT);
             }
         }
@@ -705,31 +704,31 @@ public class CustomCmds {
                     """,
             usage = "`~>custom <sub command>`"
     )
-    public static class CustomText extends TextCommand {
+    public static class CustomMongoText extends MongoTextCommand {
         @Override
-        protected void process(TextContext ctx) {
+        protected void process(TextContextMongo ctx) {
             ctx.sendLocalized("commands.custom.no_subcommand_specified", EmoteReference.ERROR);
         }
 
         @Override
-        public Predicate<TextContext> getPredicate() {
+        public Predicate<TextContextMongo> getPredicate() {
             return ctx -> RatelimitUtils.ratelimit(customRatelimiter, ctx, null);
         }
 
         @Alias("ls")
         @Description("Lists all the current commands on this server.")
-        public static class List extends TextCommand {
+        public static class List extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 listCustoms(ctx);
             }
         }
 
         @Alias("vw")
         @Description("Views the response of an specific command.")
-        public static class View extends TextCommand {
+        public static class View extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var cmd = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.view.not_found").formatted(EmoteReference.ERROR),
@@ -746,9 +745,9 @@ public class CustomCmds {
 
         @Alias("rw")
         @Description("Show all the raw responses of the specified command.")
-        public static class Raw extends TextCommand {
+        public static class Raw extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var cmd = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.raw.no_command").formatted(EmoteReference.ERROR),
@@ -760,17 +759,17 @@ public class CustomCmds {
         }
 
         @Description("Clear all custom commands.")
-        public static class Clear extends TextCommand {
+        public static class Clear extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 clearCommand(ctx);
             }
         }
 
         @Description("Shows the information about an specific custom command.")
-        public static class Info extends TextCommand {
+        public static class Info extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var content = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.raw.no_command").formatted(EmoteReference.ERROR),
@@ -782,9 +781,9 @@ public class CustomCmds {
         }
 
         @Description("Removes a custom command.")
-        public static class Remove extends TextCommand {
+        public static class Remove extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var content = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.remove.no_command").formatted(EmoteReference.ERROR),
@@ -796,25 +795,25 @@ public class CustomCmds {
         }
 
         @Description("Looks a command for further edits until unlocked.")
-        public static class LockCommand extends TextCommand {
+        public static class LockCommandMongo extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 lockCmd(ctx, ctx.getContent());
             }
         }
 
         @Description("Unlocks a command to do further edits.")
-        public static class UnlockCommand extends TextCommand {
+        public static class UnlockCommandMongo extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 unlockCmd(ctx, ctx.getContent());
             }
         }
 
         @Description("Evaluates the result of a custom command.")
-        public static class Eval extends TextCommand {
+        public static class Eval extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 if (!adminPredicate.test(ctx)) {
                     return;
                 }
@@ -846,9 +845,9 @@ public class CustomCmds {
         }
 
         @Description("Edits the response of a command.")
-        public static class Edit extends TextCommand {
+        public static class Edit extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var cmd = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.edit.no_command").formatted(EmoteReference.ERROR),
@@ -866,9 +865,9 @@ public class CustomCmds {
 
         @Alias("new")
         @Description("Adds a new custom commands or adds a response to an existing command.")
-        public static class Add extends TextCommand {
+        public static class Add extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var cmd = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.add.no_command").formatted(EmoteReference.ERROR),
@@ -888,9 +887,9 @@ public class CustomCmds {
 
         @Alias("dlr")
         @Description("Deletes the response of a custom command.")
-        public static class DeleteResponse extends TextCommand {
+        public static class DeleteResponse extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 var lang = ctx.getLanguageContext();
                 var name = ctx.argument(Parsers.string(),
                         lang.get("commands.custom.deleteresponse.no_command").formatted(EmoteReference.ERROR),
@@ -907,9 +906,9 @@ public class CustomCmds {
 
         @Alias("rn")
         @Description("Renames a custom command.")
-        public static class Rename extends TextCommand {
+        public static class Rename extends MongoTextCommand {
             @Override
-            protected void process(TextContext ctx) {
+            protected void process(TextContextMongo ctx) {
                 if (!adminPredicate.test(ctx)) {
                     return;
                 }
@@ -928,8 +927,8 @@ public class CustomCmds {
         }
     }
 
-    private static void listCustoms(IContext ctx) {
-        if (!ctx.getGuild().getSelfMember().hasPermission(ctx.getChannel(), Permission.MESSAGE_EMBED_LINKS) && ctx instanceof TextContext) {
+    private static void listCustoms(IContextMongo ctx) {
+        if (!ctx.getGuild().getSelfMember().hasPermission(ctx.getChannel(), Permission.MESSAGE_EMBED_LINKS) && ctx instanceof TextContextMongo) {
             ctx.sendLocalized("general.missing_embed_permissions");
             return;
         }
@@ -959,7 +958,7 @@ public class CustomCmds {
         );
     }
 
-    private static void viewCommands(IContext ctx, String cmd, int number) {
+    private static void viewCommands(IContextMongo ctx, String cmd, int number) {
         var command = ctx.db().getCustomCommand(ctx.getGuild(), cmd);
         if (command == null) {
             ctx.sendLocalized("commands.custom.view.not_found", EmoteReference.ERROR);
@@ -974,7 +973,7 @@ public class CustomCmds {
         ctx.sendLocalized("commands.custom.view.success", (number + 1), command.getName(), command.getValues().get(number));
     }
 
-    private static void rawCommand(IContext ctx, String command) {
+    private static void rawCommand(IContextMongo ctx, String command) {
         var custom = ctx.db().getCustomCommand(ctx.getGuild(), command);
         if (custom == null) {
             ctx.sendLocalized("commands.custom.not_found", EmoteReference.ERROR2, command);
@@ -1004,7 +1003,7 @@ public class CustomCmds {
         DiscordUtils.sendPaginatedEmbed(ctx.getUtilsContext(), embed, DiscordUtils.divideFields(6, fields));
     }
 
-    private static void infoCommand(IContext ctx, String cmd) {
+    private static void infoCommand(IContextMongo ctx, String cmd) {
         var command = ctx.db().getCustomCommand(ctx.getGuild(), cmd);
         if (command == null) {
             ctx.sendLocalized("commands.custom.raw.not_found", EmoteReference.ERROR);
@@ -1031,7 +1030,7 @@ public class CustomCmds {
         );
     }
 
-    private static void clearCommand(IContext ctx) {
+    private static void clearCommand(IContextMongo ctx) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1078,7 +1077,7 @@ public class CustomCmds {
         });
     }
 
-    public static void renameCmd(IContext ctx, String cmd, String value) {
+    public static void renameCmd(IContextMongo ctx, String cmd, String value) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1126,7 +1125,7 @@ public class CustomCmds {
         TextChannelGround.of(ctx.getChannel()).dropItemWithChance(8, 2);
     }
 
-    public static void lockCmd(IContext ctx, String name) {
+    public static void lockCmd(IContextMongo ctx, String name) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1153,7 +1152,7 @@ public class CustomCmds {
         ctx.sendLocalized("commands.custom.lockcommand.success", EmoteReference.CORRECT, name);
     }
 
-    public static void unlockCmd(IContext ctx, String name) {
+    public static void unlockCmd(IContextMongo ctx, String name) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1185,7 +1184,7 @@ public class CustomCmds {
         ctx.sendLocalized("commands.custom.unlockcommand.success", EmoteReference.CORRECT, name);
     }
 
-    public static void deleteResponseCmd(IContext ctx, String name, int where) {
+    public static void deleteResponseCmd(IContextMongo ctx, String name, int where) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1220,7 +1219,7 @@ public class CustomCmds {
         ctx.sendLocalized("commands.custom.deleteresponse.success", EmoteReference.CORRECT, where, custom.getName());
     }
 
-    public static void removeCmd(IContext ctx, String content) {
+    public static void removeCmd(IContextMongo ctx, String content) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1261,7 +1260,7 @@ public class CustomCmds {
         ctx.sendLocalized("commands.custom.remove.success", EmoteReference.PENCIL, content);
     }
 
-    public static void addCmd(IContext ctx, String name, String content, boolean nsfw) {
+    public static void addCmd(IContextMongo ctx, String name, String content, boolean nsfw) {
         if (!adminPredicate.test(ctx)) {
             return;
         }
@@ -1340,7 +1339,7 @@ public class CustomCmds {
         TextChannelGround.of(ctx.getChannel()).dropItemWithChance(8, 2);
     }
 
-    public static void editCmd(IContext ctx, String name, int where, String commandContent, boolean nsfw) {
+    public static void editCmd(IContextMongo ctx, String name, int where, String commandContent, boolean nsfw) {
         if (!adminPredicate.test(ctx)) {
             return;
         }

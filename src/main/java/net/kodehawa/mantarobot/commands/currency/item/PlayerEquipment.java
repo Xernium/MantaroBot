@@ -23,7 +23,7 @@ import net.kodehawa.mantarobot.commands.currency.item.special.tools.FishRod;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Pickaxe;
 import net.kodehawa.mantarobot.commands.currency.item.special.tools.Wrench;
 import net.kodehawa.mantarobot.data.MantaroData;
-import net.kodehawa.mantarobot.db.entities.MongoUser;
+import net.kodehawa.mantarobot.dbold.entities.MongoUser;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;

@@ -18,7 +18,7 @@
 package net.kodehawa.mantarobot.utils.commands.ratelimit;
 
 import net.dv8tion.jda.api.entities.User;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.i18n.I18nContext;
 import net.kodehawa.mantarobot.data.Config;
 import net.kodehawa.mantarobot.data.MantaroData;
@@ -111,36 +111,36 @@ public class RatelimitUtils {
     }
 
     // Overloads
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx) {
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), ctx.getLanguageContext(), null, false);
     }
 
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx, I18nContext languageContext) {
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx, I18nContext languageContext) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), languageContext, null, false);
     }
 
     @SuppressWarnings("unused")
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx,
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx,
                                     I18nContext languageContext, String extra) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), languageContext, extra, false);
     }
 
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx, boolean spamAware) {
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx, boolean spamAware) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), ctx.getLanguageContext(), null, spamAware);
     }
 
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx, String extra, boolean spamAware) {
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx, String extra, boolean spamAware) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), ctx.getLanguageContext(), extra, spamAware);
     }
 
     @SuppressWarnings("unused")
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx,
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx,
                                     I18nContext languageContext, boolean spamAware) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), languageContext, null, spamAware);
     }
 
     @SuppressWarnings("unused")
-    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContext ctx,
+    public static boolean ratelimit(IncreasingRateLimiter rateLimiter, IContextMongo ctx,
                                     I18nContext languageContext, String extra, boolean spamAware) {
         return ratelimit(rateLimiter, ctx.getAuthor().getId(), ctx.ratelimitContext(), languageContext, extra, spamAware);
     }

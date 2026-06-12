@@ -32,9 +32,9 @@ import net.kodehawa.mantarobot.core.command.meta.Description;
 import net.kodehawa.mantarobot.core.command.meta.Help;
 import net.kodehawa.mantarobot.core.command.meta.Name;
 import net.kodehawa.mantarobot.core.command.meta.Options;
-import net.kodehawa.mantarobot.core.command.helpers.IContext;
+import net.kodehawa.mantarobot.core.command.helpers.IContextMongo;
 import net.kodehawa.mantarobot.core.command.slash.SlashCommand;
-import net.kodehawa.mantarobot.core.command.slash.SlashContext;
+import net.kodehawa.mantarobot.core.command.slash.SlashContextMongo;
 import net.kodehawa.mantarobot.core.command.meta.Module;
 import net.kodehawa.mantarobot.core.command.helpers.CommandCategory;
 import net.kodehawa.mantarobot.core.command.helpers.CommandPermission;
@@ -80,7 +80,7 @@ public class MiscCmds {
     )
     public static class IAm extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) {}
+        protected void process(SlashContextMongo ctx) {}
 
         @Name("add")
         @Description("Get an autorole assigned to you.")
@@ -89,7 +89,7 @@ public class MiscCmds {
         })
         public static class Add extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 iamFunction(ctx.getOptionAsString("role"), ctx);
             }
         }
@@ -101,7 +101,7 @@ public class MiscCmds {
         })
         public static class Not extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 iamnotFunction(ctx.getOptionAsString("role"), ctx);
             }
         }
@@ -110,7 +110,7 @@ public class MiscCmds {
         @Description("List all autoroles.")
         public static class ListAll extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 List<MessageEmbed.Field> fields = new LinkedList<>();
                 var dbGuild = ctx.getDBGuild();
                 var languageContext = ctx.getLanguageContext();
@@ -217,7 +217,7 @@ public class MiscCmds {
         );
 
         @Override
-        protected void process(SlashContext ctx) {
+        protected void process(SlashContextMongo ctx) {
             ctx.reply("\uD83D\uDCAC " + answers.get(rand.nextInt(answers.size())));
         }
     }
@@ -227,10 +227,10 @@ public class MiscCmds {
     @Category(CommandCategory.UTILS)
     public static class PollCommand extends SlashCommand {
         @Override
-        protected void process(SlashContext ctx) { }
+        protected void process(SlashContextMongo ctx) { }
 
         @Override
-        public Predicate<SlashContext> getPredicate() {
+        public Predicate<SlashContextMongo> getPredicate() {
             return ctx -> {
                 // We should also add some kind of configurable role, probably.
                 if (!CommandPermission.ADMIN.test(ctx.getMember())) {
@@ -267,7 +267,7 @@ public class MiscCmds {
         })
         public static class CreatePoll extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 if (!ctx.getGuild().getSelfMember().hasPermission(ctx.getChannel(), Permission.MESSAGE_ADD_REACTION)) {
                     ctx.replyEphemeral("commands.poll.no_reaction_perms", EmoteReference.ERROR);
                     return;
@@ -348,7 +348,7 @@ public class MiscCmds {
         @Description("List running polls.")
         public static class ListCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var guildData = ctx.getDBGuild();
                 var polls = guildData.getRunningPolls();
                 if (polls.isEmpty()) {
@@ -387,7 +387,7 @@ public class MiscCmds {
         @Description("Cancels a poll.")
         public static class CancelCommand extends SlashCommand {
             @Override
-            protected void process(SlashContext ctx) {
+            protected void process(SlashContextMongo ctx) {
                 var dbGuild = ctx.getDBGuild();
                 try {
                     var polls = dbGuild.getRunningPolls();
@@ -425,7 +425,7 @@ public class MiscCmds {
         }
     }
 
-    public static void iamFunction(String autoroleName, IContext ctx, String message) {
+    public static void iamFunction(String autoroleName, IContextMongo ctx, String message) {
         var dbGuild = ctx.db().getGuild(ctx.getGuild());
         var autoroles = dbGuild.getAutoroles();
 
@@ -467,7 +467,7 @@ public class MiscCmds {
         }
     }
 
-    public static void iamnotFunction(String autoroleName, IContext ctx, String message) {
+    public static void iamnotFunction(String autoroleName, IContextMongo ctx, String message) {
         var dbGuild = ctx.db().getGuild(ctx.getGuild());
         var autoroles = dbGuild.getAutoroles();
 
@@ -499,11 +499,11 @@ public class MiscCmds {
         }
     }
 
-    public static void iamFunction(String autoroleName, IContext ctx) {
+    public static void iamFunction(String autoroleName, IContextMongo ctx) {
         iamFunction(autoroleName, ctx, null);
     }
 
-    public static void iamnotFunction(String autoroleName, IContext ctx) {
+    public static void iamnotFunction(String autoroleName, IContextMongo ctx) {
         iamnotFunction(autoroleName, ctx, null);
     }
 }
