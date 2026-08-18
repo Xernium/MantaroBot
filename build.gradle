@@ -56,7 +56,7 @@ dependencies {
     implementation 'org.java-websocket:Java-WebSocket:1.6.0'
 
     // Database
-    implementation 'org.mongodb:mongodb-driver-sync:5.8.0'
+    implementation 'org.mongodb:mongodb-driver-sync:5.10.0'
     implementation 'io.valkey:valkey-java:5.5.0'
 
     // Utilities
